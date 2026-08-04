@@ -8,10 +8,10 @@
 <aside id="sidebar" class="w-[280px] bg-white border-r border-gray-100 shrink-0 flex flex-col h-screen sticky top-0">
 
     <div class="flex items-center gap-3 px-6 py-6 shrink-0">
-        <div class="w-10 h-10 rounded-xl bg-[var(--brand-600)] text-white flex items-center justify-center text-lg">
+        {{-- <div class="w-10 h-10 rounded-xl bg-[var(--brand-600)] text-white flex items-center justify-center text-lg">
             <i class="fa-solid fa-cash-register"></i>
-        </div>
-        <h1 class="text-xl font-extrabold tracking-tight text-[var(--ink-900)]">PointDash</h1>
+        </div> --}}
+        <h1 class="text-xl font-extrabold tracking-tight text-[var(--ink-900)]">TunasTaniMakmur</h1>
     </div>
 
     <label class="relative block px-4 mb-2 shrink-0">
@@ -190,11 +190,11 @@
 
     </nav>
 
-    <div class="mx-4 my-4 p-4 rounded-2xl bg-[var(--surface)] shrink-0">
+    {{-- <div class="mx-4 my-4 p-4 rounded-2xl bg-[var(--surface)] shrink-0">
         <p class="text-xs font-semibold text-[var(--ink-900)]">Shift status</p>
         <p class="text-xs text-[var(--ink-400)] mt-1">Register #2 &middot; Open since 9:00 AM</p>
         <button class="mt-3 w-full text-xs font-semibold bg-white border border-gray-200 rounded-xl py-2 text-[var(--ink-700)] hover:border-[var(--brand-600)] hover:text-[var(--brand-600)] transition-colors">
             Close shift
         </button>
-    </div>
+    </div> --}}
 </aside>

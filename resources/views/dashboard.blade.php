@@ -51,6 +51,54 @@
         </div>
     </div>
 
+    {{-- Finance & open orders --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mt-6">
+
+        <div class="stat-card p-6">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">RECEIVABLES OUTSTANDING</p>
+                <div class="w-9 h-9 rounded-xl bg-[var(--good-100)] text-[var(--good-600)] flex items-center justify-center">
+                    <i class="fa-solid fa-hand-holding-dollar text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">${{ number_format($receivablesOutstanding, 2) }}</p>
+            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">Sales not yet paid by customers</p>
+        </div>
+
+        <div class="stat-card p-6">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">PAYABLES OUTSTANDING</p>
+                <div class="w-9 h-9 rounded-xl bg-[var(--bad-100)] text-[var(--bad-600)] flex items-center justify-center">
+                    <i class="fa-solid fa-money-check-dollar text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">${{ number_format($payablesOutstanding, 2) }}</p>
+            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">Purchases not yet paid to suppliers</p>
+        </div>
+
+        <div class="stat-card p-6">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">PENDING SALES ORDERS</p>
+                <div class="w-9 h-9 rounded-xl bg-[var(--brand-100)] text-[var(--brand-600)] flex items-center justify-center">
+                    <i class="fa-solid fa-cart-shopping text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ $pendingSalesOrders }}</p>
+            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">Awaiting fulfillment</p>
+        </div>
+
+        <div class="stat-card p-6">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">PENDING PURCHASE ORDERS</p>
+                <div class="w-9 h-9 rounded-xl bg-[var(--warn-100)] text-[var(--warn-600)] flex items-center justify-center">
+                    <i class="fa-solid fa-truck-ramp-box text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ $pendingPurchaseOrders }}</p>
+            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">Awaiting delivery/receipt</p>
+        </div>
+    </div>
+
     {{-- Chart + top products --}}
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-6">
 
@@ -101,6 +149,54 @@
                     </div>
                 @empty
                     <p class="text-sm text-[var(--ink-400)] py-6 text-center">No sales recorded yet today.</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+    {{-- Low stock + top customers --}}
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+
+        <div class="bg-white rounded-3xl p-6">
+            <h3 class="font-semibold text-lg text-[var(--ink-900)]">Low Stock Products</h3>
+            <p class="text-xs text-[var(--ink-400)] mt-0.5">Balance below reorder threshold</p>
+
+            <div class="mt-5 space-y-1">
+                @forelse($lowStockProducts as $product)
+                    <div class="product-row flex items-center gap-3 p-2 rounded-xl">
+                        <div class="w-10 h-10 rounded-xl bg-[var(--bad-100)] text-[var(--bad-600)] flex items-center justify-center">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-[var(--ink-900)] truncate">{{ $product->name }}</p>
+                            <p class="text-xs text-[var(--ink-400)]">{{ $product->code }}</p>
+                        </div>
+                        <span class="chip bg-[var(--bad-100)] text-[var(--bad-600)]">{{ (int) $product->balance }} left</span>
+                    </div>
+                @empty
+                    <p class="text-sm text-[var(--ink-400)] py-6 text-center">All products are well stocked.</p>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6">
+            <h3 class="font-semibold text-lg text-[var(--ink-900)]">Top Customers</h3>
+            <p class="text-xs text-[var(--ink-400)] mt-0.5">By total revenue, all time</p>
+
+            <div class="mt-5 space-y-1">
+                @forelse($topCustomers as $customer)
+                    <div class="product-row flex items-center gap-3 p-2 rounded-xl">
+                        <div class="w-10 h-10 rounded-xl bg-[var(--brand-100)] text-[var(--brand-600)] flex items-center justify-center">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-[var(--ink-900)] truncate">{{ $customer->name }}</p>
+                            <p class="text-xs text-[var(--ink-400)]">{{ $customer->orders }} orders</p>
+                        </div>
+                        <span class="text-sm font-semibold text-[var(--ink-900)]">${{ number_format($customer->total, 2) }}</span>
+                    </div>
+                @empty
+                    <p class="text-sm text-[var(--ink-400)] py-6 text-center">No sales recorded yet.</p>
                 @endforelse
             </div>
         </div>

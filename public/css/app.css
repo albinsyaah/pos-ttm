@@ -20,7 +20,7 @@
 *{ box-sizing:border-box; }
 
 body{
-  font-family:'Inter',sans-serif;
+  font-family:'Poppins',sans-serif;
   background:var(--surface);
   color:var(--ink-900);
   -webkit-font-smoothing:antialiased;

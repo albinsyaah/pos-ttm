@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ArPayment;
+use App\Models\ApPayment;
 use App\Models\InventoryLedger;
-use App\Models\Product;
+use App\Models\Purchase;
+use App\Models\PurchaseOrder;
 use App\Models\Sale;
 use App\Models\SaleDetail;
+use App\Models\SalesOrder;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -25,10 +29,20 @@ class DashboardController extends Controller
         $todaySales = Sale::whereDate('sale_date', $today)->sum('total_amount');
         $ordersToday = Sale::whereDate('sale_date', $today)->count();
         $avgOrderValue = $ordersToday > 0 ? $todaySales / $ordersToday : 0;
-        $lowStockCount = $this->lowStockCount();
+
+        $lowStockProducts = $this->lowStockProducts();
+        $lowStockCount = $lowStockProducts->count();
+
+        $receivablesOutstanding = Sale::sum('total_amount') - ArPayment::sum('amount');
+        $payablesOutstanding = Purchase::sum('total_amount') - ApPayment::sum('amount');
+
+        // "Pending" = raised but not yet fulfilled by an actual sale/purchase.
+        $pendingSalesOrders = SalesOrder::whereDoesntHave('sales')->count();
+        $pendingPurchaseOrders = PurchaseOrder::whereDoesntHave('purchases')->count();
 
         $days = $this->weeklySalesChart($today);
         $topProducts = $this->topProducts($today);
+        $topCustomers = $this->topCustomers();
         $orders = $this->recentOrders();
 
         return view('dashboard', [
@@ -36,29 +50,37 @@ class DashboardController extends Controller
             'ordersToday' => $ordersToday,
             'avgOrderValue' => $avgOrderValue,
             'lowStockCount' => $lowStockCount,
+            'lowStockProducts' => $lowStockProducts,
+            'receivablesOutstanding' => max(0, $receivablesOutstanding),
+            'payablesOutstanding' => max(0, $payablesOutstanding),
+            'pendingSalesOrders' => $pendingSalesOrders,
+            'pendingPurchaseOrders' => $pendingPurchaseOrders,
             'days' => $days,
             'topProducts' => $topProducts,
+            'topCustomers' => $topCustomers,
             'orders' => $orders,
         ]);
     }
 
     /**
-     * Count of products whose latest inventory ledger balance is below
-     * the low-stock threshold (summed across all warehouses).
+     * Products whose latest inventory ledger balance (summed across
+     * warehouses) is below the low-stock threshold, lowest first.
      */
-    protected function lowStockCount(): int
+    protected function lowStockProducts()
     {
         $latestPerProductWarehouse = InventoryLedger::select('product_id', 'warehouse_id', DB::raw('MAX(id) as last_id'))
             ->groupBy('product_id', 'warehouse_id');
 
-        $balances = InventoryLedger::joinSub($latestPerProductWarehouse, 'latest', function ($join) {
+        return InventoryLedger::joinSub($latestPerProductWarehouse, 'latest', function ($join) {
                 $join->on('inventory_ledgers.id', '=', 'latest.last_id');
             })
-            ->select('inventory_ledgers.product_id', DB::raw('SUM(inventory_ledgers.balance) as total_balance'))
-            ->groupBy('inventory_ledgers.product_id')
+            ->join('products', 'products.id', '=', 'inventory_ledgers.product_id')
+            ->select('products.id', 'products.name', 'products.code', DB::raw('SUM(inventory_ledgers.balance) as balance'))
+            ->groupBy('products.id', 'products.name', 'products.code')
+            ->having('balance', '<', $this->lowStockThreshold)
+            ->orderBy('balance')
+            ->limit(8)
             ->get();
-
-        return $balances->filter(fn ($row) => $row->total_balance < $this->lowStockThreshold)->count();
     }
 
     /**
@@ -121,6 +143,20 @@ class DashboardController extends Controller
                 ];
             })
             ->all();
+    }
+
+    /**
+     * Top 5 customers by total revenue (all time).
+     */
+    protected function topCustomers()
+    {
+        return Sale::query()
+            ->join('customers', 'customers.id', '=', 'sales.customer_id')
+            ->selectRaw('customers.id, customers.name, customers.code, COUNT(sales.id) as orders, SUM(sales.total_amount) as total')
+            ->groupBy('customers.id', 'customers.name', 'customers.code')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
     }
 
     /**
