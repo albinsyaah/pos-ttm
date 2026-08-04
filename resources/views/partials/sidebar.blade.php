@@ -29,7 +29,9 @@
             <i class="fa-solid fa-grip w-4 text-center"></i> Dashboard
         </a>
 
-        <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+        <a href="{{ \Illuminate\Support\Facades\Route::has('customers.index') ? route('customers.index') : '#' }}"
+           class="sidebar-item {{ request()->routeIs('customers.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+           @if(request()->routeIs('customers.*')) aria-current="page" @endif>
             <i class="fa-solid fa-users w-4 text-center"></i> Customer
         </a>
 

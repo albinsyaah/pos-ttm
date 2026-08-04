@@ -1,0 +1,189 @@
+@extends('layouts.app')
+
+@section('title', 'Customers')
+@section('page-title', 'Customers')
+
+@section('content')
+
+    <div class="flex items-center justify-between flex-wrap gap-4">
+        <form action="{{ route('customers.index') }}" method="GET" class="relative">
+            <label class="sr-only" for="customerSearch">Search customers</label>
+            <input
+                id="customerSearch"
+                name="q"
+                type="search"
+                value="{{ $search }}"
+                placeholder="Search by name, code or phone"
+                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
+            />
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
+        </form>
+
+        <button
+            id="addCustomerBtn"
+            type="button"
+            data-action="{{ route('customers.store') }}"
+            class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors"
+        >
+            <i class="fa-solid fa-plus"></i> Add Customer
+        </button>
+    </div>
+
+    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+        <table class="w-full text-sm min-w-[680px]">
+            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+                <tr class="text-left border-b border-gray-100">
+                    <th class="p-5 font-semibold">Code</th>
+                    <th class="font-semibold">Name</th>
+                    <th class="font-semibold">Phone</th>
+                    <th class="font-semibold">Address</th>
+                    <th class="font-semibold text-right pr-5">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($customers as $customer)
+                    <tr class="table-row border-b border-gray-50">
+                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $customer->code }}</td>
+                        <td class="text-[var(--ink-700)]">{{ $customer->name }}</td>
+                        <td class="text-[var(--ink-400)]">{{ $customer->phone ?: '—' }}</td>
+                        <td class="text-[var(--ink-400)] max-w-xs truncate">{{ $customer->address ?: '—' }}</td>
+                        <td class="text-right pr-5">
+                            <div class="inline-flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    class="edit-customer-btn icon-btn"
+                                    aria-label="Edit {{ $customer->name }}"
+                                    data-action="{{ route('customers.update', $customer) }}"
+                                    data-code="{{ $customer->code }}"
+                                    data-name="{{ $customer->name }}"
+                                    data-phone="{{ $customer->phone }}"
+                                    data-address="{{ $customer->address }}"
+                                >
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="delete-customer-btn icon-btn"
+                                    aria-label="Delete {{ $customer->name }}"
+                                    data-action="{{ route('customers.destroy', $customer) }}"
+                                    data-name="{{ $customer->name }}"
+                                >
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                            <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
+                            No customers found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-6">
+        {{ $customers->links() }}
+    </div>
+
+    {{-- Add / Edit modal --}}
+    <div id="customerModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="customerModalTitle">
+        <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-md">
+            <div class="flex items-center justify-between mb-5">
+                <h3 id="customerModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">Add Customer</h3>
+                <button type="button" class="icon-btn modal-close" aria-label="Close">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <form id="customerForm" method="POST" action="{{ route('customers.store') }}">
+                @csrf
+                <div id="customerFormMethod"></div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="code" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Code</label>
+                        <input id="code" name="code" type="text" required maxlength="50"
+                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                    </div>
+                    <div>
+                        <label for="name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Name</label>
+                        <input id="name" name="name" type="text" required maxlength="150"
+                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Phone</label>
+                        <input id="phone" name="phone" type="text" maxlength="30"
+                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                    </div>
+                    <div>
+                        <label for="address" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Address</label>
+                        <textarea id="address" name="address" rows="3" maxlength="500"
+                                  class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"></textarea>
+                    </div>
+                </div>
+
+                @if ($errors->any())
+                    <div class="mt-4 text-xs text-[var(--bad-600)] space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
+
+                <div class="flex items-center justify-end gap-3 mt-6">
+                    <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">Cancel</button>
+                    <button type="submit" class="bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Delete confirmation modal --}}
+    <div id="deleteModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+        <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-sm">
+            <div class="w-12 h-12 rounded-2xl bg-[var(--bad-100)] text-[var(--bad-600)] flex items-center justify-center mb-4">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="deleteModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">Delete customer?</h3>
+            <p id="deleteModalText" class="text-sm text-[var(--ink-400)] mt-1.5">This action cannot be undone.</p>
+
+            <form id="deleteForm" method="POST" class="mt-6 flex items-center justify-end gap-3">
+                @csrf
+                @method('DELETE')
+                <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">Cancel</button>
+                <button type="submit" class="bg-[var(--bad-600)] hover:opacity-90 text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">Delete</button>
+            </form>
+        </div>
+    </div>
+
+@endsection
+
+@push('styles')
+    <style>
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 33, 56, .45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            z-index: 50;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-card { box-shadow: 0 24px 48px -16px rgba(26,33,56,.35); }
+    </style>
+@endpush
+
+@push('scripts')
+    <script>
+        @if(session('success'))
+            document.addEventListener('DOMContentLoaded', () => showToast(@json(session('success'))));
+        @endif
+    </script>
+    <script src="{{ asset('js/customers.js') }}"></script>
+@endpush
