@@ -1,0 +1,131 @@
+:root{
+  --ink-900:#1a2138;
+  --ink-700:#4a5578;
+  --ink-400:#8891ab;
+  --ink-200:#e4e8f2;
+  --surface:#f6f7fb;
+  --card:#ffffff;
+  --brand-600:#3b4cf6;
+  --brand-700:#2f3ce0;
+  --brand-100:#e8eaff;
+  --good-600:#12b76a;
+  --good-100:#e3faf0;
+  --bad-600:#f04438;
+  --bad-100:#feeceb;
+  --warn-600:#f79009;
+  --warn-100:#fef2df;
+  --focus:#3b4cf6;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--surface);
+  color:var(--ink-900);
+  -webkit-font-smoothing:antialiased;
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+::selection{ background:var(--brand-100); color:var(--brand-700); }
+
+/* Sidebar items */
+.sidebar-item{
+  position:relative;
+  transition: color .15s ease, background-color .15s ease;
+  border-radius: 12px;
+}
+.sidebar-item:hover{ color:var(--brand-600); background:var(--brand-100); }
+.sidebar-item.active{
+  color:var(--brand-700);
+  background:var(--brand-100);
+  font-weight:600;
+}
+
+/* Sidebar accordion */
+#mainNav{ scrollbar-width: thin; scrollbar-color: var(--ink-200) transparent; }
+#mainNav::-webkit-scrollbar{ width:6px; }
+#mainNav::-webkit-scrollbar-thumb{ background:var(--ink-200); border-radius:999px; }
+
+.nav-toggle{ cursor:pointer; background:none; border:none; font: inherit; text-align:left; }
+.nav-chevron{ transition: transform .18s ease; color:var(--ink-400); }
+.nav-toggle[aria-expanded="true"] .nav-chevron{ transform: rotate(90deg); color:var(--brand-600); }
+
+.nav-panel{ display:none; }
+.nav-group.open > .nav-panel{ display:block; }
+
+.sidebar-item.sub{ font-size:.8125rem; }
+.sidebar-item.sub2{ font-size:.75rem; color:var(--ink-400); }
+.sidebar-item.sub2:hover{ color:var(--brand-600); }
+
+.nav-hidden{ display:none !important; }
+
+/* Stat cards */
+.stat-card{
+  background:var(--card);
+  border-radius:24px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.stat-card:hover{ transform: translateY(-2px); box-shadow: 0 16px 32px -18px rgba(26,33,56,.18); }
+
+.card-gradient{
+  background: linear-gradient(135deg, #3b4cf6 0%, #6c4cf6 100%);
+  box-shadow: 0 20px 40px -12px rgba(59,76,246,.45);
+}
+
+/* Table */
+.table-row{ transition: background-color .12s ease; }
+.table-row:hover{ background:#fafbff; }
+
+.chip{
+  padding:.35rem 1rem;
+  border-radius:999px;
+  font-weight:600;
+  font-size:.75rem;
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+}
+.chip-dot{ width:6px; height:6px; border-radius:999px; }
+
+.filter-tab{ transition: all .15s ease; }
+
+.icon-btn{
+  width:2.75rem; height:2.75rem;
+  border-radius:999px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--ink-200);
+  color:var(--ink-700);
+  transition: background-color .15s ease, transform .1s ease;
+}
+.icon-btn:hover{ background:var(--brand-100); color:var(--brand-600); }
+.icon-btn:active{ transform: scale(0.95); }
+
+.bar{
+  transition: transform .2s ease, background-color .2s ease;
+  transform-origin:bottom;
+}
+.bar:hover{ transform: scaleY(1.04); }
+
+.product-row{ transition: background-color .12s ease; }
+.product-row:hover{ background: var(--surface); }
+
+/* Toasts */
+.toast{ animation: toast-in .25s ease forwards; }
+@keyframes toast-in{
+  from{ opacity:0; transform: translateY(8px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+@media (max-width: 1024px){
+  #sidebar{ display:none; }
+}

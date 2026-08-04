@@ -1,0 +1,11 @@
+{
+    "agents": [
+        "cursor",
+        "claude_code",
+        "factory"
+    ],
+    "cloud": false,
+    "mcp": true,
+    "nightwatch": false,
+    "sail": false
+}
