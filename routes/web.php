@@ -10,11 +10,18 @@ use App\Http\Controllers\Inventory\BrandController;
 use App\Http\Controllers\Inventory\ItemTypeController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\ProductGroupController;
+use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
+
+// Language switch: available to guests (e.g. on the login page) and to
+// signed-in users alike, so it isn't nested inside the auth group below.
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])
+    ->whereIn('locale', ['en', 'id'])
+    ->name('language.switch');
 
 // Guest-only auth routes
 Route::middleware('guest')->group(function () {

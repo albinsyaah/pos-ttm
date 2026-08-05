@@ -40,6 +40,17 @@ userMenuBtn?.addEventListener('click', (e) => {
   userMenuBtn.setAttribute('aria-expanded', String(!isOpen));
 });
 
+// Language switcher dropdown (navbar)
+const langMenuBtn = document.getElementById('langMenuBtn');
+const langMenu = document.getElementById('langMenu');
+
+langMenuBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isOpen = !langMenu.classList.contains('hidden');
+  langMenu.classList.toggle('hidden', isOpen);
+  langMenuBtn.setAttribute('aria-expanded', String(!isOpen));
+});
+
 document.addEventListener('click', (e) => {
   if (!userMenu || userMenu.classList.contains('hidden')) return;
   if (!userMenu.contains(e.target) && e.target !== userMenuBtn) {
@@ -48,9 +59,21 @@ document.addEventListener('click', (e) => {
   }
 });
 
+document.addEventListener('click', (e) => {
+  if (!langMenu || langMenu.classList.contains('hidden')) return;
+  if (!langMenu.contains(e.target) && e.target !== langMenuBtn) {
+    langMenu.classList.add('hidden');
+    langMenuBtn?.setAttribute('aria-expanded', 'false');
+  }
+});
+
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && userMenu && !userMenu.classList.contains('hidden')) {
     userMenu.classList.add('hidden');
     userMenuBtn?.setAttribute('aria-expanded', 'false');
+  }
+  if (e.key === 'Escape' && langMenu && !langMenu.classList.contains('hidden')) {
+    langMenu.classList.add('hidden');
+    langMenuBtn?.setAttribute('aria-expanded', 'false');
   }
 });

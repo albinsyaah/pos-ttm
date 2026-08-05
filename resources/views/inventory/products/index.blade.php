@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Barang')
-@section('page-title', 'Barang')
+@section('title', __('app.products.title'))
+@section('page-title', __('app.products.title'))
 
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
         <form action="{{ route('inventory.products.index') }}" method="GET" class="relative">
-            <label class="sr-only" for="productSearch">Search products</label>
+            <label class="sr-only" for="productSearch">{{ __('app.products.search_products') }}</label>
             <input
                 id="productSearch"
                 name="q"
                 type="search"
                 value="{{ $search }}"
-                placeholder="Search by code or name"
+                placeholder="{{ __('app.products.search_placeholder') }}"
                 class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
             />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
@@ -26,7 +26,7 @@
                 data-action="{{ route('inventory.products.store') }}"
                 class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors"
             >
-                <i class="fa-solid fa-plus"></i> Add Barang
+                <i class="fa-solid fa-plus"></i> {{ __('app.products.add_product') }}
             </button>
         @endcan
     </div>
@@ -35,12 +35,12 @@
         <table class="w-full text-sm min-w-[820px]">
             <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">Code</th>
-                    <th class="font-semibold">Name</th>
-                    <th class="font-semibold">Merk</th>
-                    <th class="font-semibold">Jenis Barang</th>
-                    <th class="font-semibold">Grup Produk</th>
-                    <th class="font-semibold text-right pr-5">Actions</th>
+                    <th class="p-5 font-semibold">{{ __('app.common.code') }}</th>
+                    <th class="font-semibold">{{ __('app.common.name') }}</th>
+                    <th class="font-semibold">{{ __('app.products.brand') }}</th>
+                    <th class="font-semibold">{{ __('app.products.item_type') }}</th>
+                    <th class="font-semibold">{{ __('app.products.product_group') }}</th>
+                    <th class="font-semibold text-right pr-5">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -84,7 +84,7 @@
                     <tr>
                         <td colspan="6" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
-                            No products found.
+                            {{ __('app.products.no_products_found') }}
                         </td>
                     </tr>
                 @endforelse
@@ -100,7 +100,7 @@
     <div id="productModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
         <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-md">
             <div class="flex items-center justify-between mb-5">
-                <h3 id="productModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">Add Barang</h3>
+                <h3 id="productModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">{{ __('app.products.add_product') }}</h3>
                 <button type="button" class="icon-btn modal-close" aria-label="Close">
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
@@ -112,27 +112,27 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label for="code" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Code</label>
+                        <label for="code" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.code') }}</label>
                         <input id="code" name="code" type="text" required maxlength="50"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
-                        <label for="name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Name</label>
+                        <label for="name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.name') }}</label>
                         <input id="name" name="name" type="text" required maxlength="150"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
-                        <label for="brand_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Merk</label>
+                        <label for="brand_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.brand') }}</label>
                         <select id="brand_id" name="brand_id"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
-                            <option value="">— None —</option>
+                            <option value="">{{ __('app.common.none') }}</option>
                             @foreach($brands as $brand)
                                 <option value="{{ $brand->id }}">{{ $brand->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label for="item_type_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Jenis Barang</label>
+                        <label for="item_type_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.item_type') }}</label>
                         <select id="item_type_id" name="item_type_id"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                             <option value="">— None —</option>
@@ -142,7 +142,7 @@
                         </select>
                     </div>
                     <div>
-                        <label for="product_group_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Grup Produk</label>
+                        <label for="product_group_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.product_group') }}</label>
                         <select id="product_group_id" name="product_group_id"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                             <option value="">— None —</option>
@@ -162,8 +162,8 @@
                 @endif
 
                 <div class="flex items-center justify-end gap-3 mt-6">
-                    <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">Cancel</button>
-                    <button type="submit" class="bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">Save</button>
+                    <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">{{ __('app.common.cancel') }}</button>
+                    <button type="submit" class="bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">{{ __('app.common.save') }}</button>
                 </div>
             </form>
         </div>
@@ -175,14 +175,14 @@
             <div class="w-12 h-12 rounded-2xl bg-[var(--bad-100)] text-[var(--bad-600)] flex items-center justify-center mb-4">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h3 id="deleteModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">Delete barang?</h3>
-            <p id="deleteModalText" class="text-sm text-[var(--ink-400)] mt-1.5">This action cannot be undone.</p>
+            <h3 id="deleteModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">{{ __('app.products.delete_product') }}</h3>
+            <p id="deleteModalText" class="text-sm text-[var(--ink-400)] mt-1.5">{{ __('app.common.this_action_cannot_be_undone') }}</p>
 
             <form id="deleteForm" method="POST" class="mt-6 flex items-center justify-end gap-3">
                 @csrf
                 @method('DELETE')
-                <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">Cancel</button>
-                <button type="submit" class="bg-[var(--bad-600)] hover:opacity-90 text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">Delete</button>
+                <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">{{ __('app.common.cancel') }}</button>
+                <button type="submit" class="bg-[var(--bad-600)] hover:opacity-90 text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">{{ __('app.common.delete') }}</button>
             </form>
         </div>
     </div>

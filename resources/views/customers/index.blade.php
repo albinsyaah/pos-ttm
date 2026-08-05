@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Customers')
-@section('page-title', 'Customers')
+@section('title', __('app.customers.title'))
+@section('page-title', __('app.customers.title'))
 
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
         <form action="{{ route('customers.index') }}" method="GET" class="relative">
-            <label class="sr-only" for="customerSearch">Search customers</label>
+            <label class="sr-only" for="customerSearch">{{ __('app.customers.search_customers') }}</label>
             <input
                 id="customerSearch"
                 name="q"
                 type="search"
                 value="{{ $search }}"
-                placeholder="Search by name, code or phone"
+                placeholder="{{ __('app.customers.search_placeholder') }}"
                 class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
             />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
@@ -25,7 +25,7 @@
             data-action="{{ route('customers.store') }}"
             class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors"
         >
-            <i class="fa-solid fa-plus"></i> Add Customer
+            <i class="fa-solid fa-plus"></i> {{ __('app.customers.add_customer') }}
         </button>
     </div>
 
@@ -33,11 +33,11 @@
         <table class="w-full text-sm min-w-[680px]">
             <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">Code</th>
-                    <th class="font-semibold">Name</th>
-                    <th class="font-semibold">Phone</th>
-                    <th class="font-semibold">Address</th>
-                    <th class="font-semibold text-right pr-5">Actions</th>
+                    <th class="p-5 font-semibold">{{ __('app.common.code') }}</th>
+                    <th class="font-semibold">{{ __('app.common.name') }}</th>
+                    <th class="font-semibold">{{ __('app.common.phone') }}</th>
+                    <th class="font-semibold">{{ __('app.common.address') }}</th>
+                    <th class="font-semibold text-right pr-5">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,7 +77,7 @@
                     <tr>
                         <td colspan="5" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
-                            No customers found.
+                            {{ __('app.customers.no_customers_found') }}
                         </td>
                     </tr>
                 @endforelse
@@ -93,7 +93,7 @@
     <div id="customerModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="customerModalTitle">
         <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-md">
             <div class="flex items-center justify-between mb-5">
-                <h3 id="customerModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">Add Customer</h3>
+                <h3 id="customerModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">{{ __('app.customers.add_customer') }}</h3>
                 <button type="button" class="icon-btn modal-close" aria-label="Close">
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
@@ -105,22 +105,22 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label for="code" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Code</label>
+                        <label for="code" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.code') }}</label>
                         <input id="code" name="code" type="text" required maxlength="50"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
-                        <label for="name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Name</label>
+                        <label for="name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.name') }}</label>
                         <input id="name" name="name" type="text" required maxlength="150"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
-                        <label for="phone" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Phone</label>
+                        <label for="phone" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.phone') }}</label>
                         <input id="phone" name="phone" type="text" maxlength="30"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
-                        <label for="address" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">Address</label>
+                        <label for="address" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.address') }}</label>
                         <textarea id="address" name="address" rows="3" maxlength="500"
                                   class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"></textarea>
                     </div>
@@ -135,8 +135,8 @@
                 @endif
 
                 <div class="flex items-center justify-end gap-3 mt-6">
-                    <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">Cancel</button>
-                    <button type="submit" class="bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">Save</button>
+                    <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">{{ __('app.common.cancel') }}</button>
+                    <button type="submit" class="bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">{{ __('app.common.save') }}</button>
                 </div>
             </form>
         </div>
@@ -148,14 +148,14 @@
             <div class="w-12 h-12 rounded-2xl bg-[var(--bad-100)] text-[var(--bad-600)] flex items-center justify-center mb-4">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h3 id="deleteModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">Delete customer?</h3>
-            <p id="deleteModalText" class="text-sm text-[var(--ink-400)] mt-1.5">This action cannot be undone.</p>
+            <h3 id="deleteModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">{{ __('app.customers.delete_customer') }}</h3>
+            <p id="deleteModalText" class="text-sm text-[var(--ink-400)] mt-1.5">{{ __('app.common.this_action_cannot_be_undone') }}</p>
 
             <form id="deleteForm" method="POST" class="mt-6 flex items-center justify-end gap-3">
                 @csrf
                 @method('DELETE')
-                <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">Cancel</button>
-                <button type="submit" class="bg-[var(--bad-600)] hover:opacity-90 text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">Delete</button>
+                <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">{{ __('app.common.cancel') }}</button>
+                <button type="submit" class="bg-[var(--bad-600)] hover:opacity-90 text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">{{ __('app.common.delete') }}</button>
             </form>
         </div>
     </div>

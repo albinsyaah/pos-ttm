@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="UTF-8" />
@@ -23,7 +23,7 @@
 
             <div class="text-center mb-8">
                 <h1 class="text-2xl font-extrabold tracking-tight text-[var(--ink-900)]">TunasTaniMakmur</h1>
-                <p class="text-sm text-[var(--ink-400)] mt-1">Sign in to your PointDash account</p>
+                <p class="text-sm text-[var(--ink-400)] mt-1">{{ __('app.auth.sign_in_to_account') }}</p>
             </div>
 
             <div class="bg-white rounded-3xl p-8 shadow-sm">
@@ -49,12 +49,12 @@
 
                     <div>
                         <label for="username"
-                            class="block text-xs font-semibold text-[var(--ink-700)] mb-1.5">Username</label>
+                            class="block text-xs font-semibold text-[var(--ink-700)] mb-1.5">{{ __('app.auth.username') }}</label>
                         <div class="relative">
                             <input id="username" name="username" type="text" value="{{ old('username') }}" autofocus
                                 autocomplete="username" required
                                 class="w-full rounded-xl bg-[var(--surface)] py-3 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
-                                placeholder="Enter your username" />
+                                placeholder="{{ __('app.auth.enter_username') }}" />
                             <i
                                 class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
                         </div>
@@ -62,17 +62,17 @@
 
                     <div>
                         <label for="password"
-                            class="block text-xs font-semibold text-[var(--ink-700)] mb-1.5">Password</label>
+                            class="block text-xs font-semibold text-[var(--ink-700)] mb-1.5">{{ __('app.auth.password') }}</label>
                         <div class="relative">
                             <input id="password" name="password" type="password" autocomplete="current-password"
                                 required
                                 class="w-full rounded-xl bg-[var(--surface)] py-3 pl-11 pr-11 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
-                                placeholder="Enter your password" />
+                                placeholder="{{ __('app.auth.enter_password') }}" />
                             <i
                                 class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
                             <button type="button" id="togglePassword"
                                 class="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"
-                                aria-label="Show password">
+                                aria-label="{{ __('app.auth.show_password') }}">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
@@ -82,19 +82,19 @@
                         <label class="flex items-center gap-2 text-sm text-[var(--ink-700)]">
                             <input type="checkbox" name="remember"
                                 class="rounded border-gray-300 text-[var(--brand-600)] focus:ring-[var(--brand-600)]" />
-                            Remember me
+                            {{ __('app.auth.remember_me') }}
                         </label>
                     </div>
 
                     <button type="submit"
                         class="w-full flex items-center justify-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-xl py-3 transition-colors">
-                        Sign in <i class="fa-solid fa-arrow-right text-xs"></i>
+                        {{ __('app.auth.sign_in') }} <i class="fa-solid fa-arrow-right text-xs"></i>
                     </button>
                 </form>
             </div>
 
             <p class="text-center text-xs text-[var(--ink-400)] mt-6">
-                Access is managed by your Super Admin. Contact them if you need an account or your access has changed.
+                {{ __('app.auth.access_managed_note') }}
             </p>
         </div>
     </div>
@@ -107,7 +107,7 @@
             input.type = show ? 'text' : 'password';
             icon.classList.toggle('fa-eye', !show);
             icon.classList.toggle('fa-eye-slash', show);
-            this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            this.setAttribute('aria-label', show ? @json(__('app.auth.hide_password')) : @json(__('app.auth.show_password')));
         });
     </script>
 

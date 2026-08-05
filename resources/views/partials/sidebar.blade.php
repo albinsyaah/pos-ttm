@@ -15,8 +15,8 @@
     </div>
 
     <label class="relative block px-4 mb-2 shrink-0">
-        <span class="sr-only">Search menu</span>
-        <input id="navSearch" type="search" placeholder="Search menu"
+        <span class="sr-only">{{ __('app.sidebar.search_menu') }}</span>
+        <input id="navSearch" type="search" placeholder="{{ __('app.sidebar.search_menu') }}"
             class="w-full rounded-xl bg-[var(--surface)] py-2 pl-9 pr-3 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
         <i class="fa-solid fa-magnifying-glass absolute left-7 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-xs"></i>
     </label>
@@ -27,7 +27,7 @@
             <a href="{{ \Illuminate\Support\Facades\Route::has('dashboard') ? route('dashboard') : '#' }}"
                class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
                @if(request()->routeIs('dashboard')) aria-current="page" @endif>
-                <i class="fa-solid fa-grip w-4 text-center"></i> Dashboard
+                <i class="fa-solid fa-grip w-4 text-center"></i> {{ __('app.sidebar.dashboard') }}
             </a>
         @endcan
 
@@ -35,7 +35,7 @@
             <a href="{{ \Illuminate\Support\Facades\Route::has('customers.index') ? route('customers.index') : '#' }}"
                class="sidebar-item {{ request()->routeIs('customers.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
                @if(request()->routeIs('customers.*')) aria-current="page" @endif>
-                <i class="fa-solid fa-users w-4 text-center"></i> Customer
+                <i class="fa-solid fa-users w-4 text-center"></i> {{ __('app.sidebar.customer') }}
             </a>
         @endcan
 
@@ -44,22 +44,22 @@
         <div class="nav-group {{ request()->routeIs('inventory.*') ? 'open' : '' }}">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="{{ request()->routeIs('inventory.*') ? 'true' : 'false' }}">
                 <i class="fa-solid fa-layer-group w-4 text-center"></i>
-                <span class="flex-1 text-left">Inventory</span>
+                <span class="flex-1 text-left">{{ __('app.sidebar.inventory') }}</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
             </button>
             <div class="nav-panel">
                 <a href="{{ route('inventory.brands.index') }}"
                    class="sidebar-item sub {{ request()->routeIs('inventory.brands.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
-                   @if(request()->routeIs('inventory.brands.*')) aria-current="page" @endif>Merk</a>
+                   @if(request()->routeIs('inventory.brands.*')) aria-current="page" @endif>{{ __('app.sidebar.brand') }}</a>
                 <a href="{{ route('inventory.item-types.index') }}"
                    class="sidebar-item sub {{ request()->routeIs('inventory.item-types.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
-                   @if(request()->routeIs('inventory.item-types.*')) aria-current="page" @endif>Jenis Barang</a>
+                   @if(request()->routeIs('inventory.item-types.*')) aria-current="page" @endif>{{ __('app.sidebar.item_type') }}</a>
                 <a href="{{ route('inventory.product-groups.index') }}"
                    class="sidebar-item sub {{ request()->routeIs('inventory.product-groups.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
-                   @if(request()->routeIs('inventory.product-groups.*')) aria-current="page" @endif>Grup Produk</a>
+                   @if(request()->routeIs('inventory.product-groups.*')) aria-current="page" @endif>{{ __('app.sidebar.product_group') }}</a>
                 <a href="{{ route('inventory.products.index') }}"
                    class="sidebar-item sub {{ request()->routeIs('inventory.products.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
-                   @if(request()->routeIs('inventory.products.*')) aria-current="page" @endif>Barang</a>
+                   @if(request()->routeIs('inventory.products.*')) aria-current="page" @endif>{{ __('app.sidebar.product') }}</a>
             </div>
         </div>
         @endcan
@@ -68,13 +68,13 @@
             <a href="{{ route('assets.index') }}"
                class="sidebar-item {{ request()->routeIs('assets.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
                @if(request()->routeIs('assets.*')) aria-current="page" @endif>
-                <i class="fa-solid fa-box w-4 text-center"></i> Asset
+                <i class="fa-solid fa-box w-4 text-center"></i> {{ __('app.sidebar.asset') }}
             </a>
         @endcan
 
         @can('pricing.view')
             <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-                <i class="fa-solid fa-tags w-4 text-center"></i> Setup Harga
+                <i class="fa-solid fa-tags w-4 text-center"></i> {{ __('app.sidebar.price_setup') }}
             </a>
         @endcan
 
@@ -83,24 +83,24 @@
         <div class="nav-group">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
                 <i class="fa-solid fa-sack-dollar w-4 text-center"></i>
-                <span class="flex-1 text-left">Keuangan</span>
+                <span class="flex-1 text-left">{{ __('app.sidebar.finance') }}</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
             </button>
             <div class="nav-panel">
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Cash Flow</a>
+                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.cash_flow') }}</a>
             </div>
         </div>
         @endcan
 
         @can('suppliers.view')
             <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-                <i class="fa-solid fa-truck-field w-4 text-center"></i> Supplier
+                <i class="fa-solid fa-truck-field w-4 text-center"></i> {{ __('app.sidebar.supplier') }}
             </a>
         @endcan
 
         @can('warehouses.view')
             <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-                <i class="fa-solid fa-warehouse w-4 text-center"></i> Gudang
+                <i class="fa-solid fa-warehouse w-4 text-center"></i> {{ __('app.sidebar.warehouse') }}
             </a>
         @endcan
 
@@ -109,12 +109,12 @@
         <div class="nav-group">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
                 <i class="fa-solid fa-id-badge w-4 text-center"></i>
-                <span class="flex-1 text-left">Kepegawaian</span>
+                <span class="flex-1 text-left">{{ __('app.sidebar.hr') }}</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
             </button>
             <div class="nav-panel">
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Karyawan</a>
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Salesman</a>
+                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.employee') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.salesman') }}</a>
             </div>
         </div>
         @endcan
@@ -124,7 +124,7 @@
         <div class="nav-group">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
                 <i class="fa-solid fa-right-left w-4 text-center"></i>
-                <span class="flex-1 text-left">Transaksi</span>
+                <span class="flex-1 text-left">{{ __('app.sidebar.transactions') }}</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
             </button>
             <div class="nav-panel">
@@ -132,30 +132,30 @@
                 {{-- Account Payable --}}
                 <div class="nav-group">
                     <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="false">
-                        <span class="flex-1 text-left">Account Payable</span>
+                        <span class="flex-1 text-left">{{ __('app.sidebar.account_payable') }}</span>
                         <i class="fa-solid fa-chevron-right nav-chevron text-[10px]"></i>
                     </button>
                     <div class="nav-panel">
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Purchase Order</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Pembelian</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Retur Pembelian</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Pembayaran Hutang</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.purchase_order') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.purchase') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.purchase_return') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.payable_payment') }}</a>
                     </div>
                 </div>
 
                 {{-- Account Receivable --}}
                 <div class="nav-group">
                     <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="false">
-                        <span class="flex-1 text-left">Account Receivable</span>
+                        <span class="flex-1 text-left">{{ __('app.sidebar.account_receivable') }}</span>
                         <i class="fa-solid fa-chevron-right nav-chevron text-[10px]"></i>
                     </button>
                     <div class="nav-panel">
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Sales Order</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Penjualan</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Point of Sales New</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Point of Sales</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Retur Penjualan</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Sales SPG</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales_order') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.point_of_sales_new') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.point_of_sales') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales_return') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales_spg') }}</a>
                         <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Pembayaran Hutang</a>
                     </div>
                 </div>
@@ -163,20 +163,20 @@
                 {{-- Mutasi Internal --}}
                 <div class="nav-group">
                     <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="false">
-                        <span class="flex-1 text-left">Mutasi Internal</span>
+                        <span class="flex-1 text-left">{{ __('app.sidebar.internal_mutation') }}</span>
                         <i class="fa-solid fa-chevron-right nav-chevron text-[10px]"></i>
                     </button>
                     <div class="nav-panel">
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Permintaan Barang</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Pengeluaran Internal</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Penerimaan Internal</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Transfer Gudang</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Deviasi</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.item_request') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.internal_expenditure') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.internal_receipt') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.warehouse_transfer') }}</a>
+                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.deviation') }}</a>
                     </div>
                 </div>
 
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Cash Management</a>
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">General Ledger</a>
+                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.cash_management') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.general_ledger') }}</a>
             </div>
         </div>
         @endcan
@@ -186,35 +186,35 @@
         <div class="nav-group">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
                 <i class="fa-solid fa-chart-line w-4 text-center"></i>
-                <span class="flex-1 text-left">Report</span>
+                <span class="flex-1 text-left">{{ __('app.sidebar.report') }}</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
             </button>
             <div class="nav-panel">
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Purchase Order Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Pembelian Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Retur Pembelian Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Payment Hutang Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Sales Order Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Sales Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Penjualan Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Retur Penjualan Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Payment Piutang Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Kartu Piutang Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Umur Piutang Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Pengeluaran Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Penerimaan Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Transfer Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Deviasi Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Kartu Stok</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Posisi Report</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Persediaan Report</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.purchase_order_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.purchase_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.purchase_return_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.payable_payment_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_order_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_report_2') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_return_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receivable_payment_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receivable_card_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receivable_aging_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.expenditure_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receipt_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.transfer_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.deviation_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.stock_card') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.position_report') }}</a>
+                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.inventory_report') }}</a>
             </div>
         </div>
         @endcan
 
         @can('inquiry.view')
             <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-                <i class="fa-solid fa-magnifying-glass-chart w-4 text-center"></i> Inquery
+                <i class="fa-solid fa-magnifying-glass-chart w-4 text-center"></i> {{ __('app.sidebar.inquiry') }}
             </a>
         @endcan
 
@@ -224,13 +224,13 @@
             <a href="{{ route('admin.users.index') }}"
                class="sidebar-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
                @if(request()->routeIs('admin.users.*')) aria-current="page" @endif>
-                <i class="fa-solid fa-user-shield w-4 text-center"></i> Administrator
+                <i class="fa-solid fa-user-shield w-4 text-center"></i> {{ __('app.sidebar.administrator') }}
             </a>
 
             <a href="{{ route('admin.roles.index') }}"
                class="sidebar-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
                @if(request()->routeIs('admin.roles.*')) aria-current="page" @endif>
-                <i class="fa-solid fa-shield-halved w-4 text-center"></i> Roles &amp; Permissions
+                <i class="fa-solid fa-shield-halved w-4 text-center"></i> {{ __('app.sidebar.roles_permissions') }}
             </a>
         @endrole
 
