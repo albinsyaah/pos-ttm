@@ -65,7 +65,9 @@
         @endcan
 
         @can('assets.view')
-            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+            <a href="{{ route('assets.index') }}"
+               class="sidebar-item {{ request()->routeIs('assets.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('assets.*')) aria-current="page" @endif>
                 <i class="fa-solid fa-box w-4 text-center"></i> Asset
             </a>
         @endcan

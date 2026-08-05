@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AssetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
@@ -56,6 +57,11 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('products', ProductController::class)
             ->only(['index', 'store', 'update', 'destroy']);
     });
+
+    // Fixed assets. Per-action permission checks live on the controller via
+    // HasMiddleware (permission:assets.view / permission:assets.manage).
+    Route::resource('assets', AssetController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
 
     // Super Admin only: user accounts + role/permission management.
     Route::prefix('admin')->name('admin.')->middleware('role:Super Admin')->group(function () {
