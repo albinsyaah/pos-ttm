@@ -5,6 +5,10 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Inventory\BrandController;
+use App\Http\Controllers\Inventory\ItemTypeController;
+use App\Http\Controllers\Inventory\ProductController;
+use App\Http\Controllers\Inventory\ProductGroupController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -32,6 +36,26 @@ Route::middleware(['auth', 'active'])->group(function () {
     // HasMiddleware (see CustomerController::middleware()).
     Route::resource('customers', CustomerController::class)
         ->only(['index', 'store', 'update', 'destroy']);
+
+    // Inventory: brands (Merk), item types (Jenis Barang), product groups
+    // (Grup Produk) and products (Barang). Per-action permission checks live
+    // on each controller via HasMiddleware (permission:inventory.view /
+    // permission:inventory.manage).
+    Route::prefix('inventory')->name('inventory.')->group(function () {
+        Route::resource('brands', BrandController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+
+        Route::resource('item-types', ItemTypeController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['item-types' => 'itemType']);
+
+        Route::resource('product-groups', ProductGroupController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['product-groups' => 'productGroup']);
+
+        Route::resource('products', ProductController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+    });
 
     // Super Admin only: user accounts + role/permission management.
     Route::prefix('admin')->name('admin.')->middleware('role:Super Admin')->group(function () {

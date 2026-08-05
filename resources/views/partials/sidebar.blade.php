@@ -41,17 +41,25 @@
 
         {{-- Inventory --}}
         @can('inventory.view')
-        <div class="nav-group">
-            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
+        <div class="nav-group {{ request()->routeIs('inventory.*') ? 'open' : '' }}">
+            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="{{ request()->routeIs('inventory.*') ? 'true' : 'false' }}">
                 <i class="fa-solid fa-layer-group w-4 text-center"></i>
                 <span class="flex-1 text-left">Inventory</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
             </button>
             <div class="nav-panel">
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Merk</a>
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Jenis Barang</a>
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Grup Produk</a>
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Barang</a>
+                <a href="{{ route('inventory.brands.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('inventory.brands.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('inventory.brands.*')) aria-current="page" @endif>Merk</a>
+                <a href="{{ route('inventory.item-types.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('inventory.item-types.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('inventory.item-types.*')) aria-current="page" @endif>Jenis Barang</a>
+                <a href="{{ route('inventory.product-groups.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('inventory.product-groups.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('inventory.product-groups.*')) aria-current="page" @endif>Grup Produk</a>
+                <a href="{{ route('inventory.products.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('inventory.products.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('inventory.products.*')) aria-current="page" @endif>Barang</a>
             </div>
         </div>
         @endcan
