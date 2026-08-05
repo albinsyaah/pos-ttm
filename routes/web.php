@@ -11,6 +11,7 @@ use App\Http\Controllers\Inventory\ItemTypeController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\ProductGroupController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\Pricing\PriceSetupController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -69,6 +70,14 @@ Route::middleware(['auth', 'active'])->group(function () {
     // HasMiddleware (permission:assets.view / permission:assets.manage).
     Route::resource('assets', AssetController::class)
         ->only(['index', 'store', 'update', 'destroy']);
+
+    // Setup Harga (price setups). Per-action permission checks live on the
+    // controller via HasMiddleware (permission:pricing.view / permission:pricing.manage).
+    Route::prefix('pricing')->name('pricing.')->group(function () {
+        Route::resource('price-setups', PriceSetupController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['price-setups' => 'priceSetup']);
+    });
 
     // Super Admin only: user accounts + role/permission management.
     Route::prefix('admin')->name('admin.')->middleware('role:Super Admin')->group(function () {

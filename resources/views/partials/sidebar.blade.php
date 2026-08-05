@@ -73,7 +73,9 @@
         @endcan
 
         @can('pricing.view')
-            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+            <a href="{{ route('pricing.price-setups.index') }}"
+               class="sidebar-item {{ request()->routeIs('pricing.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('pricing.*')) aria-current="page" @endif>
                 <i class="fa-solid fa-tags w-4 text-center"></i> {{ __('app.sidebar.price_setup') }}
             </a>
         @endcan
