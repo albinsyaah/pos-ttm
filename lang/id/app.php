@@ -23,6 +23,7 @@ return [
         'add' => 'Tambah',
         'search' => 'Cari',
         'none' => '— Tidak ada —',
+        'select' => '— Pilih —',
         'active' => 'Aktif',
         'disabled' => 'Nonaktif',
         'this_action_cannot_be_undone' => 'Tindakan ini tidak dapat dibatalkan.',
@@ -55,6 +56,7 @@ return [
         'asset' => 'Aset',
         'price_setup' => 'Setup Harga',
         'finance' => 'Keuangan',
+        'chart_of_accounts' => 'Bagan Akun',
         'cash_flow' => 'Arus Kas',
         'supplier' => 'Supplier',
         'warehouse' => 'Gudang',
@@ -238,6 +240,64 @@ return [
         'purchase_date' => 'Tanggal Pembelian',
         'no_assets_found' => 'Aset tidak ditemukan.',
         'delete_asset' => 'Hapus aset?',
+    ],
+
+    // Setup Harga
+    'price_setups' => [
+        'title' => 'Setup Harga',
+        'search_price_setups' => 'Cari setup harga',
+        'search_placeholder' => 'Cari berdasarkan produk atau kategori',
+        'add_price_setup' => 'Tambah Setup Harga',
+        'edit_price_setup' => 'Ubah Setup Harga',
+        'product' => 'Produk',
+        'price_category' => 'Kategori Harga',
+        'price_category_placeholder' => 'mis. Retail, Grosir, Member',
+        'effective_date' => 'Tanggal Berlaku',
+        'no_price_setups_found' => 'Setup harga tidak ditemukan.',
+        'delete_price_setup' => 'Hapus setup harga?',
+    ],
+
+    // Keuangan - Bagan Akun
+    'chart_of_accounts' => [
+        'title' => 'Bagan Akun',
+        'search_accounts' => 'Cari akun',
+        'search_placeholder' => 'Cari berdasarkan kode atau nama',
+        'add_account' => 'Tambah Akun',
+        'account_name' => 'Nama Akun',
+        'type' => 'Tipe',
+        'no_accounts_found' => 'Akun tidak ditemukan.',
+        'delete_account' => 'Hapus akun?',
+    ],
+
+    // Keuangan - Arus Kas
+    'cash_flows' => [
+        'title' => 'Arus Kas',
+        'search_cash_flows' => 'Cari transaksi arus kas',
+        'search_placeholder' => 'Cari berdasarkan deskripsi, kode atau nama akun',
+        'add_cash_flow' => 'Tambah Arus Kas',
+        'transaction_date' => 'Tanggal Transaksi',
+        'type' => 'Tipe',
+        'cash_in' => 'Kas Masuk',
+        'cash_out' => 'Kas Keluar',
+        'account' => 'Akun',
+        'description' => 'Deskripsi',
+        'no_cash_flows_found' => 'Transaksi arus kas tidak ditemukan.',
+        'delete_cash_flow' => 'Hapus transaksi arus kas?',
+    ],
+
+    // Keuangan - Buku Besar
+    'general_ledgers' => [
+        'title' => 'Buku Besar',
+        'search_ledgers' => 'Cari entri buku besar',
+        'search_placeholder' => 'Cari berdasarkan referensi, kode atau nama akun',
+        'add_ledger' => 'Tambah Entri Buku Besar',
+        'transaction_date' => 'Tanggal Transaksi',
+        'account' => 'Akun',
+        'reference_number' => 'Nomor Referensi',
+        'debit' => 'Debit',
+        'credit' => 'Kredit',
+        'no_ledgers_found' => 'Entri buku besar tidak ditemukan.',
+        'delete_ledger' => 'Hapus entri buku besar?',
     ],
 
     // Admin - Users

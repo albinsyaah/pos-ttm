@@ -82,14 +82,22 @@
 
         {{-- Keuangan --}}
         @can('finance.view')
-        <div class="nav-group">
-            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
+        <div class="nav-group {{ request()->routeIs('finance.*') ? 'open' : '' }}">
+            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="{{ request()->routeIs('finance.*') ? 'true' : 'false' }}">
                 <i class="fa-solid fa-sack-dollar w-4 text-center"></i>
                 <span class="flex-1 text-left">{{ __('app.sidebar.finance') }}</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
             </button>
             <div class="nav-panel">
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.cash_flow') }}</a>
+                <a href="{{ route('finance.chart-of-accounts.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('finance.chart-of-accounts.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('finance.chart-of-accounts.*')) aria-current="page" @endif>{{ __('app.sidebar.chart_of_accounts') }}</a>
+                <a href="{{ route('finance.cash-flows.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('finance.cash-flows.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('finance.cash-flows.*')) aria-current="page" @endif>{{ __('app.sidebar.cash_flow') }}</a>
+                <a href="{{ route('finance.general-ledgers.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('finance.general-ledgers.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('finance.general-ledgers.*')) aria-current="page" @endif>{{ __('app.sidebar.general_ledger') }}</a>
             </div>
         </div>
         @endcan

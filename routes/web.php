@@ -6,6 +6,9 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Finance\CashFlowController;
+use App\Http\Controllers\Finance\ChartOfAccountController;
+use App\Http\Controllers\Finance\GeneralLedgerController;
 use App\Http\Controllers\Inventory\BrandController;
 use App\Http\Controllers\Inventory\ItemTypeController;
 use App\Http\Controllers\Inventory\ProductController;
@@ -77,6 +80,23 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('price-setups', PriceSetupController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['price-setups' => 'priceSetup']);
+    });
+
+    // Keuangan (Finance): chart of accounts, cash flow, general ledger.
+    // Per-action permission checks live on each controller via HasMiddleware
+    // (permission:finance.view / permission:finance.manage).
+    Route::prefix('finance')->name('finance.')->group(function () {
+        Route::resource('chart-of-accounts', ChartOfAccountController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['chart-of-accounts' => 'account']);
+
+        Route::resource('cash-flows', CashFlowController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['cash-flows' => 'cashFlow']);
+
+        Route::resource('general-ledgers', GeneralLedgerController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['general-ledgers' => 'generalLedger']);
     });
 
     // Super Admin only: user accounts + role/permission management.

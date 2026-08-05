@@ -23,6 +23,7 @@ return [
         'add' => 'Add',
         'search' => 'Search',
         'none' => '— None —',
+        'select' => '— Select —',
         'active' => 'Active',
         'disabled' => 'Disabled',
         'this_action_cannot_be_undone' => 'This action cannot be undone.',
@@ -55,6 +56,7 @@ return [
         'asset' => 'Asset',
         'price_setup' => 'Price Setup',
         'finance' => 'Finance',
+        'chart_of_accounts' => 'Chart of Accounts',
         'cash_flow' => 'Cash Flow',
         'supplier' => 'Supplier',
         'warehouse' => 'Warehouse',
@@ -238,6 +240,64 @@ return [
         'purchase_date' => 'Purchase Date',
         'no_assets_found' => 'No assets found.',
         'delete_asset' => 'Delete asset?',
+    ],
+
+    // Price Setups (Setup Harga)
+    'price_setups' => [
+        'title' => 'Price Setup',
+        'search_price_setups' => 'Search price setups',
+        'search_placeholder' => 'Search by product or category',
+        'add_price_setup' => 'Add Price Setup',
+        'edit_price_setup' => 'Edit Price Setup',
+        'product' => 'Product',
+        'price_category' => 'Price Category',
+        'price_category_placeholder' => 'e.g. Retail, Wholesale, Member',
+        'effective_date' => 'Effective Date',
+        'no_price_setups_found' => 'No price setups found.',
+        'delete_price_setup' => 'Delete price setup?',
+    ],
+
+    // Finance - Chart of Accounts
+    'chart_of_accounts' => [
+        'title' => 'Chart of Accounts',
+        'search_accounts' => 'Search accounts',
+        'search_placeholder' => 'Search by code or name',
+        'add_account' => 'Add Account',
+        'account_name' => 'Account Name',
+        'type' => 'Type',
+        'no_accounts_found' => 'No accounts found.',
+        'delete_account' => 'Delete account?',
+    ],
+
+    // Finance - Cash Flow
+    'cash_flows' => [
+        'title' => 'Cash Flow',
+        'search_cash_flows' => 'Search cash flow entries',
+        'search_placeholder' => 'Search by description, account code or name',
+        'add_cash_flow' => 'Add Cash Flow',
+        'transaction_date' => 'Transaction Date',
+        'type' => 'Type',
+        'cash_in' => 'Cash In',
+        'cash_out' => 'Cash Out',
+        'account' => 'Account',
+        'description' => 'Description',
+        'no_cash_flows_found' => 'No cash flow entries found.',
+        'delete_cash_flow' => 'Delete cash flow entry?',
+    ],
+
+    // Finance - General Ledger
+    'general_ledgers' => [
+        'title' => 'General Ledger',
+        'search_ledgers' => 'Search ledger entries',
+        'search_placeholder' => 'Search by reference, account code or name',
+        'add_ledger' => 'Add Ledger Entry',
+        'transaction_date' => 'Transaction Date',
+        'account' => 'Account',
+        'reference_number' => 'Reference Number',
+        'debit' => 'Debit',
+        'credit' => 'Credit',
+        'no_ledgers_found' => 'No ledger entries found.',
+        'delete_ledger' => 'Delete ledger entry?',
     ],
 
     // Admin - Users
