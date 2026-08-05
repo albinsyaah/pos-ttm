@@ -13,7 +13,7 @@
                 <p class="text-xs opacity-80 tracking-wide">{{ __('app.dashboard.todays_sales') }}</p>
                 <i class="fa-solid fa-sack-dollar opacity-80"></i>
             </div>
-            <p class="text-3xl font-bold mt-3">${{ number_format($todaySales, 2) }}</p>
+            <p class="text-3xl font-bold mt-3">Rp{{ number_format($todaySales) }}</p>
             <p class="text-xs mt-2 opacity-90">{{ __('app.dashboard.total_sales_today') }}</p>
         </div>
 
@@ -35,7 +35,7 @@
                     <i class="fa-solid fa-tag text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">${{ number_format($avgOrderValue, 2) }}</p>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($avgOrderValue) }}</p>
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.todays_sales_divided_orders') }}</p>
         </div>
 
@@ -61,7 +61,7 @@
                     <i class="fa-solid fa-hand-holding-dollar text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">${{ number_format($receivablesOutstanding, 2) }}</p>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($receivablesOutstanding) }}</p>
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.sales_not_yet_paid') }}</p>
         </div>
 
@@ -72,7 +72,7 @@
                     <i class="fa-solid fa-money-check-dollar text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">${{ number_format($payablesOutstanding, 2) }}</p>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($payablesOutstanding) }}</p>
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.purchases_not_yet_paid') }}</p>
         </div>
 
@@ -122,8 +122,8 @@
                 @foreach($days as $day)
                     <div class="flex flex-col items-center gap-2 flex-1">
                         <div class="w-full flex items-end justify-center gap-1 h-40">
-                            <div class="bar w-3 bg-[var(--ink-200)] rounded-md" style="height: {{ max(2, $day['last'] * $scale) }}px" title="{{ __('app.dashboard.last_week_tooltip') }}: ${{ number_format($day['last'], 2) }}"></div>
-                            <div class="bar w-3 bg-[var(--brand-600)] rounded-md" style="height: {{ max(2, $day['this'] * $scale) }}px" title="{{ __('app.dashboard.this_week_tooltip') }}: ${{ number_format($day['this'], 2) }}"></div>
+                            <div class="bar w-3 bg-[var(--ink-200)] rounded-md" style="height: {{ max(2, $day['last'] * $scale) }}px" title="{{ __('app.dashboard.last_week_tooltip') }}: Rp{{ number_format($day['last']) }}"></div>
+                            <div class="bar w-3 bg-[var(--brand-600)] rounded-md" style="height: {{ max(2, $day['this'] * $scale) }}px" title="{{ __('app.dashboard.this_week_tooltip') }}: Rp{{ number_format($day['this']) }}"></div>
                         </div>
                         <span class="text-[10px] text-[var(--ink-400)]">{{ $day['label'] }}</span>
                     </div>
@@ -145,7 +145,7 @@
                             <p class="text-sm font-medium text-[var(--ink-900)] truncate">{{ $product['name'] }}</p>
                             <p class="text-xs text-[var(--ink-400)]">{{ $product['sold'] }} {{ __('app.dashboard.sold') }}</p>
                         </div>
-                        <span class="text-sm font-semibold text-[var(--ink-900)]">${{ number_format($product['revenue'], 2) }}</span>
+                        <span class="text-sm font-semibold text-[var(--ink-900)]">Rp{{ number_format($product['revenue']) }}</span>
                     </div>
                 @empty
                     <p class="text-sm text-[var(--ink-400)] py-6 text-center">{{ __('app.dashboard.no_sales_recorded_today') }}</p>
@@ -193,7 +193,7 @@
                             <p class="text-sm font-medium text-[var(--ink-900)] truncate">{{ $customer->name }}</p>
                             <p class="text-xs text-[var(--ink-400)]">{{ $customer->orders }} {{ __('app.dashboard.orders') }}</p>
                         </div>
-                        <span class="text-sm font-semibold text-[var(--ink-900)]">${{ number_format($customer->total, 2) }}</span>
+                        <span class="text-sm font-semibold text-[var(--ink-900)]">Rp{{ number_format($customer->total) }}</span>
                     </div>
                 @empty
                     <p class="text-sm text-[var(--ink-400)] py-6 text-center">{{ __('app.dashboard.no_sales_recorded_yet') }}</p>
@@ -229,7 +229,7 @@
                         <td class="text-[var(--ink-400)]">{{ $order['items'] }} {{ __('app.dashboard.items_count') }}</td>
                         <td class="text-[var(--ink-700)]">{{ ucfirst($order['source']) }}</td>
                         <td class="text-[var(--ink-400)]">{{ $order['date'] }} &middot; {{ $order['time'] }}</td>
-                        <td class="font-semibold text-[var(--ink-900)]">${{ number_format($order['total'], 2) }}</td>
+                        <td class="font-semibold text-[var(--ink-900)]">Rp{{ number_format($order['total']) }}</td>
                         <td class="text-right pr-5">
                             <button class="dl-btn border border-gray-200 text-[var(--ink-700)] rounded-full px-4 py-2 text-xs font-medium hover:border-[var(--brand-600)] hover:text-[var(--brand-600)] transition-colors">{{ __('app.dashboard.print') }}</button>
                         </td>
