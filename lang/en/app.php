@@ -14,6 +14,9 @@ return [
         'name' => 'Name',
         'phone' => 'Phone',
         'address' => 'Address',
+        'contact_person' => 'Contact Person',
+        'location' => 'Location',
+        'position' => 'Position',
         'status' => 'Status',
         'save' => 'Save',
         'cancel' => 'Cancel',
@@ -183,6 +186,46 @@ return [
         'add_customer' => 'Add Customer',
         'no_customers_found' => 'No customers found.',
         'delete_customer' => 'Delete customer?',
+    ],
+
+    // Suppliers
+    'suppliers' => [
+        'title' => 'Supplier',
+        'search_suppliers' => 'Search suppliers',
+        'search_placeholder' => 'Search by name, code or phone',
+        'add_supplier' => 'Add Supplier',
+        'no_suppliers_found' => 'No suppliers found.',
+        'delete_supplier' => 'Delete supplier?',
+    ],
+
+    // Warehouses (Gudang)
+    'warehouses' => [
+        'title' => 'Warehouse',
+        'search_warehouses' => 'Search warehouses',
+        'search_placeholder' => 'Search by name, code or location',
+        'add_warehouse' => 'Add Warehouse',
+        'no_warehouses_found' => 'No warehouses found.',
+        'delete_warehouse' => 'Delete warehouse?',
+    ],
+
+    // HR - Employees
+    'employees' => [
+        'title' => 'Employee',
+        'search_employees' => 'Search employees',
+        'search_placeholder' => 'Search by name, code or position',
+        'add_employee' => 'Add Employee',
+        'no_employees_found' => 'No employees found.',
+        'delete_employee' => 'Delete employee?',
+    ],
+
+    // HR - Salesmen
+    'salesmen' => [
+        'title' => 'Salesman',
+        'search_salesmen' => 'Search salesmen',
+        'search_placeholder' => 'Search by name or code',
+        'add_salesman' => 'Add Salesman',
+        'no_salesmen_found' => 'No salesmen found.',
+        'delete_salesman' => 'Delete salesman?',
     ],
 
     // Inventory - Brands

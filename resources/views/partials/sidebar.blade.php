@@ -103,28 +103,36 @@
         @endcan
 
         @can('suppliers.view')
-            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+            <a href="{{ route('suppliers.index') }}"
+               class="sidebar-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('suppliers.*')) aria-current="page" @endif>
                 <i class="fa-solid fa-truck-field w-4 text-center"></i> {{ __('app.sidebar.supplier') }}
             </a>
         @endcan
 
         @can('warehouses.view')
-            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+            <a href="{{ route('warehouses.index') }}"
+               class="sidebar-item {{ request()->routeIs('warehouses.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('warehouses.*')) aria-current="page" @endif>
                 <i class="fa-solid fa-warehouse w-4 text-center"></i> {{ __('app.sidebar.warehouse') }}
             </a>
         @endcan
 
         {{-- Kepegawaian --}}
         @can('hr.view')
-        <div class="nav-group">
-            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
+        <div class="nav-group {{ request()->routeIs('hr.*') ? 'open' : '' }}">
+            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="{{ request()->routeIs('hr.*') ? 'true' : 'false' }}">
                 <i class="fa-solid fa-id-badge w-4 text-center"></i>
                 <span class="flex-1 text-left">{{ __('app.sidebar.hr') }}</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
             </button>
             <div class="nav-panel">
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.employee') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.salesman') }}</a>
+                <a href="{{ route('hr.employees.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('hr.employees.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('hr.employees.*')) aria-current="page" @endif>{{ __('app.sidebar.employee') }}</a>
+                <a href="{{ route('hr.salesmen.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('hr.salesmen.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('hr.salesmen.*')) aria-current="page" @endif>{{ __('app.sidebar.salesman') }}</a>
             </div>
         </div>
         @endcan

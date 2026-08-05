@@ -9,12 +9,16 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\CashFlowController;
 use App\Http\Controllers\Finance\ChartOfAccountController;
 use App\Http\Controllers\Finance\GeneralLedgerController;
+use App\Http\Controllers\Hr\EmployeeController;
+use App\Http\Controllers\Hr\SalesmanController;
 use App\Http\Controllers\Inventory\BrandController;
 use App\Http\Controllers\Inventory\ItemTypeController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\ProductGroupController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Pricing\PriceSetupController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -97,6 +101,29 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('general-ledgers', GeneralLedgerController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['general-ledgers' => 'generalLedger']);
+    });
+
+    // Supplier. Per-action permission checks live on the controller via
+    // HasMiddleware (permission:suppliers.view / permission:suppliers.manage).
+    Route::resource('suppliers', SupplierController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
+
+    // Gudang (Warehouse). Per-action permission checks live on the controller
+    // via HasMiddleware (permission:warehouses.view / permission:warehouses.manage).
+    Route::resource('warehouses', WarehouseController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
+
+    // Kepegawaian (HR): employees and salesmen. Salesmen are Employee records
+    // filtered/forced to position "Salesman" (see Hr\SalesmanController).
+    // Per-action permission checks live on each controller via HasMiddleware
+    // (permission:hr.view / permission:hr.manage).
+    Route::prefix('hr')->name('hr.')->group(function () {
+        Route::resource('employees', EmployeeController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+
+        Route::resource('salesmen', SalesmanController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['salesmen' => 'salesman']);
     });
 
     // Super Admin only: user accounts + role/permission management.

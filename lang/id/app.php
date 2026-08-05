@@ -14,6 +14,9 @@ return [
         'name' => 'Nama',
         'phone' => 'Telepon',
         'address' => 'Alamat',
+        'contact_person' => 'Kontak Person',
+        'location' => 'Lokasi',
+        'position' => 'Jabatan',
         'status' => 'Status',
         'save' => 'Simpan',
         'cancel' => 'Batal',
@@ -183,6 +186,46 @@ return [
         'add_customer' => 'Tambah Pelanggan',
         'no_customers_found' => 'Pelanggan tidak ditemukan.',
         'delete_customer' => 'Hapus pelanggan?',
+    ],
+
+    // Supplier
+    'suppliers' => [
+        'title' => 'Supplier',
+        'search_suppliers' => 'Cari supplier',
+        'search_placeholder' => 'Cari berdasarkan nama, kode atau telepon',
+        'add_supplier' => 'Tambah Supplier',
+        'no_suppliers_found' => 'Supplier tidak ditemukan.',
+        'delete_supplier' => 'Hapus supplier?',
+    ],
+
+    // Gudang
+    'warehouses' => [
+        'title' => 'Gudang',
+        'search_warehouses' => 'Cari gudang',
+        'search_placeholder' => 'Cari berdasarkan nama, kode atau lokasi',
+        'add_warehouse' => 'Tambah Gudang',
+        'no_warehouses_found' => 'Gudang tidak ditemukan.',
+        'delete_warehouse' => 'Hapus gudang?',
+    ],
+
+    // Kepegawaian - Karyawan
+    'employees' => [
+        'title' => 'Karyawan',
+        'search_employees' => 'Cari karyawan',
+        'search_placeholder' => 'Cari berdasarkan nama, kode atau jabatan',
+        'add_employee' => 'Tambah Karyawan',
+        'no_employees_found' => 'Karyawan tidak ditemukan.',
+        'delete_employee' => 'Hapus karyawan?',
+    ],
+
+    // Kepegawaian - Salesman
+    'salesmen' => [
+        'title' => 'Salesman',
+        'search_salesmen' => 'Cari salesman',
+        'search_placeholder' => 'Cari berdasarkan nama atau kode',
+        'add_salesman' => 'Tambah Salesman',
+        'no_salesmen_found' => 'Salesman tidak ditemukan.',
+        'delete_salesman' => 'Hapus salesman?',
     ],
 
     // Inventory - Brands
