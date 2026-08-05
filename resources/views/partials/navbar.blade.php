@@ -6,7 +6,7 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
             <div>
-                <h2 class="text-2xl sm:text-3xl font-bold text-[var(--ink-900)]">@yield('page-title', __('app.layout.dashboard'))</h2>
+                <h2 class="text-xl sm:text-2xl font-bold text-[var(--ink-900)]">@yield('page-title', __('app.layout.dashboard'))</h2>
                 <p class="text-xs text-[var(--ink-400)] mt-0.5" id="todayDate">{{ now()->translatedFormat('l, d F Y') }}</p>
             </div>
         </div>

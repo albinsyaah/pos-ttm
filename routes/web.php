@@ -18,6 +18,10 @@ use App\Http\Controllers\Inventory\ProductGroupController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Pricing\PriceSetupController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\Transactions\ApPaymentController;
+use App\Http\Controllers\Transactions\PurchaseController;
+use App\Http\Controllers\Transactions\PurchaseOrderController;
+use App\Http\Controllers\Transactions\PurchaseReturnController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
@@ -124,6 +128,27 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('salesmen', SalesmanController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['salesmen' => 'salesman']);
+    });
+
+    // Transaksi (Transactions): Account Payable — purchase orders, purchases,
+    // purchase returns, and payable (AP) payments. Per-action permission
+    // checks live on each controller via HasMiddleware
+    // (permission:transactions.view / permission:transactions.manage).
+    Route::prefix('transactions')->name('transactions.')->group(function () {
+        Route::resource('purchase-orders', PurchaseOrderController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['purchase-orders' => 'purchaseOrder']);
+
+        Route::resource('purchases', PurchaseController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+
+        Route::resource('purchase-returns', PurchaseReturnController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['purchase-returns' => 'purchaseReturn']);
+
+        Route::resource('payable-payments', ApPaymentController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['payable-payments' => 'payablePayment']);
     });
 
     // Super Admin only: user accounts + role/permission management.

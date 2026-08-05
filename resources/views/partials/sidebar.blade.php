@@ -139,8 +139,8 @@
 
         {{-- Transaksi --}}
         @can('transactions.view')
-        <div class="nav-group">
-            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
+        <div class="nav-group {{ request()->routeIs('transactions.*') ? 'open' : '' }}">
+            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="{{ request()->routeIs('transactions.*') ? 'true' : 'false' }}">
                 <i class="fa-solid fa-right-left w-4 text-center"></i>
                 <span class="flex-1 text-left">{{ __('app.sidebar.transactions') }}</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
@@ -148,16 +148,24 @@
             <div class="nav-panel">
 
                 {{-- Account Payable --}}
-                <div class="nav-group">
-                    <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="false">
+                <div class="nav-group {{ request()->routeIs('transactions.purchase-orders.*', 'transactions.purchases.*', 'transactions.purchase-returns.*', 'transactions.payable-payments.*') ? 'open' : '' }}">
+                    <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="{{ request()->routeIs('transactions.purchase-orders.*', 'transactions.purchases.*', 'transactions.purchase-returns.*', 'transactions.payable-payments.*') ? 'true' : 'false' }}">
                         <span class="flex-1 text-left">{{ __('app.sidebar.account_payable') }}</span>
                         <i class="fa-solid fa-chevron-right nav-chevron text-[10px]"></i>
                     </button>
                     <div class="nav-panel">
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.purchase_order') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.purchase') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.purchase_return') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.payable_payment') }}</a>
+                        <a href="{{ route('transactions.purchase-orders.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.purchase-orders.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.purchase-orders.*')) aria-current="page" @endif>{{ __('app.sidebar.purchase_order') }}</a>
+                        <a href="{{ route('transactions.purchases.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.purchases.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.purchases.*')) aria-current="page" @endif>{{ __('app.sidebar.purchase') }}</a>
+                        <a href="{{ route('transactions.purchase-returns.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.purchase-returns.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.purchase-returns.*')) aria-current="page" @endif>{{ __('app.sidebar.purchase_return') }}</a>
+                        <a href="{{ route('transactions.payable-payments.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.payable-payments.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.payable-payments.*')) aria-current="page" @endif>{{ __('app.sidebar.payable_payment') }}</a>
                     </div>
                 </div>
 
