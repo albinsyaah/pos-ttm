@@ -1,9 +1,9 @@
 {{--
   Sidebar navigation.
-  Swap href="#" for real routes as you build them out, e.g.:
-    href="{{ route('customer.index') }}"
-  and mark the active item with:
-    class="sidebar-item {{ request()->routeIs('customer.*') ? 'active' : '' }}"
+  Each top-level module is gated behind the matching permission from
+  App\Support\AccessControl (e.g. @can('customers.view')) so a signed-in
+  user only ever sees the modules their role grants them. Super Admin
+  bypasses every @can check automatically (see AppServiceProvider).
 --}}
 <aside id="sidebar" class="w-[280px] bg-white border-r border-gray-100 shrink-0 flex flex-col h-screen sticky top-0">
 
@@ -23,19 +23,24 @@
 
     <nav id="mainNav" class="flex-1 overflow-y-auto px-3 pb-4 text-[var(--ink-400)] text-sm" aria-label="Main navigation">
 
-        <a href="{{ \Illuminate\Support\Facades\Route::has('dashboard') ? route('dashboard') : '#' }}"
-           class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
-           @if(request()->routeIs('dashboard')) aria-current="page" @endif>
-            <i class="fa-solid fa-grip w-4 text-center"></i> Dashboard
-        </a>
+        @can('dashboard.view')
+            <a href="{{ \Illuminate\Support\Facades\Route::has('dashboard') ? route('dashboard') : '#' }}"
+               class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('dashboard')) aria-current="page" @endif>
+                <i class="fa-solid fa-grip w-4 text-center"></i> Dashboard
+            </a>
+        @endcan
 
-        <a href="{{ \Illuminate\Support\Facades\Route::has('customers.index') ? route('customers.index') : '#' }}"
-           class="sidebar-item {{ request()->routeIs('customers.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
-           @if(request()->routeIs('customers.*')) aria-current="page" @endif>
-            <i class="fa-solid fa-users w-4 text-center"></i> Customer
-        </a>
+        @can('customers.view')
+            <a href="{{ \Illuminate\Support\Facades\Route::has('customers.index') ? route('customers.index') : '#' }}"
+               class="sidebar-item {{ request()->routeIs('customers.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('customers.*')) aria-current="page" @endif>
+                <i class="fa-solid fa-users w-4 text-center"></i> Customer
+            </a>
+        @endcan
 
         {{-- Inventory --}}
+        @can('inventory.view')
         <div class="nav-group">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
                 <i class="fa-solid fa-layer-group w-4 text-center"></i>
@@ -49,16 +54,22 @@
                 <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Barang</a>
             </div>
         </div>
+        @endcan
 
-        <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-            <i class="fa-solid fa-box w-4 text-center"></i> Asset
-        </a>
+        @can('assets.view')
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+                <i class="fa-solid fa-box w-4 text-center"></i> Asset
+            </a>
+        @endcan
 
-        <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-            <i class="fa-solid fa-tags w-4 text-center"></i> Setup Harga
-        </a>
+        @can('pricing.view')
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+                <i class="fa-solid fa-tags w-4 text-center"></i> Setup Harga
+            </a>
+        @endcan
 
         {{-- Keuangan --}}
+        @can('finance.view')
         <div class="nav-group">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
                 <i class="fa-solid fa-sack-dollar w-4 text-center"></i>
@@ -69,16 +80,22 @@
                 <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Cash Flow</a>
             </div>
         </div>
+        @endcan
 
-        <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-            <i class="fa-solid fa-truck-field w-4 text-center"></i> Supplier
-        </a>
+        @can('suppliers.view')
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+                <i class="fa-solid fa-truck-field w-4 text-center"></i> Supplier
+            </a>
+        @endcan
 
-        <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-            <i class="fa-solid fa-warehouse w-4 text-center"></i> Gudang
-        </a>
+        @can('warehouses.view')
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+                <i class="fa-solid fa-warehouse w-4 text-center"></i> Gudang
+            </a>
+        @endcan
 
         {{-- Kepegawaian --}}
+        @can('hr.view')
         <div class="nav-group">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
                 <i class="fa-solid fa-id-badge w-4 text-center"></i>
@@ -90,8 +107,10 @@
                 <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">Salesman</a>
             </div>
         </div>
+        @endcan
 
         {{-- Transaksi --}}
+        @can('transactions.view')
         <div class="nav-group">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
                 <i class="fa-solid fa-right-left w-4 text-center"></i>
@@ -150,8 +169,10 @@
                 <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">General Ledger</a>
             </div>
         </div>
+        @endcan
 
         {{-- Report --}}
+        @can('reports.view')
         <div class="nav-group">
             <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
                 <i class="fa-solid fa-chart-line w-4 text-center"></i>
@@ -179,14 +200,29 @@
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">Persediaan Report</a>
             </div>
         </div>
+        @endcan
 
-        <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-            <i class="fa-solid fa-magnifying-glass-chart w-4 text-center"></i> Inquery
-        </a>
+        @can('inquiry.view')
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+                <i class="fa-solid fa-magnifying-glass-chart w-4 text-center"></i> Inquery
+            </a>
+        @endcan
 
-        <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
-            <i class="fa-solid fa-user-shield w-4 text-center"></i> Administrator
-        </a>
+        @role('Super Admin')
+            <div class="my-3 border-t border-gray-100"></div>
+
+            <a href="{{ route('admin.users.index') }}"
+               class="sidebar-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('admin.users.*')) aria-current="page" @endif>
+                <i class="fa-solid fa-user-shield w-4 text-center"></i> Administrator
+            </a>
+
+            <a href="{{ route('admin.roles.index') }}"
+               class="sidebar-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('admin.roles.*')) aria-current="page" @endif>
+                <i class="fa-solid fa-shield-halved w-4 text-center"></i> Roles &amp; Permissions
+            </a>
+        @endrole
 
     </nav>
 

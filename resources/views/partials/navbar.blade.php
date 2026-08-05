@@ -36,10 +36,33 @@
             </button>
 
             <img
-                src="{{ auth()->user()->avatar_url ?? 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200' }}"
-                alt="{{ auth()->user()->name ?? 'Cashier' }} profile photo"
+                src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200"
+                alt="{{ auth()->user()?->displayName() ?? 'User' }} profile photo"
                 class="w-11 h-11 rounded-full object-cover ring-2 ring-[var(--ink-200)]"
             />
+
+            <div class="relative">
+                <button id="userMenuBtn" type="button" class="flex items-center gap-2" aria-haspopup="true" aria-expanded="false">
+                    <span class="hidden md:block text-left">
+                        <span class="block text-sm font-semibold text-[var(--ink-900)] leading-tight">{{ auth()->user()?->displayName() ?? 'User' }}</span>
+                        <span class="block text-xs text-[var(--ink-400)] leading-tight">{{ auth()->user()?->roles->pluck('name')->join(', ') ?: 'No role' }}</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-xs text-[var(--ink-400)]"></i>
+                </button>
+
+                <div id="userMenu" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-2xl shadow-lg border border-gray-100 py-2 z-20">
+                    <div class="px-4 py-2 md:hidden border-b border-gray-50 mb-1">
+                        <p class="text-sm font-semibold text-[var(--ink-900)]">{{ auth()->user()?->displayName() ?? 'User' }}</p>
+                        <p class="text-xs text-[var(--ink-400)]">{{ auth()->user()?->roles->pluck('name')->join(', ') ?: 'No role' }}</p>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-[var(--bad-600)] hover:bg-[var(--bad-100)] flex items-center gap-2">
+                            <i class="fa-solid fa-right-from-bracket"></i> Log out
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </header>

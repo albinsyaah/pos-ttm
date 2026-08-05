@@ -5,10 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Validation\Rule;
 
-class CustomerController extends Controller
+class CustomerController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:customers.view', only: ['index']),
+            new Middleware('permission:customers.manage', only: ['store', 'update', 'destroy']),
+        ];
+    }
+
     public function index(Request $request)
     {
         $search = trim((string) $request->query('q', ''));

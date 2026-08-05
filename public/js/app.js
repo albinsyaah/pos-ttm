@@ -28,3 +28,29 @@ document.getElementById('menuBtn')?.addEventListener('click', () => {
   if (!sidebar) return;
   sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
 });
+
+// Profile / user menu dropdown (navbar)
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userMenu = document.getElementById('userMenu');
+
+userMenuBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isOpen = !userMenu.classList.contains('hidden');
+  userMenu.classList.toggle('hidden', isOpen);
+  userMenuBtn.setAttribute('aria-expanded', String(!isOpen));
+});
+
+document.addEventListener('click', (e) => {
+  if (!userMenu || userMenu.classList.contains('hidden')) return;
+  if (!userMenu.contains(e.target) && e.target !== userMenuBtn) {
+    userMenu.classList.add('hidden');
+    userMenuBtn?.setAttribute('aria-expanded', 'false');
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && userMenu && !userMenu.classList.contains('hidden')) {
+    userMenu.classList.add('hidden');
+    userMenuBtn?.setAttribute('aria-expanded', 'false');
+  }
+});
