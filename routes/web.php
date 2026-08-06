@@ -21,7 +21,11 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\Transactions\ApPaymentController;
 use App\Http\Controllers\Transactions\ArPaymentController;
 use App\Http\Controllers\Transactions\CashManagementController;
+use App\Http\Controllers\Transactions\DeviationController;
 use App\Http\Controllers\Transactions\GeneralLedgerController as TransactionsGeneralLedgerController;
+use App\Http\Controllers\Transactions\InternalExpenditureController;
+use App\Http\Controllers\Transactions\InternalReceiptController;
+use App\Http\Controllers\Transactions\ItemRequestController;
 use App\Http\Controllers\Transactions\PointOfSaleController;
 use App\Http\Controllers\Transactions\PointOfSaleNewController;
 use App\Http\Controllers\Transactions\PurchaseController;
@@ -31,6 +35,7 @@ use App\Http\Controllers\Transactions\SaleController;
 use App\Http\Controllers\Transactions\SalesOrderController;
 use App\Http\Controllers\Transactions\SalesReturnController;
 use App\Http\Controllers\Transactions\SalesSpgController;
+use App\Http\Controllers\Transactions\WarehouseTransferController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
@@ -185,6 +190,32 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['receivable-payments' => 'receivablePayment']);
 
+        // Internal Mutation: item requests, internal expenditures, internal
+        // receipts, warehouse transfers and deviations are all InternalMutation
+        // records, filtered/forced to a fixed "type" (see Transactions\ItemRequestController /
+        // InternalExpenditureController / InternalReceiptController /
+        // WarehouseTransferController / DeviationController, matching the
+        // pattern used by Hr\SalesmanController).
+        Route::resource('item-requests', ItemRequestController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['item-requests' => 'itemRequest']);
+
+        Route::resource('internal-expenditures', InternalExpenditureController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['internal-expenditures' => 'internalExpenditure']);
+
+        Route::resource('internal-receipts', InternalReceiptController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['internal-receipts' => 'internalReceipt']);
+
+        Route::resource('warehouse-transfers', WarehouseTransferController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['warehouse-transfers' => 'warehouseTransfer']);
+
+        Route::resource('deviations', DeviationController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['deviations' => 'deviation']);
+
         // Cash Management and General Ledger transaction entry pages. These
         // reuse the CashFlow/GeneralLedger models (see Finance module) but
         // are exposed here as day-to-day transaction entry screens.
@@ -208,3 +239,4 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'store', 'update', 'destroy']);
     });
 });
+

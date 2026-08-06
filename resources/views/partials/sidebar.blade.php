@@ -201,17 +201,27 @@
                 </div>
 
                 {{-- Mutasi Internal --}}
-                <div class="nav-group">
-                    <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="false">
+                <div class="nav-group {{ request()->routeIs('transactions.item-requests.*', 'transactions.internal-expenditures.*', 'transactions.internal-receipts.*', 'transactions.warehouse-transfers.*', 'transactions.deviations.*') ? 'open' : '' }}">
+                    <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="{{ request()->routeIs('transactions.item-requests.*', 'transactions.internal-expenditures.*', 'transactions.internal-receipts.*', 'transactions.warehouse-transfers.*', 'transactions.deviations.*') ? 'true' : 'false' }}">
                         <span class="flex-1 text-left">{{ __('app.sidebar.internal_mutation') }}</span>
                         <i class="fa-solid fa-chevron-right nav-chevron text-[10px]"></i>
                     </button>
                     <div class="nav-panel">
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.item_request') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.internal_expenditure') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.internal_receipt') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.warehouse_transfer') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.deviation') }}</a>
+                        <a href="{{ route('transactions.item-requests.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.item-requests.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.item-requests.*')) aria-current="page" @endif>{{ __('app.sidebar.item_request') }}</a>
+                        <a href="{{ route('transactions.internal-expenditures.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.internal-expenditures.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.internal-expenditures.*')) aria-current="page" @endif>{{ __('app.sidebar.internal_expenditure') }}</a>
+                        <a href="{{ route('transactions.internal-receipts.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.internal-receipts.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.internal-receipts.*')) aria-current="page" @endif>{{ __('app.sidebar.internal_receipt') }}</a>
+                        <a href="{{ route('transactions.warehouse-transfers.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.warehouse-transfers.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.warehouse-transfers.*')) aria-current="page" @endif>{{ __('app.sidebar.warehouse_transfer') }}</a>
+                        <a href="{{ route('transactions.deviations.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.deviations.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.deviations.*')) aria-current="page" @endif>{{ __('app.sidebar.deviation') }}</a>
                     </div>
                 </div>
 
@@ -288,3 +298,4 @@
         </button>
     </div> --}}
 </aside>
+
