@@ -20,6 +20,8 @@ use App\Http\Controllers\Pricing\PriceSetupController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\Transactions\ApPaymentController;
 use App\Http\Controllers\Transactions\ArPaymentController;
+use App\Http\Controllers\Transactions\CashManagementController;
+use App\Http\Controllers\Transactions\GeneralLedgerController as TransactionsGeneralLedgerController;
 use App\Http\Controllers\Transactions\PointOfSaleController;
 use App\Http\Controllers\Transactions\PointOfSaleNewController;
 use App\Http\Controllers\Transactions\PurchaseController;
@@ -182,6 +184,17 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('receivable-payments', ArPaymentController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['receivable-payments' => 'receivablePayment']);
+
+        // Cash Management and General Ledger transaction entry pages. These
+        // reuse the CashFlow/GeneralLedger models (see Finance module) but
+        // are exposed here as day-to-day transaction entry screens.
+        Route::resource('cash-management', CashManagementController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['cash-management' => 'cashManagement']);
+
+        Route::resource('general-ledger', TransactionsGeneralLedgerController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['general-ledger' => 'generalLedger']);
     });
 
     // Super Admin only: user accounts + role/permission management.

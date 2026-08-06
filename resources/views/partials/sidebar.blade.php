@@ -215,8 +215,12 @@
                     </div>
                 </div>
 
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.cash_management') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center gap-3 pl-11 pr-4 py-2">{{ __('app.sidebar.general_ledger') }}</a>
+                <a href="{{ route('transactions.cash-management.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('transactions.cash-management.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('transactions.cash-management.*')) aria-current="page" @endif>{{ __('app.sidebar.cash_management') }}</a>
+                <a href="{{ route('transactions.general-ledger.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('transactions.general-ledger.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('transactions.general-ledger.*')) aria-current="page" @endif>{{ __('app.sidebar.general_ledger') }}</a>
             </div>
         </div>
         @endcan

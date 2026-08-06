@@ -568,6 +568,37 @@ return [
         'delete_receivable_payment' => 'Delete receivable payment?',
     ],
 
+    // Transactions - Cash Management
+    'cash_management' => [
+        'title' => 'Cash Management',
+        'search_cash_transactions' => 'Search cash transactions',
+        'search_placeholder' => 'Search by description, account code or name',
+        'add_cash_transaction' => 'Add Cash Transaction',
+        'transaction_date' => 'Transaction Date',
+        'type' => 'Type',
+        'cash_in' => 'Cash In',
+        'cash_out' => 'Cash Out',
+        'account' => 'Account',
+        'description' => 'Description',
+        'no_cash_transactions_found' => 'No cash transactions found.',
+        'delete_cash_transaction' => 'Delete cash transaction?',
+    ],
+
+    // Transactions - General Ledger
+    'transactions_general_ledger' => [
+        'title' => 'General Ledger',
+        'search_ledgers' => 'Search ledger entries',
+        'search_placeholder' => 'Search by reference, account code or name',
+        'add_ledger' => 'Add Ledger Entry',
+        'transaction_date' => 'Transaction Date',
+        'account' => 'Account',
+        'reference_number' => 'Reference Number',
+        'debit' => 'Debit',
+        'credit' => 'Credit',
+        'no_ledgers_found' => 'No ledger entries found.',
+        'delete_ledger' => 'Delete ledger entry?',
+    ],
+
     // Admin - Users
     'users' => [
         'title' => 'Users',

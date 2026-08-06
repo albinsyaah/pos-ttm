@@ -568,6 +568,37 @@ return [
         'delete_receivable_payment' => 'Hapus pembayaran piutang?',
     ],
 
+    // Transaksi - Manajemen Kas
+    'cash_management' => [
+        'title' => 'Manajemen Kas',
+        'search_cash_transactions' => 'Cari transaksi kas',
+        'search_placeholder' => 'Cari berdasarkan deskripsi, kode atau nama akun',
+        'add_cash_transaction' => 'Tambah Transaksi Kas',
+        'transaction_date' => 'Tanggal Transaksi',
+        'type' => 'Tipe',
+        'cash_in' => 'Kas Masuk',
+        'cash_out' => 'Kas Keluar',
+        'account' => 'Akun',
+        'description' => 'Deskripsi',
+        'no_cash_transactions_found' => 'Transaksi kas tidak ditemukan.',
+        'delete_cash_transaction' => 'Hapus transaksi kas?',
+    ],
+
+    // Transaksi - Buku Besar
+    'transactions_general_ledger' => [
+        'title' => 'Buku Besar',
+        'search_ledgers' => 'Cari entri buku besar',
+        'search_placeholder' => 'Cari berdasarkan referensi, kode atau nama akun',
+        'add_ledger' => 'Tambah Entri Buku Besar',
+        'transaction_date' => 'Tanggal Transaksi',
+        'account' => 'Akun',
+        'reference_number' => 'Nomor Referensi',
+        'debit' => 'Debit',
+        'credit' => 'Kredit',
+        'no_ledgers_found' => 'Entri buku besar tidak ditemukan.',
+        'delete_ledger' => 'Hapus entri buku besar?',
+    ],
+
     // Admin - Users
     'users' => [
         'title' => 'Pengguna',
