@@ -170,8 +170,8 @@
                 </div>
 
                 {{-- Account Receivable --}}
-                <div class="nav-group {{ request()->routeIs('transactions.sales-orders.*', 'transactions.sales.*', 'transactions.point-of-sale-new.*', 'transactions.point-of-sale.*') ? 'open' : '' }}">
-                    <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="{{ request()->routeIs('transactions.sales-orders.*', 'transactions.sales.*', 'transactions.point-of-sale-new.*', 'transactions.point-of-sale.*') ? 'true' : 'false' }}">
+                <div class="nav-group {{ request()->routeIs('transactions.sales-orders.*', 'transactions.sales.*', 'transactions.point-of-sale-new.*', 'transactions.point-of-sale.*', 'transactions.sales-returns.*', 'transactions.sales-spg.*', 'transactions.receivable-payments.*') ? 'open' : '' }}">
+                    <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="{{ request()->routeIs('transactions.sales-orders.*', 'transactions.sales.*', 'transactions.point-of-sale-new.*', 'transactions.point-of-sale.*', 'transactions.sales-returns.*', 'transactions.sales-spg.*', 'transactions.receivable-payments.*') ? 'true' : 'false' }}">
                         <span class="flex-1 text-left">{{ __('app.sidebar.account_receivable') }}</span>
                         <i class="fa-solid fa-chevron-right nav-chevron text-[10px]"></i>
                     </button>
@@ -188,9 +188,15 @@
                         <a href="{{ route('transactions.point-of-sale.index') }}"
                            class="sidebar-item sub2 {{ request()->routeIs('transactions.point-of-sale.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
                            @if(request()->routeIs('transactions.point-of-sale.*')) aria-current="page" @endif>{{ __('app.sidebar.point_of_sales') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales_return') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales_spg') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Pembayaran Hutang</a>
+                        <a href="{{ route('transactions.sales-returns.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.sales-returns.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.sales-returns.*')) aria-current="page" @endif>{{ __('app.sidebar.sales_return') }}</a>
+                        <a href="{{ route('transactions.sales-spg.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.sales-spg.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.sales-spg.*')) aria-current="page" @endif>{{ __('app.sidebar.sales_spg') }}</a>
+                        <a href="{{ route('transactions.receivable-payments.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.receivable-payments.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.receivable-payments.*')) aria-current="page" @endif>{{ __('app.sidebar.receivable_payment') }}</a>
                     </div>
                 </div>
 

@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Http\Controllers\Transactions;
+
+use App\Http\Controllers\Controller;
+use App\Models\ArPayment;
+use App\Models\Customer;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Validation\Rule;
+
+class ArPaymentController extends Controller implements HasMiddleware
+{
+    /**
+     * Fixed payment methods.
+     */
+    public const PAYMENT_METHODS = ['cash', 'bank_transfer', 'check', 'giro'];
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:transactions.view', only: ['index']),
+            new Middleware('permission:transactions.manage', only: ['store', 'update', 'destroy']),
+        ];
+    }
+
+    public function index(Request $request)
+    {
+        $search = trim((string) $request->query('q', ''));
+
+        $receivablePayments = ArPayment::query()
+            ->with('customer')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('payment_number', 'like', "%{$search}%")
+                        ->orWhereHas('customer', function ($customerQuery) use ($search) {
+                            $customerQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('code', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->orderByDesc('payment_date')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('transactions.receivable-payments.index', [
+            'receivablePayments' => $receivablePayments,
+            'search' => $search,
+            'customers' => Customer::orderBy('name')->get(),
+            'paymentMethods' => self::PAYMENT_METHODS,
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $this->validatePayment($request);
+
+        ArPayment::create($data);
+
+        return redirect()->route('transactions.receivable-payments.index')->with('success', 'Receivable payment added successfully.');
+    }
+
+    public function update(Request $request, ArPayment $receivablePayment): RedirectResponse
+    {
+        $data = $this->validatePayment($request, $receivablePayment->id);
+
+        $receivablePayment->update($data);
+
+        return redirect()->route('transactions.receivable-payments.index')->with('success', 'Receivable payment updated successfully.');
+    }
+
+    public function destroy(ArPayment $receivablePayment): RedirectResponse
+    {
+        $receivablePayment->delete();
+
+        return redirect()->route('transactions.receivable-payments.index')->with('success', 'Receivable payment deleted successfully.');
+    }
+
+    protected function validatePayment(Request $request, ?int $ignoreId = null): array
+    {
+        return $request->validate([
+            'payment_number' => [
+                'required', 'string', 'max:100',
+                Rule::unique('ar_payments', 'payment_number')->ignore($ignoreId),
+            ],
+            'amount' => ['required', 'numeric', 'min:0', 'max:9999999999999.99'],
+            'payment_date' => ['required', 'date'],
+            'payment_method' => ['required', 'string', Rule::in(self::PAYMENT_METHODS)],
+            'customer_id' => ['required', 'exists:customers,id'],
+        ]);
+    }
+}

@@ -19,6 +19,7 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Pricing\PriceSetupController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\Transactions\ApPaymentController;
+use App\Http\Controllers\Transactions\ArPaymentController;
 use App\Http\Controllers\Transactions\PointOfSaleController;
 use App\Http\Controllers\Transactions\PointOfSaleNewController;
 use App\Http\Controllers\Transactions\PurchaseController;
@@ -26,6 +27,8 @@ use App\Http\Controllers\Transactions\PurchaseOrderController;
 use App\Http\Controllers\Transactions\PurchaseReturnController;
 use App\Http\Controllers\Transactions\SaleController;
 use App\Http\Controllers\Transactions\SalesOrderController;
+use App\Http\Controllers\Transactions\SalesReturnController;
+use App\Http\Controllers\Transactions\SalesSpgController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
@@ -167,6 +170,18 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('point-of-sale', PointOfSaleController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['point-of-sale' => 'pointOfSale']);
+
+        Route::resource('sales-returns', SalesReturnController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['sales-returns' => 'salesReturn']);
+
+        Route::resource('sales-spg', SalesSpgController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['sales-spg' => 'salesSpg']);
+
+        Route::resource('receivable-payments', ArPaymentController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['receivable-payments' => 'receivablePayment']);
     });
 
     // Super Admin only: user accounts + role/permission management.

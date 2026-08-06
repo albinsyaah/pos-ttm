@@ -514,6 +514,60 @@ return [
         'new_transaction' => 'Transaksi Baru',
     ],
 
+    // Transactions - Sales Returns (Retur Penjualan)
+    'sales_returns' => [
+        'title' => 'Retur Penjualan',
+        'search_sales_returns' => 'Cari retur penjualan',
+        'search_placeholder' => 'Cari berdasarkan nomor retur atau nomor invoice',
+        'add_sales_return' => 'Tambah Retur Penjualan',
+        'edit_sales_return' => 'Ubah Retur Penjualan',
+        'return_number' => 'Nomor Retur',
+        'return_date' => 'Tanggal Retur',
+        'sale' => 'Penjualan',
+        'total' => 'Total',
+        'items' => 'Item',
+        'no_sales_returns_found' => 'Tidak ada retur penjualan ditemukan.',
+        'delete_sales_return' => 'Hapus retur penjualan?',
+    ],
+
+    // Transactions - Sales SPG
+    'sales_spg' => [
+        'title' => 'Sales SPG',
+        'search_transactions' => 'Cari transaksi',
+        'search_placeholder' => 'Cari berdasarkan nomor invoice atau customer',
+        'add_transaction' => 'Tambah Transaksi',
+        'edit_transaction' => 'Ubah Transaksi',
+        'invoice_number' => 'Nomor Invoice',
+        'sale_date' => 'Tanggal',
+        'customer_optional' => 'Customer (opsional)',
+        'salesman_optional' => 'Salesman (opsional)',
+        'warehouse' => 'Gudang',
+        'items' => 'Item',
+        'total' => 'Total',
+        'no_transactions_found' => 'Tidak ada transaksi ditemukan.',
+        'delete_transaction' => 'Hapus transaksi?',
+    ],
+
+    // Transactions - Receivable Payments (Pembayaran Piutang)
+    'receivable_payments' => [
+        'title' => 'Pembayaran Piutang',
+        'search_receivable_payments' => 'Cari pembayaran piutang',
+        'search_placeholder' => 'Cari berdasarkan nomor pembayaran atau customer',
+        'add_receivable_payment' => 'Tambah Pembayaran Piutang',
+        'edit_receivable_payment' => 'Ubah Pembayaran Piutang',
+        'payment_number' => 'Nomor Pembayaran',
+        'payment_date' => 'Tanggal Pembayaran',
+        'payment_method' => 'Metode Pembayaran',
+        'customer' => 'Customer',
+        'amount' => 'Jumlah',
+        'method_cash' => 'Tunai',
+        'method_bank_transfer' => 'Transfer Bank',
+        'method_check' => 'Cek',
+        'method_giro' => 'Giro',
+        'no_receivable_payments_found' => 'Tidak ada pembayaran piutang ditemukan.',
+        'delete_receivable_payment' => 'Hapus pembayaran piutang?',
+    ],
+
     // Admin - Users
     'users' => [
         'title' => 'Pengguna',

@@ -514,6 +514,60 @@ return [
         'new_transaction' => 'New Transaction',
     ],
 
+    // Transactions - Sales Returns
+    'sales_returns' => [
+        'title' => 'Sales Return',
+        'search_sales_returns' => 'Search sales returns',
+        'search_placeholder' => 'Search by return number or invoice number',
+        'add_sales_return' => 'Add Sales Return',
+        'edit_sales_return' => 'Edit Sales Return',
+        'return_number' => 'Return Number',
+        'return_date' => 'Return Date',
+        'sale' => 'Sale',
+        'total' => 'Total',
+        'items' => 'Items',
+        'no_sales_returns_found' => 'No sales returns found.',
+        'delete_sales_return' => 'Delete sales return?',
+    ],
+
+    // Transactions - Sales SPG
+    'sales_spg' => [
+        'title' => 'Sales SPG',
+        'search_transactions' => 'Search transactions',
+        'search_placeholder' => 'Search by invoice number or customer',
+        'add_transaction' => 'Add Transaction',
+        'edit_transaction' => 'Edit Transaction',
+        'invoice_number' => 'Invoice Number',
+        'sale_date' => 'Date',
+        'customer_optional' => 'Customer (optional)',
+        'salesman_optional' => 'Salesman (optional)',
+        'warehouse' => 'Warehouse',
+        'items' => 'Items',
+        'total' => 'Total',
+        'no_transactions_found' => 'No transactions found.',
+        'delete_transaction' => 'Delete transaction?',
+    ],
+
+    // Transactions - Receivable Payments (AR Payments)
+    'receivable_payments' => [
+        'title' => 'Receivable Payment',
+        'search_receivable_payments' => 'Search receivable payments',
+        'search_placeholder' => 'Search by payment number or customer',
+        'add_receivable_payment' => 'Add Receivable Payment',
+        'edit_receivable_payment' => 'Edit Receivable Payment',
+        'payment_number' => 'Payment Number',
+        'payment_date' => 'Payment Date',
+        'payment_method' => 'Payment Method',
+        'customer' => 'Customer',
+        'amount' => 'Amount',
+        'method_cash' => 'Cash',
+        'method_bank_transfer' => 'Bank Transfer',
+        'method_check' => 'Check',
+        'method_giro' => 'Giro',
+        'no_receivable_payments_found' => 'No receivable payments found.',
+        'delete_receivable_payment' => 'Delete receivable payment?',
+    ],
+
     // Admin - Users
     'users' => [
         'title' => 'Users',
