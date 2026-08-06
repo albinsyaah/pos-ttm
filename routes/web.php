@@ -15,6 +15,7 @@ use App\Http\Controllers\Inventory\BrandController;
 use App\Http\Controllers\Inventory\ItemTypeController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\ProductGroupController;
+use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Pricing\PriceSetupController;
 use App\Http\Controllers\SupplierController;
@@ -65,6 +66,13 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:dashboard.view')
         ->name('dashboard');
+
+    // Inquiry: read-only product stock/price search tool. Permission check
+    // lives on the route itself (single action, no HasMiddleware needed),
+    // matching the dashboard route above.
+    Route::get('/inquiry', [InquiryController::class, 'index'])
+        ->middleware('permission:inquiry.view')
+        ->name('inquiry.index');
 
     // Per-action permission checks live on the controller itself via
     // HasMiddleware (see CustomerController::middleware()).
@@ -239,4 +247,3 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'store', 'update', 'destroy']);
     });
 });
-

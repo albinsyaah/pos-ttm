@@ -267,7 +267,9 @@
         @endcan
 
         @can('inquiry.view')
-            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5">
+            <a href="{{ route('inquiry.index') }}"
+               class="sidebar-item {{ request()->routeIs('inquiry.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('inquiry.*')) aria-current="page" @endif>
                 <i class="fa-solid fa-magnifying-glass-chart w-4 text-center"></i> {{ __('app.sidebar.inquiry') }}
             </a>
         @endcan
@@ -298,4 +300,3 @@
         </button>
     </div> --}}
 </aside>
-

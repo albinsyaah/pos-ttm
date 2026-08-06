@@ -301,6 +301,21 @@ return [
         'delete_price_setup' => 'Delete price setup?',
     ],
 
+    // Inquiry (read-only stock & price search tool)
+    'inquiry' => [
+        'title' => 'Inquiry',
+        'search_products' => 'Search products',
+        'search_placeholder' => 'Search by code or name',
+        'all_brands' => 'All Brands',
+        'all_item_types' => 'All Item Types',
+        'all_warehouses' => 'All Warehouses',
+        'stock' => 'Stock',
+        'price' => 'Price',
+        'no_stock_data' => 'No stock data',
+        'no_price_data' => 'No price data',
+        'no_products_found' => 'No products found.',
+    ],
+
     // Finance - Chart of Accounts
     'chart_of_accounts' => [
         'title' => 'Chart of Accounts',

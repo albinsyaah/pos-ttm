@@ -301,6 +301,21 @@ return [
         'delete_price_setup' => 'Hapus setup harga?',
     ],
 
+    // Inquiry (alat cari stok & harga, khusus lihat)
+    'inquiry' => [
+        'title' => 'Inquiry',
+        'search_products' => 'Cari barang',
+        'search_placeholder' => 'Cari berdasarkan kode atau nama',
+        'all_brands' => 'Semua Merk',
+        'all_item_types' => 'Semua Jenis Barang',
+        'all_warehouses' => 'Semua Gudang',
+        'stock' => 'Stok',
+        'price' => 'Harga',
+        'no_stock_data' => 'Belum ada data stok',
+        'no_price_data' => 'Belum ada data harga',
+        'no_products_found' => 'Barang tidak ditemukan.',
+    ],
+
     // Keuangan - Bagan Akun
     'chart_of_accounts' => [
         'title' => 'Bagan Akun',
