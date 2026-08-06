@@ -36,7 +36,7 @@ class ProductController extends Controller implements HasMiddleware
                 });
             })
             ->orderBy('name')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('inventory.products.index', [

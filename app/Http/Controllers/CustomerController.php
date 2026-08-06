@@ -32,7 +32,7 @@ class CustomerController extends Controller implements HasMiddleware
                 });
             })
             ->orderBy('name')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('customers.index', [

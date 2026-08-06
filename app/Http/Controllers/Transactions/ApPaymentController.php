@@ -42,7 +42,7 @@ class ApPaymentController extends Controller implements HasMiddleware
                 });
             })
             ->orderByDesc('payment_date')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('transactions.payable-payments.index', [

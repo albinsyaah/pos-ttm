@@ -28,7 +28,7 @@ class UserController extends Controller
                 $query->where('username', 'like', "%{$search}%");
             })
             ->orderBy('username')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('admin.users.index', [

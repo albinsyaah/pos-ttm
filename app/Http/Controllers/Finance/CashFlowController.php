@@ -42,7 +42,7 @@ class CashFlowController extends Controller implements HasMiddleware
                 });
             })
             ->orderByDesc('transaction_date')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('finance.cash-flows.index', [

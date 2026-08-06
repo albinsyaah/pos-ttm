@@ -19,9 +19,13 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Pricing\PriceSetupController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\Transactions\ApPaymentController;
+use App\Http\Controllers\Transactions\PointOfSaleController;
+use App\Http\Controllers\Transactions\PointOfSaleNewController;
 use App\Http\Controllers\Transactions\PurchaseController;
 use App\Http\Controllers\Transactions\PurchaseOrderController;
 use App\Http\Controllers\Transactions\PurchaseReturnController;
+use App\Http\Controllers\Transactions\SaleController;
+use App\Http\Controllers\Transactions\SalesOrderController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
@@ -149,6 +153,20 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('payable-payments', ApPaymentController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['payable-payments' => 'payablePayment']);
+
+        Route::resource('sales-orders', SalesOrderController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['sales-orders' => 'salesOrder']);
+
+        Route::resource('sales', SaleController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+
+        Route::get('point-of-sale-new', [PointOfSaleNewController::class, 'index'])->name('point-of-sale-new.index');
+        Route::post('point-of-sale-new', [PointOfSaleNewController::class, 'store'])->name('point-of-sale-new.store');
+
+        Route::resource('point-of-sale', PointOfSaleController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['point-of-sale' => 'pointOfSale']);
     });
 
     // Super Admin only: user accounts + role/permission management.

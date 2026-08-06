@@ -170,16 +170,24 @@
                 </div>
 
                 {{-- Account Receivable --}}
-                <div class="nav-group">
-                    <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="false">
+                <div class="nav-group {{ request()->routeIs('transactions.sales-orders.*', 'transactions.sales.*', 'transactions.point-of-sale-new.*', 'transactions.point-of-sale.*') ? 'open' : '' }}">
+                    <button class="nav-toggle sidebar-item sub w-full flex items-center gap-3 pl-11 pr-4 py-2" aria-expanded="{{ request()->routeIs('transactions.sales-orders.*', 'transactions.sales.*', 'transactions.point-of-sale-new.*', 'transactions.point-of-sale.*') ? 'true' : 'false' }}">
                         <span class="flex-1 text-left">{{ __('app.sidebar.account_receivable') }}</span>
                         <i class="fa-solid fa-chevron-right nav-chevron text-[10px]"></i>
                     </button>
                     <div class="nav-panel">
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales_order') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.point_of_sales_new') }}</a>
-                        <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.point_of_sales') }}</a>
+                        <a href="{{ route('transactions.sales-orders.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.sales-orders.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.sales-orders.*')) aria-current="page" @endif>{{ __('app.sidebar.sales_order') }}</a>
+                        <a href="{{ route('transactions.sales.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.sales.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.sales.*')) aria-current="page" @endif>{{ __('app.sidebar.sales') }}</a>
+                        <a href="{{ route('transactions.point-of-sale-new.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.point-of-sale-new.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.point-of-sale-new.*')) aria-current="page" @endif>{{ __('app.sidebar.point_of_sales_new') }}</a>
+                        <a href="{{ route('transactions.point-of-sale.index') }}"
+                           class="sidebar-item sub2 {{ request()->routeIs('transactions.point-of-sale.*') ? 'active' : '' }} flex items-center pl-16 pr-4 py-2"
+                           @if(request()->routeIs('transactions.point-of-sale.*')) aria-current="page" @endif>{{ __('app.sidebar.point_of_sales') }}</a>
                         <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales_return') }}</a>
                         <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">{{ __('app.sidebar.sales_spg') }}</a>
                         <a href="#" class="sidebar-item sub2 flex items-center pl-16 pr-4 py-2">Pembayaran Hutang</a>

@@ -29,7 +29,7 @@ class BrandController extends Controller implements HasMiddleware
             })
             ->withCount('products')
             ->orderBy('name')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('inventory.brands.index', [

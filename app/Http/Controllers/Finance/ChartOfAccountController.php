@@ -37,7 +37,7 @@ class ChartOfAccountController extends Controller implements HasMiddleware
                 });
             })
             ->orderBy('account_code')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('finance.chart-of-accounts.index', [

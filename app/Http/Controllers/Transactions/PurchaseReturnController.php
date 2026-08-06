@@ -38,7 +38,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
                 });
             })
             ->orderByDesc('return_date')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('transactions.purchase-returns.index', [

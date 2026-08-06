@@ -44,7 +44,7 @@ class PurchaseOrderController extends Controller implements HasMiddleware
                 });
             })
             ->orderByDesc('order_date')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('transactions.purchase-orders.index', [
