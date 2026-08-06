@@ -6,7 +6,7 @@
 @section('content')
 
     {{-- Stat cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
 
         <div class="stat-card card-gradient text-white p-6">
             <div class="flex items-center justify-between">
@@ -28,7 +28,7 @@
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.sales_transactions_today') }}</p>
         </div>
 
-        <div class="stat-card p-6">
+        {{-- <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.avg_order_value') }}</p>
                 <div class="w-9 h-9 rounded-xl bg-[var(--warn-100)] text-[var(--warn-600)] flex items-center justify-center">
@@ -37,7 +37,7 @@
             </div>
             <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($avgOrderValue) }}</p>
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.todays_sales_divided_orders') }}</p>
-        </div>
+        </div> --}}
 
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
@@ -52,7 +52,7 @@
     </div>
 
     {{-- Finance & open orders --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mt-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 mt-6">
 
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
@@ -76,7 +76,7 @@
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.purchases_not_yet_paid') }}</p>
         </div>
 
-        <div class="stat-card p-6">
+        {{-- <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.pending_sales_orders') }}</p>
                 <div class="w-9 h-9 rounded-xl bg-[var(--brand-100)] text-[var(--brand-600)] flex items-center justify-center">
@@ -96,7 +96,7 @@
             </div>
             <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ $pendingPurchaseOrders }}</p>
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.awaiting_delivery') }}</p>
-        </div>
+        </div> --}}
     </div>
 
     {{-- Chart + top products --}}
