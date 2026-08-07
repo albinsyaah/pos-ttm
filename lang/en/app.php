@@ -317,6 +317,49 @@ return [
     ],
 
     // Finance - Chart of Accounts
+    // Reports
+    'reports' => [
+        'purchase_order' => [
+            'title' => 'Purchase Order Report',
+            'search_label' => 'Search purchase orders',
+            'search_placeholder' => 'Search by PO number or supplier',
+            'all_suppliers' => 'All Suppliers',
+            'all_statuses' => 'All Statuses',
+            'date_to' => 'to',
+            'reset_filters' => 'Reset Filters',
+            'print' => 'Print',
+            'summary_total_orders' => 'Total Orders',
+            'summary_total_amount' => 'Total Amount',
+            'no_data' => 'No purchase orders found.',
+        ],
+        'purchase' => [
+            'title' => 'Purchase Report',
+            'search_label' => 'Search purchases',
+            'search_placeholder' => 'Search by invoice number or supplier',
+            'all_suppliers' => 'All Suppliers',
+            'all_warehouses' => 'All Warehouses',
+            'all_statuses' => 'All Statuses',
+            'date_to' => 'to',
+            'reset_filters' => 'Reset Filters',
+            'print' => 'Print',
+            'summary_total_purchases' => 'Total Purchases',
+            'summary_total_amount' => 'Total Amount',
+            'no_data' => 'No purchases found.',
+        ],
+        'purchase_return' => [
+            'title' => 'Purchase Return Report',
+            'search_label' => 'Search purchase returns',
+            'search_placeholder' => 'Search by return number or invoice number',
+            'all_suppliers' => 'All Suppliers',
+            'date_to' => 'to',
+            'reset_filters' => 'Reset Filters',
+            'print' => 'Print',
+            'summary_total_returns' => 'Total Returns',
+            'summary_total_amount' => 'Total Amount',
+            'no_data' => 'No purchase returns found.',
+        ],
+    ],
+
     'chart_of_accounts' => [
         'title' => 'Chart of Accounts',
         'search_accounts' => 'Search accounts',

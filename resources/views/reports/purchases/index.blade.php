@@ -1,0 +1,141 @@
+@extends('layouts.app')
+
+@section('title', __('app.reports.purchase.title'))
+@section('page-title', __('app.reports.purchase.title'))
+
+@section('content')
+
+    <form id="purchaseReportFilterForm" action="{{ route('reports.purchases') }}" method="GET" class="flex items-center justify-between flex-wrap gap-4">
+        <div class="relative">
+            <label class="sr-only" for="purchaseReportSearch">{{ __('app.reports.purchase.search_label') }}</label>
+            <input
+                id="purchaseReportSearch"
+                name="q"
+                type="search"
+                value="{{ $search }}"
+                placeholder="{{ __('app.reports.purchase.search_placeholder') }}"
+                autocomplete="off"
+                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
+            />
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap">
+            @if($search || $supplierId || $warehouseId || $status || $dateFrom || $dateTo)
+                <a href="{{ route('reports.purchases') }}" class="text-xs font-semibold text-[var(--ink-400)] hover:text-[var(--ink-900)] transition-colors">
+                    <i class="fa-solid fa-xmark"></i> {{ __('app.reports.purchase.reset_filters') }}
+                </a>
+            @endif
+
+            <select id="purchaseReportSupplier" name="supplier_id"
+                   class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
+                <option value="">{{ __('app.reports.purchase.all_suppliers') }}</option>
+                @foreach($suppliers as $supplier)
+                    <option value="{{ $supplier->id }}" @selected((string) $supplierId === (string) $supplier->id)>{{ $supplier->name }}</option>
+                @endforeach
+            </select>
+
+            <select id="purchaseReportWarehouse" name="warehouse_id"
+                   class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
+                <option value="">{{ __('app.reports.purchase.all_warehouses') }}</option>
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" @selected((string) $warehouseId === (string) $warehouse->id)>{{ $warehouse->name }}</option>
+                @endforeach
+            </select>
+
+            <select id="purchaseReportStatus" name="status"
+                   class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
+                <option value="">{{ __('app.reports.purchase.all_statuses') }}</option>
+                @foreach($statuses as $statusOption)
+                    <option value="{{ $statusOption }}" @selected($status === $statusOption)>{{ ucfirst($statusOption) }}</option>
+                @endforeach
+            </select>
+
+            <input id="purchaseReportDateFrom" name="date_from" type="date" value="{{ $dateFrom }}"
+                   class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+            <span class="text-[var(--ink-400)] text-xs">{{ __('app.reports.purchase.date_to') }}</span>
+            <input id="purchaseReportDateTo" name="date_to" type="date" value="{{ $dateTo }}"
+                   class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+
+            <button type="button" id="purchaseReportPrintBtn"
+                    class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
+                <i class="fa-solid fa-print"></i> {{ __('app.reports.purchase.print') }}
+            </button>
+        </div>
+    </form>
+
+    <div class="grid sm:grid-cols-2 gap-4 mt-6">
+        <div class="bg-white rounded-3xl p-5">
+            <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">{{ __('app.reports.purchase.summary_total_purchases') }}</p>
+            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">{{ number_format($totalPurchases) }}</p>
+        </div>
+        <div class="bg-white rounded-3xl p-5">
+            <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">{{ __('app.reports.purchase.summary_total_amount') }}</p>
+            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">{{ number_format((float) $totalAmount, 2) }}</p>
+        </div>
+    </div>
+
+    <div id="purchaseReportTableWrap" class="relative bg-white rounded-3xl mt-6 overflow-x-auto">
+
+        <div id="purchaseReportLoading" class="hidden absolute inset-0 z-10 flex items-start justify-center pt-16 bg-white/70 backdrop-blur-[1px] rounded-3xl">
+            <i class="fa-solid fa-circle-notch fa-spin text-xl text-[var(--brand-600)]"></i>
+        </div>
+
+        <table class="w-full text-sm min-w-[920px]">
+            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+                <tr class="text-left border-b border-gray-100">
+                    <th class="p-5 font-semibold">{{ __('app.purchases.invoice_number') }}</th>
+                    <th class="font-semibold">{{ __('app.purchases.purchase_date') }}</th>
+                    <th class="font-semibold">{{ __('app.purchases.supplier') }}</th>
+                    <th class="font-semibold">{{ __('app.purchases.warehouse') }}</th>
+                    <th class="font-semibold">{{ __('app.purchases.status') }}</th>
+                    <th class="font-semibold">{{ __('app.purchases.items') }}</th>
+                    <th class="font-semibold">{{ __('app.purchases.total') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($purchases as $purchase)
+                    <tr class="table-row border-b border-gray-50">
+                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $purchase->invoice_number }}</td>
+                        <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($purchase->purchase_date)->format('d M Y') }}</td>
+                        <td class="text-[var(--ink-700)]">{{ $purchase->supplier?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-400)]">{{ $purchase->warehouse?->name ?: '—' }}</td>
+                        <td>
+                            <span class="badge-{{ $purchase->status === 'cancelled' ? 'bad' : ($purchase->status === 'received' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
+                                {{ $purchase->status }}
+                            </span>
+                        </td>
+                        <td class="text-[var(--ink-400)]">{{ $purchase->purchaseDetails->count() }}</td>
+                        <td class="text-[var(--ink-700)]">{{ number_format((float) $purchase->total_amount, 2) }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                            <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
+                            {{ __('app.reports.purchase.no_data') }}
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-6">
+        {{ $purchases->links() }}
+    </div>
+
+@endsection
+
+@push('styles')
+    <style>
+        .badge-neutral { background: var(--surface); color: var(--ink-700); }
+
+        @media print {
+            #sidebar, #toastHost, .pagination, form#purchaseReportFilterForm, nav[role="navigation"] { display: none !important; }
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script src="{{ asset('js/reports-purchases.js') }}"></script>
+@endpush

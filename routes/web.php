@@ -18,6 +18,9 @@ use App\Http\Controllers\Inventory\ProductGroupController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Pricing\PriceSetupController;
+use App\Http\Controllers\Reports\PurchaseOrderReportController;
+use App\Http\Controllers\Reports\PurchaseReportController;
+use App\Http\Controllers\Reports\PurchaseReturnReportController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\Transactions\ApPaymentController;
 use App\Http\Controllers\Transactions\ArPaymentController;
@@ -234,6 +237,24 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('general-ledger', TransactionsGeneralLedgerController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['general-ledger' => 'generalLedger']);
+    });
+
+    // Report: read-only, filterable reports built on top of the same
+    // migrations/models the transaction modules use. Permission check lives
+    // on the route itself (single action, no HasMiddleware needed), matching
+    // the pattern used by InquiryController above.
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('purchase-orders', [PurchaseOrderReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('purchase-orders');
+
+        Route::get('purchases', [PurchaseReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('purchases');
+
+        Route::get('purchase-returns', [PurchaseReturnReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('purchase-returns');
     });
 
     // Super Admin only: user accounts + role/permission management.

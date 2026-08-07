@@ -316,7 +316,49 @@ return [
         'no_products_found' => 'Barang tidak ditemukan.',
     ],
 
-    // Keuangan - Bagan Akun
+    // Laporan
+    'reports' => [
+        'purchase_order' => [
+            'title' => 'Laporan Purchase Order',
+            'search_label' => 'Cari purchase order',
+            'search_placeholder' => 'Cari berdasarkan nomor PO atau supplier',
+            'all_suppliers' => 'Semua Supplier',
+            'all_statuses' => 'Semua Status',
+            'date_to' => 's/d',
+            'reset_filters' => 'Atur Ulang Filter',
+            'print' => 'Cetak',
+            'summary_total_orders' => 'Total Pesanan',
+            'summary_total_amount' => 'Total Nilai',
+            'no_data' => 'Tidak ada purchase order ditemukan.',
+        ],
+        'purchase' => [
+            'title' => 'Laporan Pembelian',
+            'search_label' => 'Cari pembelian',
+            'search_placeholder' => 'Cari berdasarkan nomor invoice atau supplier',
+            'all_suppliers' => 'Semua Supplier',
+            'all_warehouses' => 'Semua Gudang',
+            'all_statuses' => 'Semua Status',
+            'date_to' => 's/d',
+            'reset_filters' => 'Atur Ulang Filter',
+            'print' => 'Cetak',
+            'summary_total_purchases' => 'Total Pembelian',
+            'summary_total_amount' => 'Total Nilai',
+            'no_data' => 'Tidak ada pembelian ditemukan.',
+        ],
+        'purchase_return' => [
+            'title' => 'Laporan Retur Pembelian',
+            'search_label' => 'Cari retur pembelian',
+            'search_placeholder' => 'Cari berdasarkan nomor retur atau nomor invoice',
+            'all_suppliers' => 'Semua Supplier',
+            'date_to' => 's/d',
+            'reset_filters' => 'Atur Ulang Filter',
+            'print' => 'Cetak',
+            'summary_total_returns' => 'Total Retur',
+            'summary_total_amount' => 'Total Nilai',
+            'no_data' => 'Tidak ada retur pembelian ditemukan.',
+        ],
+    ],
+
     'chart_of_accounts' => [
         'title' => 'Bagan Akun',
         'search_accounts' => 'Cari akun',

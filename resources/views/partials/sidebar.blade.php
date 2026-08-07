@@ -237,16 +237,22 @@
 
         {{-- Report --}}
         @can('reports.view')
-        <div class="nav-group">
-            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="false">
+        <div class="nav-group {{ request()->routeIs('reports.*') ? 'open' : '' }}">
+            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="{{ request()->routeIs('reports.*') ? 'true' : 'false' }}">
                 <i class="fa-solid fa-chart-line w-4 text-center"></i>
                 <span class="flex-1 text-left">{{ __('app.sidebar.report') }}</span>
                 <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
             </button>
             <div class="nav-panel">
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.purchase_order_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.purchase_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.purchase_return_report') }}</a>
+                <a href="{{ route('reports.purchase-orders') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.purchase-orders') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.purchase-orders')) aria-current="page" @endif>{{ __('app.sidebar.purchase_order_report') }}</a>
+                <a href="{{ route('reports.purchases') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.purchases') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.purchases')) aria-current="page" @endif>{{ __('app.sidebar.purchase_report') }}</a>
+                <a href="{{ route('reports.purchase-returns') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.purchase-returns') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.purchase-returns')) aria-current="page" @endif>{{ __('app.sidebar.purchase_return_report') }}</a>
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.payable_payment_report') }}</a>
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_order_report') }}</a>
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_report') }}</a>
