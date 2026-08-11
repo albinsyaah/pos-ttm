@@ -73,6 +73,7 @@ class SalesSummaryReportController extends Controller
         $bySource = (clone $query)
             ->select('source', DB::raw('count(*) as total_count'), DB::raw('sum(total_amount) as total_amount'))
             ->groupBy('source')
+            ->reorder()
             ->get()
             ->keyBy('source');
 

@@ -19,10 +19,14 @@ use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Pricing\PriceSetupController;
 use App\Http\Controllers\Reports\ApPaymentReportController;
+use App\Http\Controllers\Reports\ArAgingReportController;
+use App\Http\Controllers\Reports\ArCardReportController;
 use App\Http\Controllers\Reports\ArPaymentReportController;
+use App\Http\Controllers\Reports\ExpenditureReportController;
 use App\Http\Controllers\Reports\PurchaseOrderReportController;
 use App\Http\Controllers\Reports\PurchaseReportController;
 use App\Http\Controllers\Reports\PurchaseReturnReportController;
+use App\Http\Controllers\Reports\ReceiptReportController;
 use App\Http\Controllers\Reports\SalesOrderReportController;
 use App\Http\Controllers\Reports\SaleReportController;
 use App\Http\Controllers\Reports\SalesReturnReportController;
@@ -285,6 +289,22 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('receivable-payments', [ArPaymentReportController::class, 'index'])
             ->middleware('permission:reports.view')
             ->name('receivable-payments');
+
+        Route::get('receivable-card', [ArCardReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('receivable-card');
+
+        Route::get('receivable-aging', [ArAgingReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('receivable-aging');
+
+        Route::get('expenditure', [ExpenditureReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('expenditure');
+
+        Route::get('receipt', [ReceiptReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('receipt');
     });
 
     // Super Admin only: user accounts + role/permission management.
@@ -293,7 +313,6 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'store', 'update', 'destroy']);
         Route::patch('users/{user}/toggle-active', [UserController::class, 'toggleActive'])
             ->name('users.toggle-active');
-
         Route::resource('roles', RoleController::class)
             ->only(['index', 'store', 'update', 'destroy']);
     });

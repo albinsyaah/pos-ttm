@@ -108,7 +108,7 @@
                 &middot; {{ $warehouses->firstWhere('id', $warehouseId)?->name }}
             @endif
             @if ($source)
-                &middot; {{ __('app.reports.sales_summary.channel_' . $source) }}
+                &middot; {{ $source }}
             @endif
         </p>
         <p class="generated">{{ __('app.reports.generated_at') }}: {{ now()->format('d M Y H:i') }}</p>
@@ -144,7 +144,7 @@
                         <td>
                             <span
                                 class="badge-neutral inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
-                                {{ __('app.reports.sales_summary.channel_' . $sale->source) }}
+                                {{ $sale->source }}
                             </span>
                         </td>
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>

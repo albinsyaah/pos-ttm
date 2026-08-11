@@ -271,10 +271,18 @@
                 <a href="{{ route('reports.receivable-payments') }}"
                    class="sidebar-item sub {{ request()->routeIs('reports.receivable-payments') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
                    @if(request()->routeIs('reports.receivable-payments')) aria-current="page" @endif>{{ __('app.sidebar.receivable_payment_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receivable_card_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receivable_aging_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.expenditure_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receipt_report') }}</a>
+                <a href="{{ route('reports.receivable-card') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.receivable-card') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.receivable-card')) aria-current="page" @endif>{{ __('app.sidebar.receivable_card_report') }}</a>
+                <a href="{{ route('reports.receivable-aging') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.receivable-aging') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.receivable-aging')) aria-current="page" @endif>{{ __('app.sidebar.receivable_aging_report') }}</a>
+                <a href="{{ route('reports.expenditure') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.expenditure') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.expenditure')) aria-current="page" @endif>{{ __('app.sidebar.expenditure_report') }}</a>
+                <a href="{{ route('reports.receipt') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.receipt') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.receipt')) aria-current="page" @endif>{{ __('app.sidebar.receipt_report') }}</a>
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.transfer_report') }}</a>
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.deviation_report') }}</a>
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.stock_card') }}</a>
