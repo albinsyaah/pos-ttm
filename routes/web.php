@@ -18,9 +18,15 @@ use App\Http\Controllers\Inventory\ProductGroupController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Pricing\PriceSetupController;
+use App\Http\Controllers\Reports\ApPaymentReportController;
+use App\Http\Controllers\Reports\ArPaymentReportController;
 use App\Http\Controllers\Reports\PurchaseOrderReportController;
 use App\Http\Controllers\Reports\PurchaseReportController;
 use App\Http\Controllers\Reports\PurchaseReturnReportController;
+use App\Http\Controllers\Reports\SalesOrderReportController;
+use App\Http\Controllers\Reports\SaleReportController;
+use App\Http\Controllers\Reports\SalesReturnReportController;
+use App\Http\Controllers\Reports\SalesSummaryReportController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\Transactions\ApPaymentController;
 use App\Http\Controllers\Transactions\ArPaymentController;
@@ -255,6 +261,30 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('purchase-returns', [PurchaseReturnReportController::class, 'index'])
             ->middleware('permission:reports.view')
             ->name('purchase-returns');
+
+        Route::get('payable-payments', [ApPaymentReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('payable-payments');
+
+        Route::get('sales-orders', [SalesOrderReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('sales-orders');
+
+        Route::get('sales', [SaleReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('sales');
+
+        Route::get('sales-summary', [SalesSummaryReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('sales-summary');
+
+        Route::get('sales-returns', [SalesReturnReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('sales-returns');
+
+        Route::get('receivable-payments', [ArPaymentReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('receivable-payments');
     });
 
     // Super Admin only: user accounts + role/permission management.

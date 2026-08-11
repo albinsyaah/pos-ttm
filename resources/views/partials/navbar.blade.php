@@ -24,9 +24,9 @@
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
             </label>
 
-            <button id="newSaleBtn" class="hidden sm:flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
+            {{-- <button id="newSaleBtn" class="hidden sm:flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
                 <i class="fa-solid fa-plus"></i> {{ __('app.layout.new_sale') }}
-            </button>
+            </button> --}}
 
             {{-- Language switcher --}}
             <div class="relative">

@@ -11,7 +11,7 @@
         {{-- <div class="w-10 h-10 rounded-xl bg-[var(--brand-600)] text-white flex items-center justify-center text-lg">
             <i class="fa-solid fa-cash-register"></i>
         </div> --}}
-        <h1 class="text-xl font-extrabold tracking-tight text-[var(--ink-900)]">TunasTaniMakmur</h1>
+        <h1 class="text-xl font-extrabold tracking-tight text-[var(--brand-600)]">TunasTaniMakmur</h1>
     </div>
 
     <label class="relative block px-4 mb-2 shrink-0">
@@ -253,12 +253,24 @@
                 <a href="{{ route('reports.purchase-returns') }}"
                    class="sidebar-item sub {{ request()->routeIs('reports.purchase-returns') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
                    @if(request()->routeIs('reports.purchase-returns')) aria-current="page" @endif>{{ __('app.sidebar.purchase_return_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.payable_payment_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_order_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_report_2') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.sales_return_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receivable_payment_report') }}</a>
+                <a href="{{ route('reports.payable-payments') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.payable-payments') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.payable-payments')) aria-current="page" @endif>{{ __('app.sidebar.payable_payment_report') }}</a>
+                <a href="{{ route('reports.sales-orders') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.sales-orders') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.sales-orders')) aria-current="page" @endif>{{ __('app.sidebar.sales_order_report') }}</a>
+                <a href="{{ route('reports.sales') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.sales') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.sales')) aria-current="page" @endif>{{ __('app.sidebar.sales_report') }}</a>
+                <a href="{{ route('reports.sales-summary') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.sales-summary') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.sales-summary')) aria-current="page" @endif>{{ __('app.sidebar.sales_report_2') }}</a>
+                <a href="{{ route('reports.sales-returns') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.sales-returns') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.sales-returns')) aria-current="page" @endif>{{ __('app.sidebar.sales_return_report') }}</a>
+                <a href="{{ route('reports.receivable-payments') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.receivable-payments') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.receivable-payments')) aria-current="page" @endif>{{ __('app.sidebar.receivable_payment_report') }}</a>
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receivable_card_report') }}</a>
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.receivable_aging_report') }}</a>
                 <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.expenditure_report') }}</a>
