@@ -23,10 +23,13 @@ use Illuminate\Validation\Rule;
  * Internal > Deviation entry) without needing a separate table, following
  * the same pattern as InternalExpenditureController / InternalReceiptController
  * / WarehouseTransferController.
+ *
+ * TYPE is public so Reports\DeviationReportController can filter on the
+ * same constant instead of duplicating the literal.
  */
 class DeviationController extends Controller implements HasMiddleware
 {
-    protected const TYPE = 'Deviation';
+    public const TYPE = 'Deviation';
 
     /**
      * Fixed internal mutation statuses.

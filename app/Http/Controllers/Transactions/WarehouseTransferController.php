@@ -21,10 +21,13 @@ use Illuminate\Validation\Rule;
  * warehouse are recorded. This gives that subset its own page (matching
  * the sidebar's Transaksi > Mutasi Internal > Warehouse Transfer entry)
  * without needing a separate table.
+ *
+ * TYPE is public so Reports\TransferReportController can filter on the
+ * same constant instead of duplicating the literal.
  */
 class WarehouseTransferController extends Controller implements HasMiddleware
 {
-    protected const TYPE = 'Transfer Antar Gudang';
+    public const TYPE = 'Transfer Antar Gudang';
 
     /**
      * Fixed internal mutation statuses.

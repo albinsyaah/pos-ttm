@@ -22,7 +22,10 @@ use App\Http\Controllers\Reports\ApPaymentReportController;
 use App\Http\Controllers\Reports\ArAgingReportController;
 use App\Http\Controllers\Reports\ArCardReportController;
 use App\Http\Controllers\Reports\ArPaymentReportController;
+use App\Http\Controllers\Reports\DeviationReportController;
 use App\Http\Controllers\Reports\ExpenditureReportController;
+use App\Http\Controllers\Reports\InventoryReportController;
+use App\Http\Controllers\Reports\PositionReportController;
 use App\Http\Controllers\Reports\PurchaseOrderReportController;
 use App\Http\Controllers\Reports\PurchaseReportController;
 use App\Http\Controllers\Reports\PurchaseReturnReportController;
@@ -31,6 +34,8 @@ use App\Http\Controllers\Reports\SalesOrderReportController;
 use App\Http\Controllers\Reports\SaleReportController;
 use App\Http\Controllers\Reports\SalesReturnReportController;
 use App\Http\Controllers\Reports\SalesSummaryReportController;
+use App\Http\Controllers\Reports\StockCardReportController;
+use App\Http\Controllers\Reports\TransferReportController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\Transactions\ApPaymentController;
 use App\Http\Controllers\Transactions\ArPaymentController;
@@ -305,6 +310,26 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('receipt', [ReceiptReportController::class, 'index'])
             ->middleware('permission:reports.view')
             ->name('receipt');
+
+        Route::get('transfers', [TransferReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('transfers');
+
+        Route::get('deviations', [DeviationReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('deviations');
+
+        Route::get('stock-card', [StockCardReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('stock-card');
+
+        Route::get('position', [PositionReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('position');
+
+        Route::get('inventory', [InventoryReportController::class, 'index'])
+            ->middleware('permission:reports.view')
+            ->name('inventory');
     });
 
     // Super Admin only: user accounts + role/permission management.

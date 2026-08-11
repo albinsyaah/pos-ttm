@@ -283,11 +283,21 @@
                 <a href="{{ route('reports.receipt') }}"
                    class="sidebar-item sub {{ request()->routeIs('reports.receipt') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
                    @if(request()->routeIs('reports.receipt')) aria-current="page" @endif>{{ __('app.sidebar.receipt_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.transfer_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.deviation_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.stock_card') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.position_report') }}</a>
-                <a href="#" class="sidebar-item sub flex items-center pl-11 pr-4 py-2">{{ __('app.sidebar.inventory_report') }}</a>
+                <a href="{{ route('reports.transfers') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.transfers') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.transfers')) aria-current="page" @endif>{{ __('app.sidebar.transfer_report') }}</a>
+                <a href="{{ route('reports.deviations') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.deviations') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.deviations')) aria-current="page" @endif>{{ __('app.sidebar.deviation_report') }}</a>
+                <a href="{{ route('reports.stock-card') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.stock-card') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.stock-card')) aria-current="page" @endif>{{ __('app.sidebar.stock_card') }}</a>
+                <a href="{{ route('reports.position') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.position') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.position')) aria-current="page" @endif>{{ __('app.sidebar.position_report') }}</a>
+                <a href="{{ route('reports.inventory') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.inventory') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.inventory')) aria-current="page" @endif>{{ __('app.sidebar.inventory_report') }}</a>
             </div>
         </div>
         @endcan
