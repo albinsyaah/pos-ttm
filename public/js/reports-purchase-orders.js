@@ -45,3 +45,7 @@ poReportForm?.addEventListener('submit', () => {
 document.getElementById('poReportPrintBtn')?.addEventListener('click', () => {
   window.print();
 });
+
+document.getElementById('poReportExportBtn')?.addEventListener('click', () => {
+  exportReportTableToExcel('poReportTableWrap', 'purchase-order-report');
+});

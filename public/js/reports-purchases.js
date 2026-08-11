@@ -44,6 +44,10 @@ purchaseReportForm?.addEventListener('submit', () => {
   showLoading();
 });
 
-document.getElementById('purchaseReportPrintBtn')?.addEventListener('click', () => {
+document.getElementById('pReportPrintBtn')?.addEventListener('click', () => {
   window.print();
+});
+
+document.getElementById('pReportExportBtn')?.addEventListener('click', () => {
+  exportReportTableToExcel('purchaseReportTableWrap', 'purchase-report');
 });

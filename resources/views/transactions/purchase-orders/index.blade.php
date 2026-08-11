@@ -59,7 +59,7 @@
                             </span>
                         </td>
                         <td class="text-[var(--ink-400)]">{{ $purchaseOrder->purchaseOrderDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format($lineTotal, 2) }}</td>
+                        <td class="text-[var(--ink-700)]">Rp{{ number_format($lineTotal) }}</td>
                         <td class="text-right pr-5">
                             @can('transactions.manage')
                                 <div class="inline-flex items-center gap-2">

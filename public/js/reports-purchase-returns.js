@@ -42,6 +42,10 @@ purchaseReturnReportForm?.addEventListener('submit', () => {
   showLoading();
 });
 
-document.getElementById('purchaseReturnReportPrintBtn')?.addEventListener('click', () => {
+document.getElementById('prReportPrintBtn')?.addEventListener('click', () => {
   window.print();
+});
+
+document.getElementById('prReportExportBtn')?.addEventListener('click', () => {
+  exportReportTableToExcel('purchaseReturnReportTableWrap', 'purchase-return-report');
 });

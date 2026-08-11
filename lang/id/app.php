@@ -318,6 +318,7 @@ return [
 
     // Laporan
     'reports' => [
+        'generated_at' => 'Dibuat pada',
         'purchase_order' => [
             'title' => 'Laporan Purchase Order',
             'search_label' => 'Cari purchase order',
@@ -330,6 +331,7 @@ return [
             'summary_total_orders' => 'Total Pesanan',
             'summary_total_amount' => 'Total Nilai',
             'no_data' => 'Tidak ada purchase order ditemukan.',
+            'export_excel' => 'Export ke Excel',
         ],
         'purchase' => [
             'title' => 'Laporan Pembelian',
@@ -344,6 +346,7 @@ return [
             'summary_total_purchases' => 'Total Pembelian',
             'summary_total_amount' => 'Total Nilai',
             'no_data' => 'Tidak ada pembelian ditemukan.',
+            'export_excel' => 'Export ke Excel',
         ],
         'purchase_return' => [
             'title' => 'Laporan Retur Pembelian',
@@ -356,6 +359,7 @@ return [
             'summary_total_returns' => 'Total Retur',
             'summary_total_amount' => 'Total Nilai',
             'no_data' => 'Tidak ada retur pembelian ditemukan.',
+            'export_excel' => 'Export ke Excel',
         ],
     ],
 

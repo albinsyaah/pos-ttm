@@ -1,4 +1,4 @@
-<header class="bg-white px-5 sm:px-8 py-5 border-b border-gray-100 sticky top-0 z-10">
+<header class="bg-white px-5 sm:px-8 py-5 border-b border-gray-100 sticky top-0 z-10" id="navbar">
     <div class="flex items-center justify-between gap-4 flex-wrap">
 
         <div class="flex items-center gap-3">
@@ -58,7 +58,7 @@
             </button>
 
             <img
-                src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200"
+                src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_1280.png"
                 alt="{{ auth()->user()?->displayName() ?? 'User' }} profile photo"
                 class="w-11 h-11 rounded-full object-cover ring-2 ring-[var(--ink-200)]"
             />

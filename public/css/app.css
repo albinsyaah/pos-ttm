@@ -130,6 +130,59 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   #sidebar{ display:none; }
 }
 
+/* ===== Report pages: shared print styles (Purchase / Purchase Order / Purchase Return reports) ===== */
+
+.report-print-header{ display:none; }
+
+@media print{
+  #sidebar, #toastHost, #navbar, .pagination, nav[role="navigation"], .report-filter-form, .report-summary{
+    display:none !important;
+  }
+
+  body{ background:#fff !important; }
+
+  .report-print-header{
+    display:block;
+    margin-bottom:16px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .report-print-header h1{ font-size:16pt; font-weight:700; margin:0 0 4px; }
+  .report-print-header p{ font-size:9pt; color:#333; margin:0 0 2px; }
+  .report-print-header .generated{ color:#777; margin-top:4px; }
+
+  .report-table-wrap{
+    box-shadow:none !important;
+    border-radius:0 !important;
+    overflow:visible !important;
+  }
+  .report-table-wrap table{
+    border-collapse:collapse;
+    width:100%;
+    font-size:9pt;
+  }
+  .report-table-wrap thead{
+    background:#eee !important;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  .report-table-wrap th, .report-table-wrap td{
+    border:1px solid #999 !important;
+    padding:5px 8px !important;
+    text-align:left;
+  }
+  .report-table-wrap .badge-good,
+  .report-table-wrap .badge-bad,
+  .report-table-wrap .badge-neutral{
+    background:none !important;
+    border:1px solid #999 !important;
+    color:#000 !important;
+    border-radius:3px !important;
+  }
+  .report-table-wrap [id$="Loading"]{ display:none !important; }
+
+  @page{ margin:14mm; }
+}
+
 /* Modals (Add/Edit/Delete dialogs) */
 .modal-overlay{
   position: fixed;

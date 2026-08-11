@@ -319,6 +319,7 @@ return [
     // Finance - Chart of Accounts
     // Reports
     'reports' => [
+        'generated_at' => 'Generated at',
         'purchase_order' => [
             'title' => 'Purchase Order Report',
             'search_label' => 'Search purchase orders',
@@ -331,6 +332,7 @@ return [
             'summary_total_orders' => 'Total Orders',
             'summary_total_amount' => 'Total Amount',
             'no_data' => 'No purchase orders found.',
+            'export_excel' => 'Export to Excel',
         ],
         'purchase' => [
             'title' => 'Purchase Report',
@@ -345,6 +347,7 @@ return [
             'summary_total_purchases' => 'Total Purchases',
             'summary_total_amount' => 'Total Amount',
             'no_data' => 'No purchases found.',
+            'export_excel' => 'Export to Excel',
         ],
         'purchase_return' => [
             'title' => 'Purchase Return Report',
@@ -357,6 +360,7 @@ return [
             'summary_total_returns' => 'Total Returns',
             'summary_total_amount' => 'Total Amount',
             'no_data' => 'No purchase returns found.',
+            'export_excel' => 'Export to Excel',
         ],
     ],
 

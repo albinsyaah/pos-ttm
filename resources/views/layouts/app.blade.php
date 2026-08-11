@@ -40,6 +40,8 @@
 
 <script src="{{ asset('js/app.js') }}"></script>
 <script src="{{ asset('js/sidebar.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="{{ asset('js/report-common.js') }}"></script>
 
 @stack('scripts')
 

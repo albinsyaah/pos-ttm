@@ -5,7 +5,7 @@
 
 @section('content')
 
-    <form id="purchaseReportFilterForm" action="{{ route('reports.purchases') }}" method="GET" class="flex items-center justify-between flex-wrap gap-4">
+    <form id="purchaseReportFilterForm" action="{{ route('reports.purchases') }}" method="GET" class="report-filter-form flex items-center justify-between flex-wrap gap-4">
         <div class="relative">
             <label class="sr-only" for="purchaseReportSearch">{{ __('app.reports.purchase.search_label') }}</label>
             <input
@@ -57,25 +57,45 @@
             <input id="purchaseReportDateTo" name="date_to" type="date" value="{{ $dateTo }}"
                    class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
 
-            <button type="button" id="purchaseReportPrintBtn"
-                    class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
+            <button type="button" id="pReportPrintBtn"
+                class="flex items-center gap-2 border border-[var(--brand-600)] text-[var(--brand-600)] hover:bg-[var(--brand-600)] hover:text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
                 <i class="fa-solid fa-print"></i> {{ __('app.reports.purchase.print') }}
+            </button>
+            <button type="button" id="pReportExportBtn"
+                class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
+                <i class="fa-solid fa-file-excel"></i> {{ __('app.reports.purchase.export_excel') }}
             </button>
         </div>
     </form>
 
-    <div class="grid sm:grid-cols-2 gap-4 mt-6">
+    <div class="grid sm:grid-cols-2 gap-4 mt-6 report-summary">
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">{{ __('app.reports.purchase.summary_total_purchases') }}</p>
             <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">{{ number_format($totalPurchases) }}</p>
         </div>
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">{{ __('app.reports.purchase.summary_total_amount') }}</p>
-            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">{{ number_format((float) $totalAmount, 2) }}</p>
+            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">Rp{{ number_format((float) $totalAmount) }}</p>
         </div>
     </div>
 
-    <div id="purchaseReportTableWrap" class="relative bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div id="pReportPrintHeader" class="report-print-header">
+        <h1>{{ __('app.reports.purchase.title') }}</h1>
+        <p>
+            @if ($dateFrom || $dateTo)
+                {{ $dateFrom ?: '…' }} &ndash; {{ $dateTo ?: '…' }}
+            @endif
+            @if ($supplierId)
+                &middot; {{ $suppliers->firstWhere('id', $supplierId)?->name }}
+            @endif
+            @if ($status)
+                &middot; {{ ucfirst($status) }}
+            @endif
+        </p>
+        <p class="generated">{{ __('app.reports.generated_at') }}: {{ now()->format('d M Y H:i') }}</p>
+    </div>
+
+    <div id="purchaseReportTableWrap" class="report-table-wrap relative bg-white rounded-3xl mt-6 overflow-x-auto">
 
         <div id="purchaseReportLoading" class="hidden absolute inset-0 z-10 flex items-start justify-center pt-16 bg-white/70 backdrop-blur-[1px] rounded-3xl">
             <i class="fa-solid fa-circle-notch fa-spin text-xl text-[var(--brand-600)]"></i>
@@ -88,7 +108,7 @@
                     <th class="font-semibold">{{ __('app.purchases.purchase_date') }}</th>
                     <th class="font-semibold">{{ __('app.purchases.supplier') }}</th>
                     <th class="font-semibold">{{ __('app.purchases.warehouse') }}</th>
-                    <th class="font-semibold">{{ __('app.purchases.status') }}</th>
+                    {{-- <th class="font-semibold">{{ __('app.purchases.status') }}</th> --}}
                     <th class="font-semibold">{{ __('app.purchases.items') }}</th>
                     <th class="font-semibold">{{ __('app.purchases.total') }}</th>
                 </tr>
@@ -100,13 +120,13 @@
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($purchase->purchase_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $purchase->supplier?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $purchase->warehouse?->name ?: '—' }}</td>
-                        <td>
+                        {{-- <td>
                             <span class="badge-{{ $purchase->status === 'cancelled' ? 'bad' : ($purchase->status === 'received' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 {{ $purchase->status }}
                             </span>
-                        </td>
+                        </td> --}}
                         <td class="text-[var(--ink-400)]">{{ $purchase->purchaseDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $purchase->total_amount, 2) }}</td>
+                        <td class="text-[var(--ink-700)]">Rp{{ number_format((float) $purchase->total_amount) }}</td>
                     </tr>
                 @empty
                     <tr>

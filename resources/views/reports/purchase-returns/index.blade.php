@@ -5,7 +5,7 @@
 
 @section('content')
 
-    <form id="purchaseReturnReportFilterForm" action="{{ route('reports.purchase-returns') }}" method="GET" class="flex items-center justify-between flex-wrap gap-4">
+    <form id="purchaseReturnReportFilterForm" action="{{ route('reports.purchase-returns') }}" method="GET" class="report-filter-form flex items-center justify-between flex-wrap gap-4">
         <div class="relative">
             <label class="sr-only" for="purchaseReturnReportSearch">{{ __('app.reports.purchase_return.search_label') }}</label>
             <input
@@ -41,25 +41,42 @@
             <input id="purchaseReturnReportDateTo" name="date_to" type="date" value="{{ $dateTo }}"
                    class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
 
-            <button type="button" id="purchaseReturnReportPrintBtn"
-                    class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
+            <button type="button" id="prReportPrintBtn"
+                class="flex items-center gap-2 border border-[var(--brand-600)] text-[var(--brand-600)] hover:bg-[var(--brand-600)] hover:text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
                 <i class="fa-solid fa-print"></i> {{ __('app.reports.purchase_return.print') }}
+            </button>
+            <button type="button" id="prReportExportBtn"
+                class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
+                <i class="fa-solid fa-file-excel"></i> {{ __('app.reports.purchase_return.export_excel') }}
             </button>
         </div>
     </form>
 
-    <div class="grid sm:grid-cols-2 gap-4 mt-6">
+    <div class="grid sm:grid-cols-2 gap-4 mt-6 report-summary">
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">{{ __('app.reports.purchase_return.summary_total_returns') }}</p>
             <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">{{ number_format($totalReturns) }}</p>
         </div>
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">{{ __('app.reports.purchase_return.summary_total_amount') }}</p>
-            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">{{ number_format((float) $totalAmount, 2) }}</p>
+            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">Rp{{ number_format((float) $totalAmount) }}</p>
         </div>
     </div>
 
-    <div id="purchaseReturnReportTableWrap" class="relative bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div id="prReportPrintHeader" class="report-print-header">
+        <h1>{{ __('app.reports.purchase_return.title') }}</h1>
+        <p>
+            @if ($dateFrom || $dateTo)
+                {{ $dateFrom ?: '…' }} &ndash; {{ $dateTo ?: '…' }}
+            @endif
+            @if ($supplierId)
+                &middot; {{ $suppliers->firstWhere('id', $supplierId)?->name }}
+            @endif
+        </p>
+        <p class="generated">{{ __('app.reports.generated_at') }}: {{ now()->format('d M Y H:i') }}</p>
+    </div>
+
+    <div id="purchaseReturnReportTableWrap" class="report-table-wrap relative bg-white rounded-3xl mt-6 overflow-x-auto">
 
         <div id="purchaseReturnReportLoading" class="hidden absolute inset-0 z-10 flex items-start justify-center pt-16 bg-white/70 backdrop-blur-[1px] rounded-3xl">
             <i class="fa-solid fa-circle-notch fa-spin text-xl text-[var(--brand-600)]"></i>
@@ -85,7 +102,7 @@
                             <span class="text-[var(--ink-400)]">{{ $purchaseReturn->purchase?->supplier ? '· ' . $purchaseReturn->purchase->supplier->name : '' }}</span>
                         </td>
                         <td class="text-[var(--ink-400)]">{{ $purchaseReturn->purchaseReturnDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $purchaseReturn->total_amount, 2) }}</td>
+                        <td class="text-[var(--ink-700)]">{{ number_format((float) $purchaseReturn->total_amount) }}</td>
                     </tr>
                 @empty
                     <tr>
