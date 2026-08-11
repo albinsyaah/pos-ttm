@@ -27,6 +27,8 @@ class DashboardController extends Controller
         $today = Carbon::today();
 
         $todaySales = Sale::whereDate('sale_date', $today)->sum('total_amount');
+        $monthSales = Sale::whereMonth('sale_date', $today->month)->sum('total_amount');
+        $weeklySales = Sale::whereBetween('sale_date', [$today->copy()->startOfWeek(), $today->copy()->endOfWeek()])->sum('total_amount');
         $ordersToday = Sale::whereDate('sale_date', $today)->count();
         $avgOrderValue = $ordersToday > 0 ? $todaySales / $ordersToday : 0;
 
@@ -47,6 +49,8 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'todaySales' => $todaySales,
+            'weeklySales' => $weeklySales,
+            'monthSales' => $monthSales,
             'ordersToday' => $ordersToday,
             'avgOrderValue' => $avgOrderValue,
             'lowStockCount' => $lowStockCount,

@@ -39,6 +39,17 @@
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.todays_sales_divided_orders') }}</p>
         </div> --}}
 
+        {{-- <div class="stat-card p-6">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.monthly_sales') }}</p>
+                <div class="w-9 h-9 rounded-xl bg-[var(--bad-100)] text-[var(--bad-600)] flex items-center justify-center">
+                    <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($monthSales) }}</p>
+            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.total_sales_month') }}</p>
+        </div> --}}
+
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.low_stock_items') }}</p>
@@ -49,6 +60,33 @@
             <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ $lowStockCount }}</p>
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.needs_reordering') }}</p>
         </div>
+    </div>
+
+    {{-- weekly & monthly sales --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 mt-6">
+        {{-- weekly sales --}}
+        <div class="stat-card p-6">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.weekly_sales') }}</p>
+                <div class="w-9 h-9 rounded-xl bg-[var(--brand-100)] text-[var(--brand-600)] flex items-center justify-center">
+                    <i class="fa-solid fa-sack-dollar opacity-80 text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($weeklySales) }}</p>
+            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.total_sales_week') }}</p>
+        </div>
+
+        <div class="stat-card p-6">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.monthly_sales') }}</p>
+                <div class="w-9 h-9 rounded-xl bg-[var(--brand-100)] text-[var(--brand-600)] flex items-center justify-center">
+                    <i class="fa-solid fa-sack-dollar opacity-80 text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($monthSales) }}</p>
+            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.total_sales_month') }}</p>
+        </div>
+
     </div>
 
     {{-- Finance & open orders --}}

@@ -133,6 +133,10 @@ return [
     'dashboard' => [
         'todays_sales' => 'PENJUALAN HARI INI',
         'total_sales_today' => 'Total penjualan yang tercatat hari ini',
+        'weekly_sales' => 'PENJUALAN MINGGU INI',
+        'total_sales_week' => 'Total penjualan yang tercatat minggu ini',
+        'monthly_sales' => 'PENJUALAN BULAN INI',
+        'total_sales_month' => 'Total penjualan yang tercatat bulan ini',
         'orders_today' => 'PESANAN HARI INI',
         'sales_transactions_today' => 'Transaksi penjualan hari ini',
         'avg_order_value' => 'RATA-RATA NILAI PESANAN',

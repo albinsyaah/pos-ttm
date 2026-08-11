@@ -133,6 +133,10 @@ return [
     'dashboard' => [
         'todays_sales' => "TODAY'S SALES",
         'total_sales_today' => 'Total sales recorded today',
+        'weekly_sales' => "WEEKLY SALES",
+        'total_sales_week' => 'Total sales recorded this week',
+        'monthly_sales' => "MONTHLY SALES",
+        'total_sales_month' => 'Total sales recorded this month',
         'orders_today' => 'ORDERS TODAY',
         'sales_transactions_today' => 'Sales transactions today',
         'avg_order_value' => 'AVG. ORDER VALUE',
