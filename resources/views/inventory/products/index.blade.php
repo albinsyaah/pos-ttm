@@ -19,7 +19,7 @@
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
 
-        @can('inventory.manage')
+        @can('inventory.products.manage')
             <button
                 id="addProductBtn"
                 type="button"
@@ -52,7 +52,7 @@
                         <td class="text-[var(--ink-400)]">{{ $product->itemType?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $product->productGroup?->name ?: '—' }}</td>
                         <td class="text-right pr-5">
-                            @can('inventory.manage')
+                            @can('inventory.products.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"

@@ -19,7 +19,7 @@
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
 
-        @can('transactions.manage')
+        @can('transactions.sales-returns.manage')
             <button
                 id="addSalesReturnBtn"
                 type="button"
@@ -55,7 +55,7 @@
                         <td class="text-[var(--ink-400)]">{{ $salesReturn->salesReturnDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $salesReturn->total_amount, 2) }}</td>
                         <td class="text-right pr-5">
-                            @can('transactions.manage')
+                            @can('transactions.sales-returns.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"

@@ -19,7 +19,7 @@
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
 
-        @can('finance.manage')
+        @can('finance.cash-flows.manage')
             <button
                 id="addCashFlowBtn"
                 type="button"
@@ -62,7 +62,7 @@
                         <td class="text-[var(--ink-400)] max-w-[220px] truncate">{{ $cashFlow->description ?: '—' }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $cashFlow->amount, 2) }}</td>
                         <td class="text-right pr-5">
-                            @can('finance.manage')
+                            @can('finance.cash-flows.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"

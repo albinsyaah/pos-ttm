@@ -21,8 +21,8 @@ class ArPaymentController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:transactions.view', only: ['index']),
-            new Middleware('permission:transactions.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:transactions.receivable-payments.view', only: ['index']),
+            new Middleware('permission:transactions.receivable-payments.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 

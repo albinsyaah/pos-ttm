@@ -12,8 +12,9 @@ use Spatie\Permission\Models\Role;
 class RolePermissionSeeder extends Seeder
 {
     /**
-     * Creates one permission per sidebar module (see App\Support\AccessControl),
-     * three starter roles, and a default Super Admin account.
+     * Creates one permission per sidebar page/submenu item (see
+     * App\Support\AccessControl), three starter roles, and a default
+     * Super Admin account.
      */
     public function run(): void
     {
@@ -38,17 +39,18 @@ class RolePermissionSeeder extends Seeder
         ));
 
         // Staff: read access plus day-to-day customer/transaction handling.
+        // "Full inventory/transactions/reports access" now means every
+        // page-level permission under those modules (see AccessControl),
+        // since permissions were split from one-per-module to
+        // one-per-sidebar-page.
         $staff = Role::firstOrCreate(['name' => 'Staff', 'guard_name' => 'web']);
-        $staff->syncPermissions([
-            'dashboard.view',
-            'customers.view',
-            'customers.manage',
-            'inventory.view',
-            'transactions.view',
-            'transactions.manage',
-            'reports.view',
-            'inquiry.view',
-        ]);
+        $staff->syncPermissions(array_filter(
+            $permissionSlugs,
+            fn (string $slug) => in_array($slug, ['dashboard.view', 'customers.view', 'customers.manage', 'inquiry.view'], true)
+                || str_starts_with($slug, 'inventory.')
+                || str_starts_with($slug, 'transactions.')
+                || str_starts_with($slug, 'reports.')
+        ));
 
         // A default Super Admin account so the app is usable immediately
         // after a fresh migrate. Change this password before going live.

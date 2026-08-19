@@ -33,8 +33,8 @@ class ItemRequestController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:transactions.view', only: ['index']),
-            new Middleware('permission:transactions.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:transactions.item-requests.view', only: ['index']),
+            new Middleware('permission:transactions.item-requests.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 

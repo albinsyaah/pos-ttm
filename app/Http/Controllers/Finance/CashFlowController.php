@@ -21,8 +21,8 @@ class CashFlowController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:finance.view', only: ['index']),
-            new Middleware('permission:finance.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:finance.cash-flows.view', only: ['index']),
+            new Middleware('permission:finance.cash-flows.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 

@@ -269,75 +269,75 @@ Route::middleware(['auth', 'active'])->group(function () {
     // the pattern used by InquiryController above.
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('purchase-orders', [PurchaseOrderReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.purchase-orders.view')
             ->name('purchase-orders');
 
         Route::get('purchases', [PurchaseReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.purchases.view')
             ->name('purchases');
 
         Route::get('purchase-returns', [PurchaseReturnReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.purchase-returns.view')
             ->name('purchase-returns');
 
         Route::get('payable-payments', [ApPaymentReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.payable-payments.view')
             ->name('payable-payments');
 
         Route::get('sales-orders', [SalesOrderReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.sales-orders.view')
             ->name('sales-orders');
 
         Route::get('sales', [SaleReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.sales.view')
             ->name('sales');
 
         Route::get('sales-summary', [SalesSummaryReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.sales-summary.view')
             ->name('sales-summary');
 
         Route::get('sales-returns', [SalesReturnReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.sales-returns.view')
             ->name('sales-returns');
 
         Route::get('receivable-payments', [ArPaymentReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.receivable-payments.view')
             ->name('receivable-payments');
 
         Route::get('receivable-card', [ArCardReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.receivable-card.view')
             ->name('receivable-card');
 
         Route::get('receivable-aging', [ArAgingReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.receivable-aging.view')
             ->name('receivable-aging');
 
         Route::get('expenditure', [ExpenditureReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.expenditure.view')
             ->name('expenditure');
 
         Route::get('receipt', [ReceiptReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.receipt.view')
             ->name('receipt');
 
         Route::get('transfers', [TransferReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.transfers.view')
             ->name('transfers');
 
         Route::get('deviations', [DeviationReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.deviations.view')
             ->name('deviations');
 
         Route::get('stock-card', [StockCardReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.stock-card.view')
             ->name('stock-card');
 
         Route::get('position', [PositionReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.position.view')
             ->name('position');
 
         Route::get('inventory', [InventoryReportController::class, 'index'])
-            ->middleware('permission:reports.view')
+            ->middleware('permission:reports.inventory.view')
             ->name('inventory');
     });
 

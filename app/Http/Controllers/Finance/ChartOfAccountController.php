@@ -20,8 +20,8 @@ class ChartOfAccountController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:finance.view', only: ['index']),
-            new Middleware('permission:finance.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:finance.chart-of-accounts.view', only: ['index']),
+            new Middleware('permission:finance.chart-of-accounts.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 

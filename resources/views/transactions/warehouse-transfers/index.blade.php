@@ -19,7 +19,7 @@
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
 
-        @can('transactions.manage')
+        @can('transactions.warehouse-transfers.manage')
             <button
                 id="addWarehouseTransferBtn"
                 type="button"
@@ -60,7 +60,7 @@
                         </td>
                         <td class="text-[var(--ink-400)]">{{ $warehouseTransfer->internalMutationDetails->count() }}</td>
                         <td class="text-right pr-5">
-                            @can('transactions.manage')
+                            @can('transactions.warehouse-transfers.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"

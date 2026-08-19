@@ -15,8 +15,8 @@ class GeneralLedgerController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:finance.view', only: ['index']),
-            new Middleware('permission:finance.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:finance.general-ledgers.view', only: ['index']),
+            new Middleware('permission:finance.general-ledgers.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 

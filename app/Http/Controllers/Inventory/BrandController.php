@@ -14,8 +14,8 @@ class BrandController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:inventory.view', only: ['index']),
-            new Middleware('permission:inventory.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:inventory.brands.view', only: ['index']),
+            new Middleware('permission:inventory.brands.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 

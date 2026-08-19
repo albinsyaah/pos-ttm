@@ -23,8 +23,8 @@ class PurchaseOrderController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:transactions.view', only: ['index']),
-            new Middleware('permission:transactions.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:transactions.purchase-orders.view', only: ['index']),
+            new Middleware('permission:transactions.purchase-orders.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 

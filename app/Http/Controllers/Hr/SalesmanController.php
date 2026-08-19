@@ -22,8 +22,8 @@ class SalesmanController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:hr.view', only: ['index']),
-            new Middleware('permission:hr.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:hr.salesmen.view', only: ['index']),
+            new Middleware('permission:hr.salesmen.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 

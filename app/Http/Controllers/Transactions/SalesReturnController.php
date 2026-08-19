@@ -18,8 +18,8 @@ class SalesReturnController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:transactions.view', only: ['index']),
-            new Middleware('permission:transactions.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:transactions.sales-returns.view', only: ['index']),
+            new Middleware('permission:transactions.sales-returns.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 

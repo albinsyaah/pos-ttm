@@ -19,7 +19,7 @@
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
 
-        @can('transactions.manage')
+        @can('transactions.purchase-orders.manage')
             <button
                 id="addPurchaseOrderBtn"
                 type="button"
@@ -61,7 +61,7 @@
                         <td class="text-[var(--ink-400)]">{{ $purchaseOrder->purchaseOrderDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">Rp{{ number_format($lineTotal) }}</td>
                         <td class="text-right pr-5">
-                            @can('transactions.manage')
+                            @can('transactions.purchase-orders.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"

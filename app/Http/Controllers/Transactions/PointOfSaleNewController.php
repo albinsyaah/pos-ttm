@@ -25,8 +25,8 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:transactions.view', only: ['index']),
-            new Middleware('permission:transactions.manage', only: ['store']),
+            new Middleware('permission:transactions.point-of-sale-new.view', only: ['index']),
+            new Middleware('permission:transactions.point-of-sale-new.manage', only: ['store']),
         ];
     }
 

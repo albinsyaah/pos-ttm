@@ -24,7 +24,7 @@
                class="flex items-center gap-2 bg-[var(--surface)] hover:bg-gray-200 text-[var(--ink-700)] text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
                 <i class="fa-solid fa-cash-register"></i> {{ __('app.sidebar.point_of_sales_new') }}
             </a>
-            @can('transactions.manage')
+            @can('transactions.point-of-sale.manage')
                 <button
                     id="addPointOfSaleBtn"
                     type="button"
@@ -60,7 +60,7 @@
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $sale->total_amount, 2) }}</td>
                         <td class="text-right pr-5">
-                            @can('transactions.manage')
+                            @can('transactions.point-of-sale.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"

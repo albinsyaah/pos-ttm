@@ -34,8 +34,8 @@ class InternalReceiptController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:transactions.view', only: ['index']),
-            new Middleware('permission:transactions.manage', only: ['store', 'update', 'destroy']),
+            new Middleware('permission:transactions.internal-receipts.view', only: ['index']),
+            new Middleware('permission:transactions.internal-receipts.manage', only: ['store', 'update', 'destroy']),
         ];
     }
 
