@@ -56,10 +56,19 @@ use App\Http\Controllers\Transactions\SalesReturnController;
 use App\Http\Controllers\Transactions\SalesSpgController;
 use App\Http\Controllers\Transactions\WarehouseTransferController;
 use App\Http\Controllers\WarehouseController;
+use App\Support\AccessControl;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
+    if (! auth()->check()) {
+        return redirect()->route('login');
+    }
+
+    $landingRoute = AccessControl::firstAccessibleRoute(auth()->user());
+
+    return $landingRoute
+        ? redirect()->route($landingRoute)
+        : redirect()->route('login');
 });
 
 // Language switch: available to guests (e.g. on the login page) and to

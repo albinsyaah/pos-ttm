@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Support\AccessControl;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,9 +41,23 @@ class LoginController extends Controller
                 ->onlyInput('username');
         }
 
+        // Send the user to the first page their role actually grants
+        // access to, rather than always the dashboard: a role like
+        // "Cashier" may not have dashboard.view at all, and would 403 the
+        // moment it landed there.
+        $landingRoute = AccessControl::firstAccessibleRoute($user);
+
+        if ($landingRoute === null) {
+            Auth::logout();
+
+            return back()
+                ->withErrors(['username' => 'Your role doesn\'t have access to any page yet. Contact your administrator.'])
+                ->onlyInput('username');
+        }
+
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(route($landingRoute));
     }
 
     public function destroy(Request $request): RedirectResponse
