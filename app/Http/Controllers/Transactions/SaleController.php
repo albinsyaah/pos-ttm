@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Http\Controllers\Concerns\SyncsSaleStock;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -18,6 +19,8 @@ use Illuminate\Validation\Rule;
 
 class SaleController extends Controller implements HasMiddleware
 {
+    use SyncsSaleStock;
+
     /**
      * The 'sales' page manages regular (non point-of-sale) invoiced sales.
      * Records created here are always tagged with this source, keeping them
@@ -81,6 +84,10 @@ class SaleController extends Controller implements HasMiddleware
             ]);
 
             $sale->saleDetails()->createMany($data['items']);
+
+            // Take the items out of the chosen warehouse; refused (and rolled
+            // back) if a warehouse is short. Same product on two lines is added up.
+            $this->syncSaleStock($sale, $data['items']);
         });
 
         return redirect()->route('transactions.sales.index')->with('success', 'Sale added successfully.');
@@ -103,6 +110,10 @@ class SaleController extends Controller implements HasMiddleware
 
             $sale->saleDetails()->delete();
             $sale->saleDetails()->createMany($data['items']);
+
+            // Writes only the difference from what this sale already took out
+            // of stock; refused (and rolled back) if a warehouse is short.
+            $this->syncSaleStock($sale, $data['items']);
         });
 
         return redirect()->route('transactions.sales.index')->with('success', 'Sale updated successfully.');
@@ -115,6 +126,9 @@ class SaleController extends Controller implements HasMiddleware
         }
 
         DB::transaction(function () use ($sale) {
+            // Put the stock this sale took out back into its warehouse.
+            $this->syncSaleStock($sale);
+
             $sale->saleDetails()->delete();
             $sale->delete();
         });

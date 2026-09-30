@@ -323,3 +323,163 @@ it('returns nothing when reversing a transaction that never moved stock', functi
 
     expect(stockService()->reverse($sale))->toBeEmpty();
 });
+
+/*
+ * sync(): the method controllers use on create / edit / delete.
+ */
+it('sync writes the stock effect of a new transaction', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $purchase = stockSource($warehouse);
+
+    $rows = stockService()->sync($purchase, $warehouse->id, [
+        ['product_id' => $product->id, 'qty' => 10],
+    ], 'in', 'PB-001');
+
+    expect($rows)->toHaveCount(1)
+        ->and($rows->first()->type)->toBe('IN')
+        ->and($rows->first()->reference_number)->toBe('PB-001')
+        ->and($rows->first()->source_id)->toBe($purchase->id)
+        ->and(stockService()->available($product->id, $warehouse->id))->toBe(10);
+});
+
+it('sync writes nothing when the transaction has not changed', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $purchase = stockSource($warehouse);
+    $items = [['product_id' => $product->id, 'qty' => 10]];
+
+    stockService()->sync($purchase, $warehouse->id, $items, 'in', 'PB-001');
+    $rowsBefore = InventoryLedger::count();
+
+    expect(stockService()->sync($purchase, $warehouse->id, $items, 'in', 'PB-001'))->toBeEmpty()
+        ->and(InventoryLedger::count())->toBe($rowsBefore);
+});
+
+it('sync adds only the difference when the quantity goes up, even if stock was used', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $purchase = stockSource($warehouse);
+
+    stockService()->sync($purchase, $warehouse->id, [['product_id' => $product->id, 'qty' => 10]], 'in', 'PB-001');
+    stockService()->decrease($product->id, $warehouse->id, 8, 'INV-001');
+
+    $rows = stockService()->sync($purchase, $warehouse->id, [['product_id' => $product->id, 'qty' => 12]], 'in', 'PB-001');
+
+    expect($rows)->toHaveCount(1)
+        ->and($rows->first()->qty)->toBe(2)
+        ->and(stockService()->available($product->id, $warehouse->id))->toBe(4);
+});
+
+it('sync removes only the difference when the quantity goes down', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $purchase = stockSource($warehouse);
+
+    stockService()->sync($purchase, $warehouse->id, [['product_id' => $product->id, 'qty' => 10]], 'in', 'PB-001');
+    $rows = stockService()->sync($purchase, $warehouse->id, [['product_id' => $product->id, 'qty' => 6]], 'in', 'PB-001');
+
+    expect($rows->first()->type)->toBe('OUT')
+        ->and($rows->first()->qty)->toBe(-4)
+        ->and($rows->first()->reference_number)->toBe('REV-PB-001')
+        ->and(stockService()->available($product->id, $warehouse->id))->toBe(6);
+});
+
+it('sync refuses a reduction that stock already used and writes nothing', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $purchase = stockSource($warehouse);
+
+    stockService()->sync($purchase, $warehouse->id, [['product_id' => $product->id, 'qty' => 10]], 'in', 'PB-001');
+    stockService()->decrease($product->id, $warehouse->id, 8, 'INV-001');
+    $rowsBefore = InventoryLedger::count();
+
+    expect(fn () => stockService()->sync($purchase, $warehouse->id, [['product_id' => $product->id, 'qty' => 5]], 'in', 'PB-001'))
+        ->toThrow(InsufficientStockException::class);
+
+    expect(InventoryLedger::count())->toBe($rowsBefore)
+        ->and(stockService()->available($product->id, $warehouse->id))->toBe(2);
+});
+
+it('sync moves stock between warehouses when the warehouse changes', function () {
+    $product = stockProduct();
+    $a = stockWarehouse('WH-A');
+    $b = stockWarehouse('WH-B');
+    $purchase = stockSource($a);
+    $items = [['product_id' => $product->id, 'qty' => 10]];
+
+    stockService()->sync($purchase, $a->id, $items, 'in', 'PB-001');
+    $rows = stockService()->sync($purchase, $b->id, $items, 'in', 'PB-001');
+
+    expect($rows)->toHaveCount(2)
+        ->and(stockService()->available($product->id, $a->id))->toBe(0)
+        ->and(stockService()->available($product->id, $b->id))->toBe(10);
+});
+
+it('sync handles added and removed products in one call', function () {
+    $keep = stockProduct('P-KEEP');
+    $drop = stockProduct('P-DROP');
+    $add = stockProduct('P-ADD');
+    $warehouse = stockWarehouse();
+    $purchase = stockSource($warehouse);
+
+    stockService()->sync($purchase, $warehouse->id, [
+        ['product_id' => $keep->id, 'qty' => 5],
+        ['product_id' => $drop->id, 'qty' => 5],
+    ], 'in', 'PB-001');
+
+    stockService()->sync($purchase, $warehouse->id, [
+        ['product_id' => $keep->id, 'qty' => 5],
+        ['product_id' => $add->id, 'qty' => 3],
+    ], 'in', 'PB-001');
+
+    expect(stockService()->available($keep->id, $warehouse->id))->toBe(5)
+        ->and(stockService()->available($drop->id, $warehouse->id))->toBe(0)
+        ->and(stockService()->available($add->id, $warehouse->id))->toBe(3);
+});
+
+it('sync cancels the whole effect when given no warehouse', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $purchase = stockSource($warehouse);
+
+    stockService()->sync($purchase, $warehouse->id, [['product_id' => $product->id, 'qty' => 10]], 'in', 'PB-001');
+    stockService()->sync($purchase, null, [], 'in', 'PB-001');
+
+    expect(stockService()->available($product->id, $warehouse->id))->toBe(0);
+});
+
+it('sync does nothing for a transaction that never had stock effect and wants none', function () {
+    $warehouse = stockWarehouse();
+    $purchase = stockSource($warehouse);
+
+    expect(stockService()->sync($purchase, null, [], 'in', 'PB-001'))->toBeEmpty();
+});
+
+it('sync works in the out direction and blocks a sale larger than stock', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $sale = stockSource($warehouse);
+    stockService()->increase($product->id, $warehouse->id, 10, 'PB-001');
+
+    stockService()->sync($sale, $warehouse->id, [['product_id' => $product->id, 'qty' => 4]], 'out', 'INV-001');
+    expect(stockService()->available($product->id, $warehouse->id))->toBe(6);
+
+    // editing the sale to 12 needs 8 more, but only 6 are left
+    expect(fn () => stockService()->sync($sale, $warehouse->id, [['product_id' => $product->id, 'qty' => 12]], 'out', 'INV-001'))
+        ->toThrow(InsufficientStockException::class);
+
+    // editing the sale down to 1 gives 3 back
+    $rows = stockService()->sync($sale, $warehouse->id, [['product_id' => $product->id, 'qty' => 1]], 'out', 'INV-001');
+    expect($rows->first()->type)->toBe('IN')
+        ->and($rows->first()->reference_number)->toBe('REV-INV-001')
+        ->and(stockService()->available($product->id, $warehouse->id))->toBe(9);
+});
+
+it('sync rejects an unknown direction', function () {
+    $warehouse = stockWarehouse();
+    $purchase = stockSource($warehouse);
+
+    expect(fn () => stockService()->sync($purchase, $warehouse->id, [], 'sideways', 'X'))
+        ->toThrow(InvalidArgumentException::class);
+});

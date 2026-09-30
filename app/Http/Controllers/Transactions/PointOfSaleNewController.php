@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Http\Controllers\Concerns\SyncsSaleStock;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 
 class PointOfSaleNewController extends Controller implements HasMiddleware
 {
+    use SyncsSaleStock;
+
     /**
      * Shares the 'sales' table with the Sales and Point of Sale pages
      * (see App\Http\Controllers\Transactions\PointOfSaleController::SOURCE).
@@ -79,6 +82,10 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             ]);
 
             $sale->saleDetails()->createMany($items);
+
+            // Take the items out of the chosen warehouse; refused (and rolled
+            // back) if a warehouse is short. Same product on two lines is added up.
+            $this->syncSaleStock($sale, $items);
         });
 
         // Stay on the terminal (fresh cart) so the cashier can ring up the

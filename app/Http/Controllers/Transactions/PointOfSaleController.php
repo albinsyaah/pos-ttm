@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Http\Controllers\Concerns\SyncsSaleStock;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -17,6 +18,8 @@ use Illuminate\Validation\Rule;
 
 class PointOfSaleController extends Controller implements HasMiddleware
 {
+    use SyncsSaleStock;
+
     /**
      * The Point of Sale pages manage over-the-counter sales, tagged with
      * this source. They share the 'sales' table with the regular Sales
@@ -79,6 +82,10 @@ class PointOfSaleController extends Controller implements HasMiddleware
             ]);
 
             $sale->saleDetails()->createMany($data['items']);
+
+            // Take the items out of the chosen warehouse; refused (and rolled
+            // back) if a warehouse is short. Same product on two lines is added up.
+            $this->syncSaleStock($sale, $data['items']);
         });
 
         return redirect()->route('transactions.point-of-sale.index')->with('success', 'Point of sale transaction added successfully.');
@@ -100,6 +107,10 @@ class PointOfSaleController extends Controller implements HasMiddleware
 
             $pointOfSale->saleDetails()->delete();
             $pointOfSale->saleDetails()->createMany($data['items']);
+
+            // Writes only the difference from what this sale already took out
+            // of stock; refused (and rolled back) if a warehouse is short.
+            $this->syncSaleStock($pointOfSale, $data['items']);
         });
 
         return redirect()->route('transactions.point-of-sale.index')->with('success', 'Point of sale transaction updated successfully.');
@@ -112,6 +123,9 @@ class PointOfSaleController extends Controller implements HasMiddleware
         }
 
         DB::transaction(function () use ($pointOfSale) {
+            // Put the stock this sale took out back into its warehouse.
+            $this->syncSaleStock($pointOfSale);
+
             $pointOfSale->saleDetails()->delete();
             $pointOfSale->delete();
         });

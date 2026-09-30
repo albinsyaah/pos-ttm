@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Exceptions\InsufficientStockException;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\Warehouse;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -21,6 +23,10 @@ class PurchaseController extends Controller implements HasMiddleware
      * Fixed purchase statuses.
      */
     public const STATUSES = ['pending', 'received', 'cancelled'];
+
+    public function __construct(private readonly StockService $stock)
+    {
+    }
 
     public static function middleware(): array
     {
@@ -76,6 +82,8 @@ class PurchaseController extends Controller implements HasMiddleware
             ]);
 
             $purchase->purchaseDetails()->createMany($data['items']);
+
+            $this->syncStock($purchase, $data);
         });
 
         return redirect()->route('transactions.purchases.index')->with('success', 'Purchase added successfully.');
@@ -98,6 +106,11 @@ class PurchaseController extends Controller implements HasMiddleware
 
             $purchase->purchaseDetails()->delete();
             $purchase->purchaseDetails()->createMany($data['items']);
+
+            // Writes only the difference from what this purchase already did
+            // to stock; throws (and rolls everything back) if an edit would
+            // take back stock that has already been used.
+            $this->syncStock($purchase, $data);
         });
 
         return redirect()->route('transactions.purchases.index')->with('success', 'Purchase updated successfully.');
@@ -109,12 +122,37 @@ class PurchaseController extends Controller implements HasMiddleware
             return back()->with('error', 'This purchase already has returns recorded and cannot be deleted.');
         }
 
-        DB::transaction(function () use ($purchase) {
-            $purchase->purchaseDetails()->delete();
-            $purchase->delete();
-        });
+        try {
+            DB::transaction(function () use ($purchase) {
+                // Take back the stock this purchase added (refused if it was already used).
+                $this->stock->sync($purchase, null, [], 'in', $purchase->invoice_number);
+
+                $purchase->purchaseDetails()->delete();
+                $purchase->delete();
+            });
+        } catch (InsufficientStockException $e) {
+            return back()->with('error', implode(' ', $e->shortages));
+        }
 
         return redirect()->route('transactions.purchases.index')->with('success', 'Purchase deleted successfully.');
+    }
+
+    /**
+     * Only a "received" purchase counts as stock; pending and cancelled ones
+     * do not. Must be called inside the caller's DB::transaction().
+     */
+    protected function syncStock(Purchase $purchase, array $data): void
+    {
+        $counts = $data['status'] === 'received';
+
+        $this->stock->sync(
+            $purchase,
+            $counts ? (int) $data['warehouse_id'] : null,
+            $counts ? $data['items'] : [],
+            'in',
+            $data['invoice_number'],
+            $data['purchase_date']
+        );
     }
 
     protected function validatePurchase(Request $request, ?int $ignoreId = null): array

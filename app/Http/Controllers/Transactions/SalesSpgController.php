@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Http\Controllers\Concerns\SyncsSaleStock;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -17,6 +18,8 @@ use Illuminate\Validation\Rule;
 
 class SalesSpgController extends Controller implements HasMiddleware
 {
+    use SyncsSaleStock;
+
     /**
      * Sales SPG (sales promotion girl / booth sales) transactions. They
      * share the 'sales' table with the regular Sales and Point of Sale
@@ -81,6 +84,10 @@ class SalesSpgController extends Controller implements HasMiddleware
             ]);
 
             $sale->saleDetails()->createMany($data['items']);
+
+            // Take the items out of the chosen warehouse; refused (and rolled
+            // back) if a warehouse is short. Same product on two lines is added up.
+            $this->syncSaleStock($sale, $data['items']);
         });
 
         return redirect()->route('transactions.sales-spg.index')->with('success', 'Sales SPG transaction added successfully.');
@@ -102,6 +109,10 @@ class SalesSpgController extends Controller implements HasMiddleware
 
             $salesSpg->saleDetails()->delete();
             $salesSpg->saleDetails()->createMany($data['items']);
+
+            // Writes only the difference from what this sale already took out
+            // of stock; refused (and rolled back) if a warehouse is short.
+            $this->syncSaleStock($salesSpg, $data['items']);
         });
 
         return redirect()->route('transactions.sales-spg.index')->with('success', 'Sales SPG transaction updated successfully.');
@@ -114,6 +125,9 @@ class SalesSpgController extends Controller implements HasMiddleware
         }
 
         DB::transaction(function () use ($salesSpg) {
+            // Put the stock this sale took out back into its warehouse.
+            $this->syncSaleStock($salesSpg);
+
             $salesSpg->saleDetails()->delete();
             $salesSpg->delete();
         });

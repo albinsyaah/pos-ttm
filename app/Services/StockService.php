@@ -34,8 +34,9 @@ use InvalidArgumentException;
  *  - Quantities are whole numbers. The same product listed more than once in a
  *    call (e.g. one paid line and one free line) is added up before checking.
  *
- * To edit a transaction: reverse($source) and then apply the new movement,
- * both inside the caller's DB::transaction().
+ * Controllers should call sync() on create, edit and delete: it writes only the
+ * difference between what a transaction already did to stock and what it should do
+ * now. reverse() is the blunt alternative that undoes everything a source did.
  */
 class StockService
 {
@@ -141,6 +142,122 @@ class StockService
         $this->assertType($type, self::OUT_TYPES);
 
         return $this->move($warehouseId, $this->aggregate($items), $type, $referenceNumber, $source, $date, negative: true);
+    }
+
+    /**
+     * Bring the stock effect of a transaction in line with its current state,
+     * writing only the difference.
+     *
+     * This is the method controllers call on create, edit and delete:
+     *  - pass the transaction's current warehouse and lines to set its stock effect;
+     *  - pass null / an empty array to cancel it (delete, or status no longer counts).
+     *
+     * It compares what the transaction has already done to stock (the net of the
+     * ledger rows tied to $source, per product + warehouse) with what it should
+     * do now, and writes one row per difference. Consequences:
+     *  - unchanged transaction: nothing is written;
+     *  - a purchase of 10 edited to 12 adds 2, even if 8 were already sold;
+     *  - a purchase of 10 edited to 5 is refused if fewer than 5 are left in stock;
+     *  - changing the warehouse takes stock out of the old one and into the new one.
+     * Rows that cancel an earlier effect use the "REV-" reference prefix.
+     * Only IN / OUT rows are written; transfers use increase/decrease directly.
+     *
+     * @param  'in'|'out'  $direction  'in' for purchases and sale returns, 'out' for sales and purchase returns.
+     * @param  array<int, array{product_id: int|string, qty: int|string}>  $items
+     * @return Collection<int, InventoryLedger>  The rows written (empty if nothing changed).
+     *
+     * @throws InsufficientStockException
+     */
+    public function sync(
+        Model $source,
+        ?int $warehouseId,
+        array $items,
+        string $direction,
+        string $referenceNumber,
+        CarbonInterface|string|null $date = null
+    ): Collection {
+        if (! in_array($direction, ['in', 'out'], true)) {
+            throw new InvalidArgumentException("Direction must be 'in' or 'out', got [{$direction}].");
+        }
+
+        $sign = $direction === 'in' ? 1 : -1;
+
+        $desired = [];
+        if ($warehouseId !== null && $items !== []) {
+            foreach ($this->aggregate($items) as $productId => $qty) {
+                $desired[$productId.':'.$warehouseId] = $sign * $qty;
+            }
+        }
+
+        return DB::transaction(function () use ($source, $desired, $direction, $sign, $referenceNumber, $date) {
+            // Lock first, then read what the source has done so far, so two
+            // edits of the same transaction cannot both act on stale numbers.
+            $productIds = array_map(fn ($key) => (int) explode(':', $key)[0], array_keys($desired));
+            foreach (array_keys($this->netBySource($source)) as $key) {
+                $productIds[] = (int) explode(':', $key)[0];
+            }
+            if ($productIds === []) {
+                return collect();
+            }
+            $this->lockProducts($productIds);
+
+            $current = $this->netBySource($source);
+
+            $plan = [];
+            foreach (array_unique(array_merge(array_keys($desired), array_keys($current))) as $key) {
+                $delta = ($desired[$key] ?? 0) - ($current[$key] ?? 0);
+                if ($delta === 0) {
+                    continue;
+                }
+                [$productId, $warehouse] = array_map('intval', explode(':', $key));
+                $plan[] = ['product_id' => $productId, 'warehouse_id' => $warehouse, 'delta' => $delta];
+            }
+
+            if ($plan === []) {
+                return collect();
+            }
+
+            usort($plan, fn ($a, $b) => [$a['product_id'], $a['warehouse_id']] <=> [$b['product_id'], $b['warehouse_id']]);
+
+            $shortages = [];
+            foreach ($plan as $line) {
+                if ($line['delta'] < 0) {
+                    $available = $this->available($line['product_id'], $line['warehouse_id']);
+                    if ($available < -$line['delta']) {
+                        $shortages[] = $this->shortageMessage(
+                            $direction === 'in' ? 'insufficient_reverse' : 'insufficient',
+                            $line['product_id'],
+                            $line['warehouse_id'],
+                            $available,
+                            -$line['delta']
+                        );
+                    }
+                }
+            }
+            if ($shortages !== []) {
+                throw InsufficientStockException::forShortages($shortages);
+            }
+
+            $moment = $this->resolveDate($date);
+            $created = collect();
+            foreach ($plan as $line) {
+                $undoesEarlierEffect = $line['delta'] * $sign < 0;
+
+                $created->push($this->write(
+                    $line['product_id'],
+                    $line['warehouse_id'],
+                    $line['delta'] > 0 ? InventoryLedger::TYPE_IN : InventoryLedger::TYPE_OUT,
+                    $line['delta'],
+                    $undoesEarlierEffect
+                        ? self::REVERSAL_PREFIX.$this->stripReversalPrefix($referenceNumber)
+                        : $referenceNumber,
+                    $moment,
+                    $source
+                ));
+            }
+
+            return $created;
+        });
     }
 
     /**
@@ -301,6 +418,22 @@ class StockService
             'source_type' => $source?->getMorphClass(),
             'source_id' => $source?->getKey(),
         ]);
+    }
+
+    /**
+     * Net qty already booked for a source, per "product_id:warehouse_id".
+     *
+     * @return array<string, int>
+     */
+    private function netBySource(Model $source): array
+    {
+        return InventoryLedger::where('source_type', $source->getMorphClass())
+            ->where('source_id', $source->getKey())
+            ->get()
+            ->groupBy(fn (InventoryLedger $e) => $e->product_id.':'.$e->warehouse_id)
+            ->map(fn ($group) => (int) $group->sum('qty'))
+            ->filter(fn (int $net) => $net !== 0)
+            ->all();
     }
 
     /**
