@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Exceptions\InsufficientStockException;
+use App\Http\Controllers\Concerns\ChecksReturnLimits;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SalesReturn;
+use App\Models\SalesReturnDetail;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -15,6 +19,8 @@ use Illuminate\Validation\Rule;
 
 class SalesReturnController extends Controller implements HasMiddleware
 {
+    use ChecksReturnLimits;
+
     public static function middleware(): array
     {
         return [
@@ -62,6 +68,9 @@ class SalesReturnController extends Controller implements HasMiddleware
             ]);
 
             $salesReturn->salesReturnDetails()->createMany($data['items']);
+
+            // Goods come back from the customer: put them into the sale's warehouse.
+            $this->syncStock($salesReturn, $data);
         });
 
         return redirect()->route('transactions.sales-returns.index')->with('success', 'Sales return added successfully.');
@@ -81,6 +90,8 @@ class SalesReturnController extends Controller implements HasMiddleware
 
             $salesReturn->salesReturnDetails()->delete();
             $salesReturn->salesReturnDetails()->createMany($data['items']);
+
+            $this->syncStock($salesReturn, $data);
         });
 
         return redirect()->route('transactions.sales-returns.index')->with('success', 'Sales return updated successfully.');
@@ -88,10 +99,18 @@ class SalesReturnController extends Controller implements HasMiddleware
 
     public function destroy(SalesReturn $salesReturn): RedirectResponse
     {
-        DB::transaction(function () use ($salesReturn) {
-            $salesReturn->salesReturnDetails()->delete();
-            $salesReturn->delete();
-        });
+        try {
+            DB::transaction(function () use ($salesReturn) {
+                // The goods are no longer returned: take them back out of stock
+                // (refused if they have already been sold again).
+                app(StockService::class)->sync($salesReturn, null, [], 'in', $salesReturn->return_number);
+
+                $salesReturn->salesReturnDetails()->delete();
+                $salesReturn->delete();
+            });
+        } catch (InsufficientStockException $e) {
+            return back()->with('error', implode(' ', $e->shortages));
+        }
 
         return redirect()->route('transactions.sales-returns.index')->with('success', 'Sales return deleted successfully.');
     }
@@ -116,6 +135,48 @@ class SalesReturnController extends Controller implements HasMiddleware
             'qty' => $item['qty'],
         ], $data['items']);
 
+        $sale = Sale::findOrFail($data['sale_id']);
+
+        $this->assertWithinReturnLimits(
+            $sale->invoice_number,
+            $data['items'],
+            $this->sumByProduct($sale->saleDetails()),
+            $this->sumByProduct(
+                SalesReturnDetail::query()->whereHas('salesReturn', function ($q) use ($sale, $ignoreId) {
+                    $q->where('sale_id', $sale->id)
+                        ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId));
+                })
+            )
+        );
+
+        // Stock goes back into the warehouse the sale was taken from.
+        $data['warehouse_id'] = $sale->warehouse_id;
+
         return $data;
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $lines
+     * @return array<int, int>  product_id => total qty
+     */
+    protected function sumByProduct($lines): array
+    {
+        return $lines->selectRaw('product_id, sum(qty) as total')
+            ->groupBy('product_id')
+            ->pluck('total', 'product_id')
+            ->map(fn ($qty) => (int) $qty)
+            ->all();
+    }
+
+    protected function syncStock(SalesReturn $salesReturn, array $data): void
+    {
+        app(StockService::class)->sync(
+            $salesReturn,
+            (int) $data['warehouse_id'],
+            $data['items'],
+            'in',
+            $data['return_number'],
+            $data['return_date']
+        );
     }
 }

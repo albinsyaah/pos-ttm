@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Http\Controllers\Concerns\ChecksReturnLimits;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
+use App\Models\PurchaseReturnDetail;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class PurchaseReturnController extends Controller implements HasMiddleware
 {
+    use ChecksReturnLimits;
+
     public static function middleware(): array
     {
         return [
@@ -62,6 +68,10 @@ class PurchaseReturnController extends Controller implements HasMiddleware
             ]);
 
             $purchaseReturn->purchaseReturnDetails()->createMany($data['items']);
+
+            // Goods go back to the supplier: take them out of the purchase's
+            // warehouse. Refused (and rolled back) if that warehouse is short.
+            $this->syncStock($purchaseReturn, $data);
         });
 
         return redirect()->route('transactions.purchase-returns.index')->with('success', 'Purchase return added successfully.');
@@ -81,6 +91,8 @@ class PurchaseReturnController extends Controller implements HasMiddleware
 
             $purchaseReturn->purchaseReturnDetails()->delete();
             $purchaseReturn->purchaseReturnDetails()->createMany($data['items']);
+
+            $this->syncStock($purchaseReturn, $data);
         });
 
         return redirect()->route('transactions.purchase-returns.index')->with('success', 'Purchase return updated successfully.');
@@ -89,6 +101,9 @@ class PurchaseReturnController extends Controller implements HasMiddleware
     public function destroy(PurchaseReturn $purchaseReturn): RedirectResponse
     {
         DB::transaction(function () use ($purchaseReturn) {
+            // The goods are no longer returned: put them back into stock.
+            app(StockService::class)->sync($purchaseReturn, null, [], 'out', $purchaseReturn->return_number);
+
             $purchaseReturn->purchaseReturnDetails()->delete();
             $purchaseReturn->delete();
         });
@@ -118,6 +133,55 @@ class PurchaseReturnController extends Controller implements HasMiddleware
             'reason' => $item['reason'] ?? null,
         ], $data['items']);
 
+        $purchase = Purchase::findOrFail($data['purchase_id']);
+
+        // Only goods that actually arrived can go back to the supplier.
+        if ($purchase->status !== 'received') {
+            throw ValidationException::withMessages([
+                'purchase_id' => __('stock.return_not_received', ['source' => $purchase->invoice_number]),
+            ]);
+        }
+
+        $this->assertWithinReturnLimits(
+            $purchase->invoice_number,
+            $data['items'],
+            $this->sumByProduct($purchase->purchaseDetails()),
+            $this->sumByProduct(
+                PurchaseReturnDetail::query()->whereHas('purchaseReturn', function ($q) use ($purchase, $ignoreId) {
+                    $q->where('purchase_id', $purchase->id)
+                        ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId));
+                })
+            )
+        );
+
+        // Stock leaves the warehouse the purchase was received into.
+        $data['warehouse_id'] = $purchase->warehouse_id;
+
         return $data;
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $lines
+     * @return array<int, int>  product_id => total qty
+     */
+    protected function sumByProduct($lines): array
+    {
+        return $lines->selectRaw('product_id, sum(qty) as total')
+            ->groupBy('product_id')
+            ->pluck('total', 'product_id')
+            ->map(fn ($qty) => (int) $qty)
+            ->all();
+    }
+
+    protected function syncStock(PurchaseReturn $purchaseReturn, array $data): void
+    {
+        app(StockService::class)->sync(
+            $purchaseReturn,
+            (int) $data['warehouse_id'],
+            $data['items'],
+            'out',
+            $data['return_number'],
+            $data['return_date']
+        );
     }
 }
