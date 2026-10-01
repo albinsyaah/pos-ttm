@@ -47,6 +47,8 @@ use App\Http\Controllers\Transactions\GeneralLedgerController as TransactionsGen
 use App\Http\Controllers\Transactions\InternalExpenditureController;
 use App\Http\Controllers\Transactions\InternalReceiptController;
 use App\Http\Controllers\Transactions\ItemRequestController;
+use App\Http\Controllers\DigitalReceiptController;
+use App\Http\Controllers\Print\SalePrintController;
 use App\Http\Controllers\Transactions\PointOfSaleController;
 use App\Http\Controllers\Transactions\PointOfSaleNewController;
 use App\Http\Controllers\Transactions\PurchaseController;
@@ -80,6 +82,14 @@ Route::get('/language/{locale}', [LanguageController::class, 'switch'])
     ->name('language.switch');
 
 // Guest-only auth routes
+// Digital receipt opened from the barcode on a printed receipt. Public on
+// purpose (customers are not users); the unguessable token is the key, and
+// the throttle makes guessing impractical.
+Route::get('/n/{token}', [DigitalReceiptController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]{32}')
+    ->middleware('throttle:60,1')
+    ->name('receipts.show');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
@@ -219,6 +229,11 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::resource('sales', SaleController::class)
             ->only(['index', 'store', 'update', 'destroy']);
+
+        // Printable documents for any sale (permission per document, see SalePrintController).
+        Route::get('sales/{sale}/print/receipt-small', [SalePrintController::class, 'receiptSmall'])->name('sales.print.receipt-small');
+        Route::get('sales/{sale}/print/receipt-large', [SalePrintController::class, 'receiptLarge'])->name('sales.print.receipt-large');
+        Route::get('sales/{sale}/print/delivery-note', [SalePrintController::class, 'deliveryNote'])->name('sales.print.delivery-note');
 
         Route::get('point-of-sale-new', [PointOfSaleNewController::class, 'index'])->name('point-of-sale-new.index');
         Route::get('point-of-sale-new/products', [PointOfSaleNewController::class, 'products'])->name('point-of-sale-new.products');

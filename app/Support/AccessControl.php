@@ -184,6 +184,14 @@ class AccessControl
                     'notifications.view' => 'Receive notifications (purchase due-date reminders)',
                 ],
             ],
+            'print' => [
+                'label' => 'Cetak',
+                'permissions' => [
+                    'print.receipt-small' => 'Print small receipt (100 x 150 mm)',
+                    'print.receipt-large' => 'Print large receipt/invoice (A4)',
+                    'print.delivery-note' => 'Print delivery note (surat jalan)',
+                ],
+            ],
             'administrator' => [
                 'label' => 'Administrator',
                 'permissions' => [

@@ -10,6 +10,7 @@ const salesOrderIdInput = document.getElementById('sales_order_id');
 const saleCustomerIdInput = document.getElementById('customer_id');
 const salesmanIdInput = document.getElementById('salesman_id');
 const saleWarehouseIdInput = document.getElementById('warehouse_id');
+const driverNameInput = document.getElementById('driver_name');
 
 const itemRowsBody = document.getElementById('itemRows');
 const itemRowTemplate = document.getElementById('itemRowTemplate');
@@ -107,6 +108,7 @@ document.querySelectorAll('.edit-sale-btn').forEach((btn) => {
     saleCustomerIdInput.value = btn.dataset.customerId || '';
     salesmanIdInput.value = btn.dataset.salesmanId || '';
     saleWarehouseIdInput.value = btn.dataset.warehouseId || '';
+    driverNameInput.value = btn.dataset.driverName || '';
 
     resetItemRows();
     try {

@@ -81,6 +81,7 @@ class SaleController extends Controller implements HasMiddleware
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
                 'warehouse_id' => $data['warehouse_id'],
+                'driver_name' => $data['driver_name'],
             ]);
 
             $sale->saleDetails()->createMany($data['items']);
@@ -106,6 +107,7 @@ class SaleController extends Controller implements HasMiddleware
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
                 'warehouse_id' => $data['warehouse_id'],
+                'driver_name' => $data['driver_name'],
             ]);
 
             $sale->saleDetails()->delete();
@@ -148,6 +150,8 @@ class SaleController extends Controller implements HasMiddleware
             'customer_id' => ['required', 'exists:customers,id'],
             'salesman_id' => ['nullable', 'exists:employees,id'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
+            // Printed on the delivery note (surat jalan).
+            'driver_name' => ['nullable', 'string', 'max:100'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.qty' => ['required', 'integer', 'min:1'],
@@ -166,6 +170,7 @@ class SaleController extends Controller implements HasMiddleware
 
         $data['sales_order_id'] = $data['sales_order_id'] ?? null;
         $data['salesman_id'] = $data['salesman_id'] ?? null;
+        $data['driver_name'] = filled($data['driver_name'] ?? null) ? trim($data['driver_name']) : null;
 
         return $data;
     }

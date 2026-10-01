@@ -60,6 +60,7 @@
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $sale->total_amount, 2) }}</td>
                         <td class="text-right pr-5">
+                            @include('partials.print-links', ['sale' => $sale])
                             @can('transactions.point-of-sale.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button

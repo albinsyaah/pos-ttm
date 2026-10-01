@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Sale extends Model
 {
@@ -25,8 +26,22 @@ class Sale extends Model
         'sales_order_id',
         'customer_id',
         'salesman_id',
-        'warehouse_id'
+        'warehouse_id',
+        'driver_name',
     ];
+
+    /**
+     * Every sale gets an unguessable token on creation. The receipt barcode
+     * links to the digital receipt by this token, never by the numeric id.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Sale $sale) {
+            if (blank($sale->public_token)) {
+                $sale->public_token = Str::random(32);
+            }
+        });
+    }
 
     /**
      * Sales that count as a receivable (piutang): sold on credit to a
@@ -37,6 +52,12 @@ class Sale extends Model
     {
         return $query->where('payment_type', self::PAYMENT_CREDIT)
             ->whereNotNull('customer_id');
+    }
+
+    /** Link the receipt barcode points to (public, no sign-in needed). */
+    public function digitalReceiptUrl(): string
+    {
+        return route('receipts.show', $this->public_token);
     }
 
     public function salesOrder()

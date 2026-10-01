@@ -54,6 +54,7 @@
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $sale->total_amount, 2) }}</td>
                         <td class="text-right pr-5">
+                            @include('partials.print-links', ['sale' => $sale])
                             @can('transactions.sales.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -67,6 +68,7 @@
                                         data-customer-id="{{ $sale->customer_id }}"
                                         data-salesman-id="{{ $sale->salesman_id }}"
                                         data-warehouse-id="{{ $sale->warehouse_id }}"
+                                        data-driver-name="{{ $sale->driver_name }}"
                                         data-items="{{ $sale->saleDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty, 'price' => $d->price])->toJson() }}"
                                     >
                                         <i class="fa-solid fa-pen text-xs"></i>
@@ -154,6 +156,11 @@
                                 <option value="{{ $salesman->id }}">{{ $salesman->code }} — {{ $salesman->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div>
+                        <label for="driver_name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.print.driver_optional') }}</label>
+                        <input id="driver_name" name="driver_name" type="text" maxlength="100" autocomplete="off"
+                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="warehouse_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.sales.warehouse') }}</label>

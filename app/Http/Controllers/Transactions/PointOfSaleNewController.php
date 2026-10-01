@@ -131,6 +131,8 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             'customer_id' => ['nullable', 'required_if:payment_type,'.Sale::PAYMENT_CREDIT, 'exists:customers,id'],
             'salesman_id' => ['nullable', 'exists:employees,id'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
+            // Printed on the delivery note (surat jalan).
+            'driver_name' => ['nullable', 'string', 'max:100'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.qty' => ['required', 'integer', 'min:1'],
@@ -157,7 +159,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             ? ($data['payment_method_id'] ?? PaymentMethod::defaultCash()?->id)
             : null;
 
-        DB::transaction(function () use ($data, $items, $totalAmount, $paymentType, $paymentMethodId) {
+        $sale = DB::transaction(function () use ($data, $items, $totalAmount, $paymentType, $paymentMethodId) {
             $sale = Sale::create([
                 'invoice_number' => $data['invoice_number'],
                 'sale_date' => $data['sale_date'],
@@ -169,6 +171,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
                 'customer_id' => $data['customer_id'] ?? null,
                 'salesman_id' => $data['salesman_id'] ?? null,
                 'warehouse_id' => $data['warehouse_id'],
+                'driver_name' => filled($data['driver_name'] ?? null) ? trim($data['driver_name']) : null,
             ]);
 
             $sale->saleDetails()->createMany($items);
@@ -176,12 +179,16 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             // Take the items out of the chosen warehouse; refused (and rolled
             // back) if a warehouse is short. Same product on two lines is added up.
             $this->syncSaleStock($sale, $items);
+
+            return $sale;
         });
 
         // Stay on the terminal (fresh cart) so the cashier can ring up the
         // next transaction immediately, rather than bouncing to a list page.
+        // The id lets the terminal offer a "print receipt" link for this sale.
         return redirect()->route('transactions.point-of-sale-new.index')
-            ->with('success', "Transaction {$data['invoice_number']} completed successfully.");
+            ->with('success', "Transaction {$data['invoice_number']} completed successfully.")
+            ->with('printed_sale_id', $sale->id);
     }
 
     /**
