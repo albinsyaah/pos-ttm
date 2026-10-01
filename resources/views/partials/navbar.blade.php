@@ -50,12 +50,41 @@
                 </div>
             </div>
 
-            <button id="notifBtn" class="icon-btn relative" aria-label="{{ __('app.layout.notifications') }}, {{ $unreadNotifications ?? 4 }} unread">
-                <i class="fa-regular fa-bell"></i>
-                <span class="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-[var(--bad-600)] text-white text-[10px] font-bold flex items-center justify-center">
-                    {{ $unreadNotifications ?? 4 }}
-                </span>
-            </button>
+            @can('notifications.view')
+                {{-- Notifications: purchase invoices overdue or due within 7 days --}}
+                <div class="relative">
+                    <button id="notifBtn" type="button" class="icon-btn relative" aria-haspopup="true" aria-expanded="false"
+                            aria-label="{{ __('app.layout.notifications') }}, {{ $dueReminders->count() }}">
+                        <i class="fa-regular fa-bell"></i>
+                        @if($dueReminders->isNotEmpty())
+                            <span class="absolute -top-0.5 -right-0.5 min-w-[1rem] h-4 px-1 rounded-full bg-[var(--bad-600)] text-white text-[10px] font-bold flex items-center justify-center">
+                                {{ $dueReminders->count() > 99 ? '99+' : $dueReminders->count() }}
+                            </span>
+                        @endif
+                    </button>
+
+                    <div id="notifMenu" class="hidden absolute right-0 mt-3 w-80 max-w-[85vw] bg-white rounded-2xl shadow-lg border border-gray-100 z-20 overflow-hidden">
+                        <div class="px-4 py-3 border-b border-gray-50">
+                            <p class="text-sm font-semibold text-[var(--ink-900)]">{{ __('app.notifications.title') }}</p>
+                        </div>
+                        <div class="max-h-96 overflow-y-auto">
+                            @forelse($dueReminders as $reminder)
+                                @include('partials.due-reminder-item', ['reminder' => $reminder])
+                            @empty
+                                <p class="px-4 py-8 text-center text-sm text-[var(--ink-400)]">{{ __('app.notifications.empty') }}</p>
+                            @endforelse
+                        </div>
+                        @if($dueReminders->isNotEmpty())
+                            @can('transactions.payable-payments.view')
+                                <a href="{{ route('transactions.payable-payments.index') }}"
+                                   class="block text-center text-sm font-semibold text-[var(--brand-600)] px-4 py-3 border-t border-gray-50 hover:bg-[var(--surface)]">
+                                    {{ __('app.notifications.view_payments') }}
+                                </a>
+                            @endcan
+                        @endif
+                    </div>
+                </div>
+            @endcan
 
             <img
                 src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_1280.png"

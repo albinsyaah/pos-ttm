@@ -52,7 +52,4 @@ document.getElementById('newSaleBtn')?.addEventListener('click', () => {
   showToast('Opening new sale screen', 'fa-cart-shopping');
 });
 
-// Notification bell
-document.getElementById('notifBtn')?.addEventListener('click', () => {
-  showToast('4 alerts: low stock and pending orders', 'fa-bell', 'var(--warn-600)');
-});
+// The notification bell is handled by js/notifications.js (real due-date reminders).

@@ -204,6 +204,11 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['purchase-returns' => 'purchaseReturn']);
 
+        // Open invoices of one supplier, for the payable payment form. Declared
+        // before the resource so "invoices" is never read as a payment id.
+        Route::get('payable-payments/invoices', [ApPaymentController::class, 'invoices'])
+            ->name('payable-payments.invoices');
+
         Route::resource('payable-payments', ApPaymentController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['payable-payments' => 'payablePayment']);

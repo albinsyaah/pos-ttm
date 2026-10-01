@@ -178,6 +178,12 @@ class AccessControl
                     'inquiry.view' => 'Use inquiry/search tools',
                 ],
             ],
+            'notifications' => [
+                'label' => 'Notifikasi',
+                'permissions' => [
+                    'notifications.view' => 'Receive notifications (purchase due-date reminders)',
+                ],
+            ],
             'administrator' => [
                 'label' => 'Administrator',
                 'permissions' => [

@@ -36,6 +36,21 @@ return [
         'walk_in' => 'Walk-in',
     ],
 
+    // Notifications (purchase due-date reminders)
+    'notifications' => [
+        'title' => 'Notifications',
+        'empty' => 'No payments due soon.',
+        'view_payments' => 'Open payable payments',
+        'overdue_days' => 'Overdue :days days',
+        'due_today' => 'Due today',
+        'due_in_days' => 'Due in :days days',
+        'outstanding' => 'Outstanding',
+        'popup_title' => 'Supplier payments to settle',
+        'popup_intro' => ':count purchase invoice(s) are overdue or due within 7 days.',
+        'more' => 'and :count more',
+        'close' => 'Close',
+    ],
+
     // Layout / navbar
     'layout' => [
         'dashboard' => 'Dashboard',
@@ -769,6 +784,13 @@ return [
         'status_cancelled' => 'Cancelled',
         'no_purchases_found' => 'No purchases found.',
         'delete_purchase' => 'Delete purchase?',
+        'due_date' => 'Due Date',
+        'outstanding' => 'Outstanding',
+        'overdue_days' => 'Overdue :days days',
+        'due_in_days' => 'Due in :days days',
+        'paid_off' => 'Paid',
+        'has_payments' => 'This purchase already has payments recorded and cannot be deleted. Delete its payments first.',
+        'payments_conflict' => 'Payments are already recorded against this purchase. Keep the same supplier and a received status, and a total that still covers what was paid.',
     ],
 
     // Transactions - Purchase Returns
@@ -807,6 +829,15 @@ return [
         'method_giro' => 'Giro',
         'no_payable_payments_found' => 'No payable payments found.',
         'delete_payable_payment' => 'Delete payable payment?',
+        'invoice' => 'Purchase Invoice',
+        'choose_supplier_first' => 'Choose a supplier first',
+        'choose_invoice' => 'Choose an invoice',
+        'no_open_invoices' => 'No unpaid invoices for this supplier',
+        'no_invoice_legacy' => '— No invoice (older payment) —',
+        'due' => 'Due',
+        'outstanding' => 'Outstanding',
+        'invoices_failed' => 'Could not load invoices. Try again.',
+        'amount_exceeds' => 'The amount is more than what is still owed on this invoice (:outstanding).',
     ],
 
     // Transactions - Sales Orders

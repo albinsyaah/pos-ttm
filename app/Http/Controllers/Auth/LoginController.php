@@ -57,6 +57,10 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
+        // Ask the layout to show the due-date pop-up once on the next page
+        // (only users with the notification permission ever see it).
+        $request->session()->put('show_due_popup', true);
+
         return redirect()->intended(route($landingRoute));
     }
 

@@ -30,6 +30,10 @@
 
         <div id="toastHost" class="fixed top-6 right-6 z-50 flex flex-col gap-2"></div>
 
+        @if($showDuePopup ?? false)
+            @include('partials.due-popup')
+        @endif
+
         <section class="p-5 sm:p-8">
             @yield('content')
         </section>
@@ -40,6 +44,7 @@
 
 <script src="{{ asset('js/app.js') }}"></script>
 <script src="{{ asset('js/sidebar.js') }}"></script>
+<script src="{{ asset('js/notifications.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="{{ asset('js/report-common.js') }}"></script>
 

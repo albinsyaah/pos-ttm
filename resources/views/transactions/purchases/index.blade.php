@@ -32,16 +32,18 @@
     </div>
 
     <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
-        <table class="w-full text-sm min-w-[920px]">
+        <table class="w-full text-sm min-w-[1120px]">
             <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-semibold">{{ __('app.purchases.invoice_number') }}</th>
                     <th class="font-semibold">{{ __('app.purchases.purchase_date') }}</th>
+                    <th class="font-semibold">{{ __('app.purchases.due_date') }}</th>
                     <th class="font-semibold">{{ __('app.purchases.supplier') }}</th>
                     <th class="font-semibold">{{ __('app.purchases.warehouse') }}</th>
                     <th class="font-semibold">{{ __('app.purchases.status') }}</th>
                     <th class="font-semibold">{{ __('app.purchases.items') }}</th>
                     <th class="font-semibold">{{ __('app.purchases.total') }}</th>
+                    <th class="font-semibold">{{ __('app.purchases.outstanding') }}</th>
                     <th class="font-semibold text-right pr-5">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
@@ -50,6 +52,15 @@
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ $purchase->invoice_number }}</td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($purchase->purchase_date)->format('d M Y') }}</td>
+                        @php($balance = $balances->get($purchase->id))
+                        <td class="text-[var(--ink-400)]">
+                            {{ $purchase->due_date?->format('d M Y') ?: '—' }}
+                            @if($balance && $balance['outstanding'] > 0 && $balance['days_left'] < 0)
+                                <span class="block text-xs font-semibold text-[var(--bad-600)]">{{ __('app.purchases.overdue_days', ['days' => abs($balance['days_left'])]) }}</span>
+                            @elseif($balance && $balance['outstanding'] > 0 && $balance['days_left'] <= \App\Models\Purchase::REMINDER_DAYS)
+                                <span class="block text-xs font-semibold text-[var(--warn-600)]">{{ __('app.purchases.due_in_days', ['days' => $balance['days_left']]) }}</span>
+                            @endif
+                        </td>
                         <td class="text-[var(--ink-700)]">{{ $purchase->supplier?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $purchase->warehouse?->name ?: '—' }}</td>
                         <td>
@@ -59,6 +70,15 @@
                         </td>
                         <td class="text-[var(--ink-400)]">{{ $purchase->purchaseDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $purchase->total_amount, 2) }}</td>
+                        <td class="text-[var(--ink-700)]">
+                            @if(! $balance)
+                                —
+                            @elseif($balance['outstanding'] > 0)
+                                {{ number_format($balance['outstanding'], 2) }}
+                            @else
+                                <span class="text-[var(--good-600)] font-semibold">{{ __('app.purchases.paid_off') }}</span>
+                            @endif
+                        </td>
                         <td class="text-right pr-5">
                             @can('transactions.purchases.manage')
                                 <div class="inline-flex items-center gap-2">
@@ -92,7 +112,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="10" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.purchases.no_purchases_found') }}
                         </td>

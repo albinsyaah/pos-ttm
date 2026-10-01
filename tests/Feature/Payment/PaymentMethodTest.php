@@ -5,6 +5,7 @@ use App\Models\ArPayment;
 use App\Models\Customer;
 use App\Models\PaymentMethod;
 use App\Models\Product;
+use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\Supplier;
 use App\Models\User;
@@ -223,9 +224,15 @@ it('offers only active methods on the terminal', function () {
 it('records the method on a payable payment and refuses an inactive one for a new payment', function () {
     pmLogin(['transactions.payable-payments.manage']);
     $supplier = Supplier::create(['code' => 'S-1', 'name' => 'Supplier Uji']);
+    $warehouse = Warehouse::create(['code' => 'W-'.uniqid(), 'name' => 'Gudang Uji']);
+    // A payable payment settles a received purchase invoice.
+    $purchase = Purchase::create([
+        'invoice_number' => 'PUR-'.uniqid(), 'purchase_date' => now()->format('Y-m-d'), 'total_amount' => 2000,
+        'status' => 'received', 'supplier_id' => $supplier->id, 'warehouse_id' => $warehouse->id,
+    ]);
     $payload = fn (int $methodId, string $number) => [
         'payment_number' => $number, 'amount' => 500, 'payment_date' => now()->format('Y-m-d'),
-        'payment_method_id' => $methodId, 'supplier_id' => $supplier->id,
+        'payment_method_id' => $methodId, 'supplier_id' => $supplier->id, 'purchase_id' => $purchase->id,
     ];
 
     $this->post(route('transactions.payable-payments.store'), $payload(pmMethod('qris')->id, 'AP-1'))

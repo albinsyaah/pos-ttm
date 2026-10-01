@@ -36,6 +36,7 @@ class ApPaymentSeeder extends Seeder
                 'payment_date' => $paymentDate,
                 'payment_method_id' => fake()->randomElement($methodIds),
                 'supplier_id' => $purchase->supplier_id,
+                'purchase_id' => $purchase->id,
             ]);
 
             $sequence++;

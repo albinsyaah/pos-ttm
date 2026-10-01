@@ -9,6 +9,7 @@ use App\Models\Purchase;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\Warehouse;
+use App\Services\PayableService;
 use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class PurchaseController extends Controller implements HasMiddleware
 {
@@ -24,8 +26,10 @@ class PurchaseController extends Controller implements HasMiddleware
      */
     public const STATUSES = ['pending', 'received', 'cancelled'];
 
-    public function __construct(private readonly StockService $stock)
-    {
+    public function __construct(
+        private readonly StockService $stock,
+        private readonly PayableService $payables,
+    ) {
     }
 
     public static function middleware(): array
@@ -55,8 +59,12 @@ class PurchaseController extends Controller implements HasMiddleware
             ->paginate(20)
             ->withQueryString();
 
+        // Balance per invoice on this page (what is still owed, and how late).
+        $balances = $this->payables->invoices($purchases->pluck('supplier_id')->unique()->all());
+
         return view('transactions.purchases.index', [
             'purchases' => $purchases,
+            'balances' => $balances,
             'search' => $search,
             'suppliers' => Supplier::orderBy('name')->get(),
             'warehouses' => Warehouse::orderBy('name')->get(),
@@ -94,6 +102,8 @@ class PurchaseController extends Controller implements HasMiddleware
         $data = $this->validatePurchase($request, $purchase->id);
 
         DB::transaction(function () use ($data, $purchase) {
+            $this->assertPaymentsStillFit($purchase, $data);
+
             $purchase->update([
                 'invoice_number' => $data['invoice_number'],
                 'purchase_date' => $data['purchase_date'],
@@ -122,6 +132,10 @@ class PurchaseController extends Controller implements HasMiddleware
             return back()->with('error', 'This purchase already has returns recorded and cannot be deleted.');
         }
 
+        if ($purchase->payments()->exists()) {
+            return back()->with('error', __('app.purchases.has_payments'));
+        }
+
         try {
             DB::transaction(function () use ($purchase) {
                 // Take back the stock this purchase added (refused if it was already used).
@@ -135,6 +149,33 @@ class PurchaseController extends Controller implements HasMiddleware
         }
 
         return redirect()->route('transactions.purchases.index')->with('success', 'Purchase deleted successfully.');
+    }
+
+    /**
+     * Once payments are recorded against an invoice, the edit may not strand
+     * them: same supplier, still a payable status, and a total that still
+     * covers what was paid.
+     */
+    protected function assertPaymentsStillFit(Purchase $purchase, array $data): void
+    {
+        $paid = (float) $purchase->payments()->sum('amount');
+
+        if ($paid <= 0) {
+            return;
+        }
+
+        $returned = (float) $purchase->purchaseReturns()->sum('total_amount');
+
+        $problem = match (true) {
+            (int) $data['supplier_id'] !== (int) $purchase->supplier_id => 'supplier_id',
+            ! in_array($data['status'], Purchase::PAYABLE_STATUSES, true) => 'status',
+            (float) $data['total_amount'] - $returned < $paid - 0.005 => 'items',
+            default => null,
+        };
+
+        if ($problem !== null) {
+            throw ValidationException::withMessages([$problem => __('app.purchases.payments_conflict')]);
+        }
     }
 
     /**

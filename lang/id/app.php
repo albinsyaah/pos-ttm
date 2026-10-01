@@ -36,6 +36,21 @@ return [
         'walk_in' => 'Pelanggan Umum',
     ],
 
+    // Notifications (purchase due-date reminders)
+    'notifications' => [
+        'title' => 'Notifikasi',
+        'empty' => 'Tidak ada pembayaran yang segera jatuh tempo.',
+        'view_payments' => 'Buka pembayaran hutang',
+        'overdue_days' => 'Terlambat :days hari',
+        'due_today' => 'Jatuh tempo hari ini',
+        'due_in_days' => ':days hari lagi',
+        'outstanding' => 'Sisa hutang',
+        'popup_title' => 'Pembayaran supplier yang perlu dilunasi',
+        'popup_intro' => ':count faktur pembelian sudah lewat jatuh tempo atau jatuh tempo dalam 7 hari.',
+        'more' => 'dan :count lainnya',
+        'close' => 'Tutup',
+    ],
+
     // Layout / navbar
     'layout' => [
         'dashboard' => 'Dashboard',
@@ -768,6 +783,13 @@ return [
         'status_cancelled' => 'Dibatalkan',
         'no_purchases_found' => 'Tidak ada pembelian ditemukan.',
         'delete_purchase' => 'Hapus pembelian?',
+        'due_date' => 'Jatuh Tempo',
+        'outstanding' => 'Sisa Hutang',
+        'overdue_days' => 'Terlambat :days hari',
+        'due_in_days' => ':days hari lagi',
+        'paid_off' => 'Lunas',
+        'has_payments' => 'Pembelian ini sudah punya pembayaran dan tidak bisa dihapus. Hapus pembayarannya terlebih dahulu.',
+        'payments_conflict' => 'Pembelian ini sudah punya pembayaran. Supplier harus tetap sama, status tetap diterima, dan total harus masih menutup jumlah yang sudah dibayar.',
     ],
 
     // Transactions - Purchase Returns
@@ -806,6 +828,15 @@ return [
         'method_giro' => 'Giro',
         'no_payable_payments_found' => 'Tidak ada pembayaran hutang ditemukan.',
         'delete_payable_payment' => 'Hapus pembayaran hutang?',
+        'invoice' => 'Faktur Pembelian',
+        'choose_supplier_first' => 'Pilih supplier terlebih dahulu',
+        'choose_invoice' => 'Pilih faktur',
+        'no_open_invoices' => 'Tidak ada faktur yang belum lunas untuk supplier ini',
+        'no_invoice_legacy' => '— Tanpa faktur (pembayaran lama) —',
+        'due' => 'Jatuh tempo',
+        'outstanding' => 'Sisa',
+        'invoices_failed' => 'Faktur gagal dimuat. Coba lagi.',
+        'amount_exceeds' => 'Jumlah melebihi sisa hutang faktur ini (:outstanding).',
     ],
 
     // Transactions - Sales Orders
