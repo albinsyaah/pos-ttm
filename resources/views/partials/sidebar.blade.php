@@ -83,12 +83,23 @@
             </a>
         @endcan
 
+        {{-- Harga (Price): setup + change history --}}
         @can('pricing.view')
-            <a href="{{ route('pricing.price-setups.index') }}"
-               class="sidebar-item {{ request()->routeIs('pricing.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
-               @if(request()->routeIs('pricing.*')) aria-current="page" @endif>
-                <i class="fa-solid fa-tags w-4 text-center"></i> {{ __('app.sidebar.price_setup') }}
-            </a>
+        <div class="nav-group {{ request()->routeIs('pricing.*') ? 'open' : '' }}">
+            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="{{ request()->routeIs('pricing.*') ? 'true' : 'false' }}">
+                <i class="fa-solid fa-tags w-4 text-center"></i>
+                <span class="flex-1 text-left">{{ __('app.sidebar.price') }}</span>
+                <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
+            </button>
+            <div class="nav-panel">
+                <a href="{{ route('pricing.price-setups.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('pricing.price-setups.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('pricing.price-setups.*')) aria-current="page" @endif>{{ __('app.sidebar.price_setup') }}</a>
+                <a href="{{ route('pricing.price-histories.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('pricing.price-histories.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('pricing.price-histories.*')) aria-current="page" @endif>{{ __('app.sidebar.price_history') }}</a>
+            </div>
+        </div>
         @endcan
 
         {{-- Keuangan --}}

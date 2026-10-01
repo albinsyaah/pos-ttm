@@ -112,7 +112,10 @@ class InquiryController extends Controller
 
         return PriceSetup::query()
             ->whereIn('product_id', $productIds)
+            // A price dated in the future does not apply yet.
+            ->whereDate('effective_date', '<=', now()->toDateString())
             ->orderByDesc('effective_date')
+            ->orderByDesc('id')
             ->get()
             ->groupBy('product_id')
             ->map(fn ($rows) => $rows->unique('price_category')->values())

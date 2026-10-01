@@ -129,6 +129,8 @@ class InventoryReportController extends Controller
         return PriceSetup::query()
             ->whereIn('product_id', $productIds)
             ->where('price_category', 'Retail')
+            // A price dated in the future does not apply yet.
+            ->whereDate('effective_date', '<=', now()->toDateString())
             ->orderByDesc('effective_date')
             ->orderByDesc('id')
             ->get(['product_id', 'amount'])

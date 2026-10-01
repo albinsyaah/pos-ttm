@@ -104,6 +104,7 @@
                 </td>
                 <td class="p-2">
                     <input type="number" name="items[__INDEX__][price]" min="0" step="0.01" required class="item-price w-full rounded-lg bg-[var(--surface)] py-2 px-2.5 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                    <span class="item-price-hint block text-[10px] mt-1 text-[var(--ink-400)]"></span>
                 </td>
                 <td class="p-2 item-line-total text-[var(--ink-700)] font-medium">0.00</td>
                 <td class="p-2 text-right">
@@ -133,7 +134,17 @@
 @endsection
 
 @push('scripts')
+@php
+    $priceLabels = [
+        'reference' => __('app.point_of_sale_new.reference_price'),
+        'changed' => __('app.point_of_sale_new.price_changed'),
+        'none' => __('app.point_of_sale_new.no_reference_price'),
+    ];
+@endphp
     <script>
+        // Reference selling prices (harga patokan): product id => dated prices, newest first.
+        window.POS_PRICE_BOOK = @json($priceBook);
+        window.POS_PRICE_LABELS = @json($priceLabels);
         @if(session('success'))
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('success'))));
         @endif

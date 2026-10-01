@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Warehouse;
+use App\Services\PriceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -37,13 +38,18 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
      * Show the checkout terminal. This is a create-only screen — completed
      * transactions are managed afterwards on the Point of Sale list page.
      */
-    public function index()
+    public function index(PriceService $prices)
     {
+        $products = Product::orderBy('name')->get();
+
         return view('transactions.point-of-sale-new.index', [
             'customers' => Customer::orderBy('name')->get(),
             'warehouses' => Warehouse::orderBy('name')->get(),
             'salesmen' => Employee::orderBy('name')->get(),
-            'products' => Product::orderBy('name')->get(),
+            'products' => $products,
+            // Dated Retail prices per product; the page picks the one that
+            // applies on the sale date and pre-fills it as the reference price.
+            'priceBook' => $prices->priceBook($products->pluck('id')),
         ]);
     }
 

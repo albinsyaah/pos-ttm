@@ -38,7 +38,7 @@ return [
 
     // Layout / navbar
     'layout' => [
-        'dashboard' => 'Dasbor',
+        'dashboard' => 'Dashboard',
         'search_placeholder' => 'Cari pesanan, produk',
         'search_orders_products' => 'Cari pesanan atau produk',
         'new_sale' => 'Penjualan Baru',
@@ -50,7 +50,7 @@ return [
     // Sidebar navigation
     'sidebar' => [
         'search_menu' => 'Cari menu',
-        'dashboard' => 'Dasbor',
+        'dashboard' => 'Dashboard',
         'customer' => 'Pelanggan',
         'inventory' => 'Inventaris',
         'brand' => 'Merk',
@@ -58,7 +58,9 @@ return [
         'product_group' => 'Grup Produk',
         'product' => 'Barang',
         'asset' => 'Aset',
+        'price' => 'Harga',
         'price_setup' => 'Setup Harga',
+        'price_history' => 'Riwayat Harga',
         'finance' => 'Keuangan',
         'chart_of_accounts' => 'Bagan Akun',
         'cash_flow' => 'Arus Kas',
@@ -68,12 +70,12 @@ return [
         'employee' => 'Karyawan',
         'salesman' => 'Salesman',
         'transactions' => 'Transaksi',
-        'account_payable' => 'Hutang Usaha',
+        'account_payable' => 'Pembelian',
         'purchase_order' => 'Purchase Order',
         'purchase' => 'Pembelian',
         'purchase_return' => 'Retur Pembelian',
         'payable_payment' => 'Pembayaran Hutang',
-        'account_receivable' => 'Piutang Usaha',
+        'account_receivable' => 'Penjualan',
         'sales_order' => 'Sales Order',
         'sales' => 'Penjualan',
         'point_of_sales_new' => 'Point of Sales Baru',
@@ -313,6 +315,21 @@ return [
         'effective_date' => 'Tanggal Berlaku',
         'no_price_setups_found' => 'Setup harga tidak ditemukan.',
         'delete_price_setup' => 'Hapus setup harga?',
+    ],
+
+    'price_histories' => [
+        'title' => 'Riwayat Harga',
+        'search' => 'Cari riwayat harga',
+        'search_placeholder' => 'Cari berdasarkan produk, kategori, atau pengguna',
+        'when' => 'Kapan',
+        'who' => 'Diubah oleh',
+        'action' => 'Aksi',
+        'from' => 'Dari',
+        'to' => 'Menjadi',
+        'action_created' => 'Ditambah',
+        'action_updated' => 'Diubah',
+        'action_deleted' => 'Dihapus',
+        'none' => 'Belum ada perubahan harga yang tercatat.',
     ],
 
     // Inquiry (alat cari stok & harga, khusus lihat)
@@ -868,6 +885,9 @@ return [
         'total' => 'Total',
         'complete_transaction' => 'Selesaikan Transaksi',
         'new_transaction' => 'Transaksi Baru',
+        'reference_price' => 'Harga patokan',
+        'price_changed' => 'harga diubah',
+        'no_reference_price' => 'Belum ada harga patokan untuk produk ini',
     ],
 
     // Transactions - Sales Returns (Retur Penjualan)

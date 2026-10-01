@@ -17,6 +17,7 @@ use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\ProductGroupController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\Pricing\PriceHistoryController;
 use App\Http\Controllers\Pricing\PriceSetupController;
 use App\Http\Controllers\Reports\ApPaymentReportController;
 use App\Http\Controllers\Reports\ArAgingReportController;
@@ -137,6 +138,9 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('price-setups', PriceSetupController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['price-setups' => 'priceSetup']);
+
+        Route::get('price-histories', [PriceHistoryController::class, 'index'])
+            ->name('price-histories.index');
     });
 
     // Keuangan (Finance): chart of accounts, cash flow, general ledger.

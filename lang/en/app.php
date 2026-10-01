@@ -58,7 +58,9 @@ return [
         'product_group' => 'Product Group',
         'product' => 'Product',
         'asset' => 'Asset',
+        'price' => 'Price',
         'price_setup' => 'Price Setup',
+        'price_history' => 'Price History',
         'finance' => 'Finance',
         'chart_of_accounts' => 'Chart of Accounts',
         'cash_flow' => 'Cash Flow',
@@ -313,6 +315,21 @@ return [
         'effective_date' => 'Effective Date',
         'no_price_setups_found' => 'No price setups found.',
         'delete_price_setup' => 'Delete price setup?',
+    ],
+
+    'price_histories' => [
+        'title' => 'Price History',
+        'search' => 'Search price history',
+        'search_placeholder' => 'Search by product, category or user',
+        'when' => 'When',
+        'who' => 'Changed by',
+        'action' => 'Action',
+        'from' => 'From',
+        'to' => 'To',
+        'action_created' => 'Added',
+        'action_updated' => 'Changed',
+        'action_deleted' => 'Deleted',
+        'none' => 'No price changes recorded yet.',
     ],
 
     // Inquiry (read-only stock & price search tool)
@@ -869,6 +886,9 @@ return [
         'total' => 'Total',
         'complete_transaction' => 'Complete Transaction',
         'new_transaction' => 'New Transaction',
+        'reference_price' => 'Reference price',
+        'price_changed' => 'price changed',
+        'no_reference_price' => 'No reference price set for this product',
     ],
 
     // Transactions - Sales Returns
