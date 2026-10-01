@@ -22,6 +22,7 @@ function closeModal(modal) {
 
 // Open "Add Payable Payment"
 document.getElementById('addPayablePaymentBtn')?.addEventListener('click', (e) => {
+  paymentMethodInput.querySelectorAll('option[data-temporary]').forEach((o) => o.remove());
   payablePaymentForm.reset();
   payablePaymentForm.action = e.currentTarget.dataset.action;
   payablePaymentFormMethod.innerHTML = '';
@@ -33,6 +34,7 @@ document.getElementById('addPayablePaymentBtn')?.addEventListener('click', (e) =
 // Open "Edit Payable Payment" for each row
 document.querySelectorAll('.edit-payable-payment-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
+    paymentMethodInput.querySelectorAll('option[data-temporary]').forEach((o) => o.remove());
     payablePaymentForm.reset();
     payablePaymentForm.action = btn.dataset.action;
     payablePaymentFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
@@ -41,7 +43,14 @@ document.querySelectorAll('.edit-payable-payment-btn').forEach((btn) => {
     paymentNumberInput.value = btn.dataset.paymentNumber || '';
     paymentDateInput.value = btn.dataset.paymentDate || '';
     paymentSupplierIdInput.value = btn.dataset.supplierId || '';
-    paymentMethodInput.value = btn.dataset.paymentMethod || '';
+    // A method deactivated after this payment was saved is not in the list; keep it selectable.
+    const methodId = btn.dataset.paymentMethodId || '';
+    if (methodId !== '' && ![...paymentMethodInput.options].some((o) => o.value === methodId)) {
+      const kept = new Option(btn.dataset.paymentMethodName || methodId, methodId);
+      kept.dataset.temporary = '1';
+      paymentMethodInput.add(kept);
+    }
+    paymentMethodInput.value = methodId;
     amountInput.value = btn.dataset.amount || '';
 
     openModal(payablePaymentModal);

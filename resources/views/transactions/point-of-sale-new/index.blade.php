@@ -192,6 +192,15 @@
                     <p id="creditNote" class="pos-note hidden">{{ __('app.point_of_sale_new.credit_note') }}</p>
                 </div>
 
+                <div id="methodField">
+                    <label for="payment_method_id" class="pos-label">{{ __('app.point_of_sale_new.payment_method') }}</label>
+                    <select id="payment_method_id" name="payment_method_id" class="pos-field">
+                        @foreach($paymentMethods as $method)
+                            <option value="{{ $method->id }}" @selected($selectedMethodId === $method->id)>{{ $method->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div>
                     <label for="customer_id" id="customerLabel" class="pos-label"
                            data-cash="{{ __('app.point_of_sale_new.customer_optional') }}"

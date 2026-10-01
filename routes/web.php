@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\CashFlowController;
 use App\Http\Controllers\Finance\ChartOfAccountController;
+use App\Http\Controllers\Finance\PaymentMethodController;
 use App\Http\Controllers\Finance\GeneralLedgerController;
 use App\Http\Controllers\Hr\EmployeeController;
 use App\Http\Controllers\Hr\SalesmanController;
@@ -154,6 +155,10 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('cash-flows', CashFlowController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['cash-flows' => 'cashFlow']);
+
+        Route::resource('payment-methods', PaymentMethodController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['payment-methods' => 'paymentMethod']);
 
         Route::resource('general-ledgers', GeneralLedgerController::class)
             ->only(['index', 'store', 'update', 'destroy'])

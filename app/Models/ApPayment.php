@@ -15,9 +15,14 @@ class ApPayment extends Model
         'payment_number',
         'amount',
         'payment_date',
-        'payment_method',
+        'payment_method_id',
         'supplier_id'
     ];
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_id');
+    }
 
     public function supplier()
     {

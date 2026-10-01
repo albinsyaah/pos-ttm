@@ -3,16 +3,17 @@
 namespace Database\Seeders;
 
 use App\Models\ArPayment;
+use App\Models\PaymentMethod;
 use App\Models\Sale;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
 class ArPaymentSeeder extends Seeder
 {
-    private const METHODS = ['Transfer Bank', 'Tunai', 'QRIS'];
-
     public function run(): void
     {
+        $methodIds = PaymentMethod::active()->pluck('id')->all();
+
         $sales = Sale::whereNotNull('customer_id')->orderBy('id')->get();
         $sequence = 1;
 
@@ -32,7 +33,7 @@ class ArPaymentSeeder extends Seeder
                 'payment_number' => 'ARPAY-'.$paymentDate->format('Ym').'-'.str_pad((string) $sequence, 4, '0', STR_PAD_LEFT),
                 'amount' => $amount,
                 'payment_date' => $paymentDate,
-                'payment_method' => fake()->randomElement(self::METHODS),
+                'payment_method_id' => fake()->randomElement($methodIds),
                 'customer_id' => $sale->customer_id,
             ]);
 

@@ -21,6 +21,7 @@ class Sale extends Model
         'total_amount',
         'source',
         'payment_type',
+        'payment_method_id',
         'sales_order_id',
         'customer_id',
         'salesman_id',
@@ -49,6 +50,10 @@ class Sale extends Model
     public function salesman()
     {
         return $this->belongsTo(Employee::class, 'salesman_id');
+    }
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_id');
     }
     public function warehouse()
     {

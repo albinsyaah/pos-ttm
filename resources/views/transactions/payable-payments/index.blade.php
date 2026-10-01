@@ -49,7 +49,7 @@
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ $payment->payment_number }}</td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $payment->supplier?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $payment->payment_method }}</td>
+                        <td class="text-[var(--ink-400)]">{{ $payment->paymentMethod?->name ?? '-' }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $payment->amount, 2) }}</td>
                         <td class="text-right pr-5">
                             @can('transactions.payable-payments.manage')
@@ -62,7 +62,8 @@
                                         data-payment-number="{{ $payment->payment_number }}"
                                         data-payment-date="{{ \Illuminate\Support\Carbon::parse($payment->payment_date)->format('Y-m-d') }}"
                                         data-supplier-id="{{ $payment->supplier_id }}"
-                                        data-payment-method="{{ $payment->payment_method }}"
+                                        data-payment-method-id="{{ $payment->payment_method_id }}"
+                                        data-payment-method-name="{{ $payment->paymentMethod?->name }}"
                                         data-amount="{{ $payment->amount }}"
                                     >
                                         <i class="fa-solid fa-pen text-xs"></i>
@@ -133,10 +134,10 @@
                     </div>
                     <div>
                         <label for="payment_method" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.payable_payments.payment_method') }}</label>
-                        <select id="payment_method" name="payment_method" required
+                        <select id="payment_method" name="payment_method_id" required
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                             @foreach($paymentMethods as $method)
-                                <option value="{{ $method }}">{{ $method }}</option>
+                                <option value="{{ $method->id }}">{{ $method->name }}</option>
                             @endforeach
                         </select>
                     </div>

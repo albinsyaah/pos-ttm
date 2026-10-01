@@ -27,7 +27,7 @@ class CashFlowSeeder extends Seeder
                 'type' => 'Inflow',
                 'amount' => $payment->amount,
                 'description' => 'Penerimaan pembayaran piutang - '.$payment->payment_number,
-                'account_id' => $payment->payment_method === 'Tunai' ? $cash : $bank,
+                'account_id' => $payment->paymentMethod?->is_cash ? $cash : $bank,
             ]);
         });
 
@@ -38,7 +38,7 @@ class CashFlowSeeder extends Seeder
                 'type' => 'Outflow',
                 'amount' => $payment->amount,
                 'description' => 'Pembayaran utang usaha - '.$payment->payment_number,
-                'account_id' => $payment->payment_method === 'Tunai' ? $cash : $bank,
+                'account_id' => $payment->paymentMethod?->is_cash ? $cash : $bank,
             ]);
         });
 

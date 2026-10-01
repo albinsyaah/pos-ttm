@@ -32,12 +32,12 @@
                 @endforeach
             </select>
 
-            <select id="apReportMethod" name="payment_method"
+            <select id="apReportMethod" name="payment_method_id"
                 class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                 <option value="">{{ __('app.reports.payable_payment.all_methods') }}</option>
                 @foreach ($paymentMethods as $methodOption)
-                    <option value="{{ $methodOption }}" @selected($paymentMethod === $methodOption)>
-                        {{ __('app.payable_payments.method_' . $methodOption) }}</option>
+                    <option value="{{ $methodOption->id }}" @selected((string) $paymentMethod === (string) $methodOption->id)>
+                        {{ $methodOption->name }}</option>
                 @endforeach
             </select>
 
@@ -82,7 +82,7 @@
                 &middot; {{ $suppliers->firstWhere('id', $supplierId)?->name }}
             @endif
             @if ($paymentMethod)
-                &middot; {{ $paymentMethod }}
+                &middot; {{ $paymentMethods->firstWhere('id', $paymentMethod)?->name }}
             @endif
         </p>
         <p class="generated">{{ __('app.reports.generated_at') }}: {{ now()->format('d M Y H:i') }}</p>
@@ -112,7 +112,7 @@
                         <td class="text-[var(--ink-400)]">
                             {{ \Illuminate\Support\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $payment->supplier?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $payment->payment_method }}</td>
+                        <td class="text-[var(--ink-400)]">{{ $payment->paymentMethod?->name ?? '-' }}</td>
                         <td class="text-[var(--ink-700)]">Rp{{ number_format((float) $payment->amount) }}</td>
                     </tr>
                 @empty

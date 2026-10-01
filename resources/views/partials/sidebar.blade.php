@@ -121,6 +121,11 @@
                    class="sidebar-item sub {{ request()->routeIs('finance.cash-flows.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
                    @if(request()->routeIs('finance.cash-flows.*')) aria-current="page" @endif>{{ __('app.sidebar.cash_flow') }}</a>
                 @endcan
+                @can('finance.payment-methods.view')
+                <a href="{{ route('finance.payment-methods.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('finance.payment-methods.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('finance.payment-methods.*')) aria-current="page" @endif>{{ __('app.sidebar.payment_method') }}</a>
+                @endcan
                 @can('finance.general-ledgers.view')
                 <a href="{{ route('finance.general-ledgers.index') }}"
                    class="sidebar-item sub {{ request()->routeIs('finance.general-ledgers.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"

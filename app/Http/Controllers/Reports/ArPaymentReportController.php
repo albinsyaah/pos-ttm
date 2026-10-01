@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Reports;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Transactions\ArPaymentController;
 use App\Models\ArPayment;
+use App\Models\PaymentMethod;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 
@@ -28,12 +28,12 @@ class ArPaymentReportController extends Controller
     {
         $search = trim((string) $request->query('q', ''));
         $customerId = $request->query('customer_id');
-        $paymentMethod = $request->query('payment_method');
+        $paymentMethod = $request->query('payment_method_id');
         $dateFrom = $request->query('date_from');
         $dateTo = $request->query('date_to');
 
         $query = ArPayment::query()
-            ->with('customer')
+            ->with(['customer', 'paymentMethod'])
             ->when($search !== '', function ($q) use ($search) {
                 $q->where(function ($inner) use ($search) {
                     $inner->where('payment_number', 'like', "%{$search}%")
@@ -44,7 +44,7 @@ class ArPaymentReportController extends Controller
                 });
             })
             ->when($customerId, fn ($q) => $q->where('customer_id', $customerId))
-            ->when($paymentMethod, fn ($q) => $q->where('payment_method', $paymentMethod))
+            ->when($paymentMethod, fn ($q) => $q->where('payment_method_id', $paymentMethod))
             ->when($dateFrom, fn ($q) => $q->whereDate('payment_date', '>=', $dateFrom))
             ->when($dateTo, fn ($q) => $q->whereDate('payment_date', '<=', $dateTo))
             ->orderByDesc('payment_date')
@@ -67,7 +67,8 @@ class ArPaymentReportController extends Controller
             'dateFrom' => $dateFrom,
             'dateTo' => $dateTo,
             'customers' => Customer::orderBy('name')->get(),
-            'paymentMethods' => ArPaymentController::PAYMENT_METHODS,
+            // Inactive methods stay filterable: old payments still point at them.
+            'paymentMethods' => PaymentMethod::orderBy('name')->get(),
             'totalPayments' => $totalPayments,
             'totalAmount' => $totalAmount,
         ]);

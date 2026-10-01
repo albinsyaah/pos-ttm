@@ -30,6 +30,8 @@
   const customerSelect = document.getElementById('customer_id');
   const customerLabel = document.getElementById('customerLabel');
   const creditNote = document.getElementById('creditNote');
+  const methodField = document.getElementById('methodField');
+  const methodSelect = document.getElementById('payment_method_id');
   const submitBtn = document.getElementById('submitBtn');
   const submitLabel = document.getElementById('submitLabel');
 
@@ -507,6 +509,11 @@
     customerSelect.required = credit;
     customerLabel.textContent = credit ? customerLabel.dataset.credit : customerLabel.dataset.cash;
     creditNote.classList.toggle('hidden', !credit);
+    // The method (Tunai, Transfer, QRIS) only applies to a sale paid right away; a disabled field is not submitted.
+    if (methodField && methodSelect) {
+      methodField.classList.toggle('hidden', credit);
+      methodSelect.disabled = credit;
+    }
   }
 
   form.querySelectorAll('input[name="payment_type"]').forEach((radio) => radio.addEventListener('change', syncPayment));

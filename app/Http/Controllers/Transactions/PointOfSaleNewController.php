@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\SyncsSaleStock;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
+use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Warehouse;
@@ -54,11 +55,15 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
     public function index(PriceService $prices, StockService $stock)
     {
         $warehouseId = old('warehouse_id');
+        $paymentMethods = PaymentMethod::active()->orderBy('id')->get();
 
         return view('transactions.point-of-sale-new.index', [
             'customers' => Customer::orderBy('name')->get(),
             'warehouses' => Warehouse::orderBy('name')->get(),
             'salesmen' => Employee::orderBy('name')->get(),
+            'paymentMethods' => $paymentMethods,
+            // Preselect what the cashier chose before a refused submission, else Tunai.
+            'selectedMethodId' => (int) (old('payment_method_id') ?: ($paymentMethods->firstWhere('is_cash', true)?->id ?? 0)),
             'cartSeed' => $this->cartSeed(
                 (array) old('items', []),
                 $warehouseId ? (int) $warehouseId : null,
@@ -117,6 +122,11 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             'invoice_number' => ['required', 'string', 'max:100', 'unique:sales,invoice_number'],
             'sale_date' => ['required', 'date'],
             'payment_type' => ['nullable', Rule::in([Sale::PAYMENT_CASH, Sale::PAYMENT_CREDIT])],
+            // How a paid-on-the-spot sale is settled (Tunai, Transfer, QRIS, ...). Credit sales have none yet.
+            'payment_method_id' => [
+                'nullable',
+                Rule::exists('payment_methods', 'id')->where('is_active', true),
+            ],
             // A credit sale becomes a receivable, which only exists for a registered customer.
             'customer_id' => ['nullable', 'required_if:payment_type,'.Sale::PAYMENT_CREDIT, 'exists:customers,id'],
             'salesman_id' => ['nullable', 'exists:employees,id'],
@@ -140,13 +150,21 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
         $totalAmount = collect($items)->sum(fn ($item) => $item['qty'] * $item['price']);
         $paymentType = $data['payment_type'] ?? Sale::PAYMENT_CASH;
 
-        DB::transaction(function () use ($data, $items, $totalAmount, $paymentType) {
+        // Only a sale paid right away has a method; a credit sale (piutang) is
+        // settled later through a receivable payment, which records its own.
+        // A cash sale that names none is treated as Tunai.
+        $paymentMethodId = $paymentType === Sale::PAYMENT_CASH
+            ? ($data['payment_method_id'] ?? PaymentMethod::defaultCash()?->id)
+            : null;
+
+        DB::transaction(function () use ($data, $items, $totalAmount, $paymentType, $paymentMethodId) {
             $sale = Sale::create([
                 'invoice_number' => $data['invoice_number'],
                 'sale_date' => $data['sale_date'],
                 'total_amount' => $totalAmount,
                 'source' => self::SOURCE,
                 'payment_type' => $paymentType,
+                'payment_method_id' => $paymentMethodId,
                 'sales_order_id' => null,
                 'customer_id' => $data['customer_id'] ?? null,
                 'salesman_id' => $data['salesman_id'] ?? null,

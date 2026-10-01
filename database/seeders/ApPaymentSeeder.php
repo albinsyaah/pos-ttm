@@ -3,16 +3,17 @@
 namespace Database\Seeders;
 
 use App\Models\ApPayment;
+use App\Models\PaymentMethod;
 use App\Models\Purchase;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
 class ApPaymentSeeder extends Seeder
 {
-    private const METHODS = ['Transfer Bank', 'Tunai', 'Giro'];
-
     public function run(): void
     {
+        $methodIds = PaymentMethod::active()->pluck('id')->all();
+
         $purchases = Purchase::orderBy('id')->get();
         $sequence = 1;
 
@@ -33,7 +34,7 @@ class ApPaymentSeeder extends Seeder
                 'payment_number' => 'APAY-'.$paymentDate->format('Ym').'-'.str_pad((string) $sequence, 4, '0', STR_PAD_LEFT),
                 'amount' => $amount,
                 'payment_date' => $paymentDate,
-                'payment_method' => fake()->randomElement(self::METHODS),
+                'payment_method_id' => fake()->randomElement($methodIds),
                 'supplier_id' => $purchase->supplier_id,
             ]);
 

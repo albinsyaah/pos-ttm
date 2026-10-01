@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Transactions;
 
 use App\Http\Controllers\Controller;
 use App\Models\ArPayment;
+use App\Models\PaymentMethod;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,11 +14,6 @@ use Illuminate\Validation\Rule;
 
 class ArPaymentController extends Controller implements HasMiddleware
 {
-    /**
-     * Fixed payment methods.
-     */
-    public const PAYMENT_METHODS = ['cash', 'bank_transfer', 'check', 'giro'];
-
     public static function middleware(): array
     {
         return [
@@ -31,7 +27,7 @@ class ArPaymentController extends Controller implements HasMiddleware
         $search = trim((string) $request->query('q', ''));
 
         $receivablePayments = ArPayment::query()
-            ->with('customer')
+            ->with(['customer', 'paymentMethod'])
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('payment_number', 'like', "%{$search}%")
@@ -49,7 +45,7 @@ class ArPaymentController extends Controller implements HasMiddleware
             'receivablePayments' => $receivablePayments,
             'search' => $search,
             'customers' => Customer::orderBy('name')->get(),
-            'paymentMethods' => self::PAYMENT_METHODS,
+            'paymentMethods' => PaymentMethod::active()->orderBy('id')->get(),
         ]);
     }
 
@@ -64,7 +60,7 @@ class ArPaymentController extends Controller implements HasMiddleware
 
     public function update(Request $request, ArPayment $receivablePayment): RedirectResponse
     {
-        $data = $this->validatePayment($request, $receivablePayment->id);
+        $data = $this->validatePayment($request, $receivablePayment->id, $receivablePayment->payment_method_id);
 
         $receivablePayment->update($data);
 
@@ -78,7 +74,11 @@ class ArPaymentController extends Controller implements HasMiddleware
         return redirect()->route('transactions.receivable-payments.index')->with('success', 'Receivable payment deleted successfully.');
     }
 
-    protected function validatePayment(Request $request, ?int $ignoreId = null): array
+    /**
+     * @param  int|null  $currentMethodId  the method the payment already has (when editing),
+     *                                      which stays valid even if it was deactivated since
+     */
+    protected function validatePayment(Request $request, ?int $ignoreId = null, ?int $currentMethodId = null): array
     {
         return $request->validate([
             'payment_number' => [
@@ -87,7 +87,12 @@ class ArPaymentController extends Controller implements HasMiddleware
             ],
             'amount' => ['required', 'numeric', 'min:0', 'max:9999999999999.99'],
             'payment_date' => ['required', 'date'],
-            'payment_method' => ['required', 'string', Rule::in(self::PAYMENT_METHODS)],
+            'payment_method_id' => [
+                'required',
+                Rule::exists('payment_methods', 'id')->where(
+                    fn ($query) => $query->where('is_active', true)->orWhere('id', $currentMethodId)
+                ),
+            ],
             'customer_id' => ['required', 'exists:customers,id'],
         ]);
     }
