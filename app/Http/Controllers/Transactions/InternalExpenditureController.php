@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Exceptions\InsufficientStockException;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\InternalMutation;
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -83,6 +85,10 @@ class InternalExpenditureController extends Controller implements HasMiddleware
             ]);
 
             $internalExpenditure->internalMutationDetails()->createMany($data['items']);
+
+            // Only a "completed" internal expenditure moves stock. Refused (and rolled back)
+            // if a warehouse is short.
+            $this->syncStock($internalExpenditure, $data);
         });
 
         return redirect()->route('transactions.internal-expenditures.index')->with('success', 'Internal expenditure added successfully.');
@@ -104,6 +110,8 @@ class InternalExpenditureController extends Controller implements HasMiddleware
 
             $internalExpenditure->internalMutationDetails()->delete();
             $internalExpenditure->internalMutationDetails()->createMany($data['items']);
+
+            $this->syncStock($internalExpenditure, $data);
         });
 
         return redirect()->route('transactions.internal-expenditures.index')->with('success', 'Internal expenditure updated successfully.');
@@ -111,12 +119,38 @@ class InternalExpenditureController extends Controller implements HasMiddleware
 
     public function destroy(InternalMutation $internalExpenditure): RedirectResponse
     {
-        DB::transaction(function () use ($internalExpenditure) {
-            $internalExpenditure->internalMutationDetails()->delete();
-            $internalExpenditure->delete();
-        });
+        try {
+            DB::transaction(function () use ($internalExpenditure) {
+                // Undo whatever this internal expenditure did to stock (refused if that stock
+                // has already been used).
+                app(StockService::class)->sync($internalExpenditure, null, [], 'out', $internalExpenditure->mutation_number);
+
+                $internalExpenditure->internalMutationDetails()->delete();
+                $internalExpenditure->delete();
+            });
+        } catch (InsufficientStockException $e) {
+            return back()->with('error', implode(' ', $e->shortages));
+        }
 
         return redirect()->route('transactions.internal-expenditures.index')->with('success', 'Internal expenditure deleted successfully.');
+    }
+
+    /**
+     * Stock leaves the warehouse only while the expenditure is "completed".
+     * Must be called inside the caller's DB::transaction().
+     */
+    protected function syncStock(InternalMutation $internalExpenditure, array $data): void
+    {
+        $counts = $data['status'] === 'completed';
+
+        app(StockService::class)->sync(
+            $internalExpenditure,
+            $counts ? (int) $data['from_warehouse_id'] : null,
+            $counts ? $data['items'] : [],
+            'out',
+            $data['mutation_number'],
+            $data['mutation_date']
+        );
     }
 
     protected function validateInternalExpenditure(Request $request, ?int $ignoreId = null): array

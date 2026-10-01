@@ -483,3 +483,222 @@ it('sync rejects an unknown direction', function () {
     expect(fn () => stockService()->sync($purchase, $warehouse->id, [], 'sideways', 'X'))
         ->toThrow(InvalidArgumentException::class);
 });
+
+/*
+ * syncTransfer(): stock moves between two warehouses as TRANSFER_OUT / TRANSFER_IN.
+ */
+it('syncTransfer moves stock from one warehouse to another', function () {
+    $product = stockProduct();
+    $from = stockWarehouse('WH-A');
+    $to = stockWarehouse('WH-B');
+    $transfer = stockSource($from);
+    stockService()->increase($product->id, $from->id, 10, 'PB-001');
+
+    $rows = stockService()->syncTransfer($transfer, $from->id, $to->id, [
+        ['product_id' => $product->id, 'qty' => 6],
+    ], 'TRF-001');
+
+    expect($rows)->toHaveCount(2)
+        ->and($rows->pluck('type')->sort()->values()->all())->toBe(['TRANSFER_IN', 'TRANSFER_OUT'])
+        ->and(stockService()->available($product->id, $from->id))->toBe(4)
+        ->and(stockService()->available($product->id, $to->id))->toBe(6)
+        ->and($rows->every(fn ($row) => $row->reference_number === 'TRF-001'))->toBeTrue();
+});
+
+it('syncTransfer is refused as a whole when the source warehouse is short', function () {
+    $product = stockProduct();
+    $from = stockWarehouse('WH-A');
+    $to = stockWarehouse('WH-B');
+    $transfer = stockSource($from);
+    stockService()->increase($product->id, $from->id, 3, 'PB-001');
+    $rowsBefore = InventoryLedger::count();
+
+    expect(fn () => stockService()->syncTransfer($transfer, $from->id, $to->id, [
+        ['product_id' => $product->id, 'qty' => 5],
+    ], 'TRF-001'))->toThrow(InsufficientStockException::class);
+
+    expect(InventoryLedger::count())->toBe($rowsBefore)
+        ->and(stockService()->available($product->id, $to->id))->toBe(0);
+});
+
+it('syncTransfer writes nothing when the transfer has not changed', function () {
+    $product = stockProduct();
+    $from = stockWarehouse('WH-A');
+    $to = stockWarehouse('WH-B');
+    $transfer = stockSource($from);
+    stockService()->increase($product->id, $from->id, 10, 'PB-001');
+    $items = [['product_id' => $product->id, 'qty' => 6]];
+
+    stockService()->syncTransfer($transfer, $from->id, $to->id, $items, 'TRF-001');
+    $rowsBefore = InventoryLedger::count();
+
+    expect(stockService()->syncTransfer($transfer, $from->id, $to->id, $items, 'TRF-001'))->toBeEmpty()
+        ->and(InventoryLedger::count())->toBe($rowsBefore);
+});
+
+it('syncTransfer moves only the difference when the quantity changes', function () {
+    $product = stockProduct();
+    $from = stockWarehouse('WH-A');
+    $to = stockWarehouse('WH-B');
+    $transfer = stockSource($from);
+    stockService()->increase($product->id, $from->id, 10, 'PB-001');
+
+    stockService()->syncTransfer($transfer, $from->id, $to->id, [['product_id' => $product->id, 'qty' => 4]], 'TRF-001');
+    stockService()->syncTransfer($transfer, $from->id, $to->id, [['product_id' => $product->id, 'qty' => 7]], 'TRF-001');
+
+    expect(stockService()->available($product->id, $from->id))->toBe(3)
+        ->and(stockService()->available($product->id, $to->id))->toBe(7);
+
+    stockService()->syncTransfer($transfer, $from->id, $to->id, [['product_id' => $product->id, 'qty' => 2]], 'TRF-001');
+
+    expect(stockService()->available($product->id, $from->id))->toBe(8)
+        ->and(stockService()->available($product->id, $to->id))->toBe(2);
+});
+
+it('syncTransfer refuses to shrink a transfer when the destination already used the stock', function () {
+    $product = stockProduct();
+    $from = stockWarehouse('WH-A');
+    $to = stockWarehouse('WH-B');
+    $transfer = stockSource($from);
+    stockService()->increase($product->id, $from->id, 10, 'PB-001');
+    stockService()->syncTransfer($transfer, $from->id, $to->id, [['product_id' => $product->id, 'qty' => 6]], 'TRF-001');
+    stockService()->decrease($product->id, $to->id, 5, 'INV-001');
+    $rowsBefore = InventoryLedger::count();
+
+    // shrinking 6 -> 2 means taking 4 back out of the destination, which has only 1
+    expect(fn () => stockService()->syncTransfer($transfer, $from->id, $to->id, [['product_id' => $product->id, 'qty' => 2]], 'TRF-001'))
+        ->toThrow(InsufficientStockException::class);
+
+    expect(InventoryLedger::count())->toBe($rowsBefore);
+});
+
+it('syncTransfer cancels a transfer when given no warehouses', function () {
+    $product = stockProduct();
+    $from = stockWarehouse('WH-A');
+    $to = stockWarehouse('WH-B');
+    $transfer = stockSource($from);
+    stockService()->increase($product->id, $from->id, 10, 'PB-001');
+    stockService()->syncTransfer($transfer, $from->id, $to->id, [['product_id' => $product->id, 'qty' => 6]], 'TRF-001');
+
+    $rows = stockService()->syncTransfer($transfer, null, null, [], 'TRF-001');
+
+    expect($rows)->toHaveCount(2)
+        ->and($rows->every(fn ($row) => str_starts_with($row->reference_number, 'REV-')))->toBeTrue()
+        ->and(stockService()->available($product->id, $from->id))->toBe(10)
+        ->and(stockService()->available($product->id, $to->id))->toBe(0);
+});
+
+it('syncTransfer rejects the same warehouse on both sides', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $transfer = stockSource($warehouse);
+
+    expect(fn () => stockService()->syncTransfer($transfer, $warehouse->id, $warehouse->id, [
+        ['product_id' => $product->id, 'qty' => 1],
+    ], 'TRF-001'))->toThrow(InvalidArgumentException::class);
+});
+
+/*
+ * syncAdjustment(): signed quantities in one warehouse (stock-opname deviations).
+ */
+it('syncAdjustment adds an overage and removes a shortage in one call', function () {
+    $over = stockProduct('P-OVER');
+    $short = stockProduct('P-SHORT');
+    $warehouse = stockWarehouse();
+    $deviation = stockSource($warehouse);
+    stockService()->increase($short->id, $warehouse->id, 10, 'PB-001');
+
+    $rows = stockService()->syncAdjustment($deviation, $warehouse->id, [
+        ['product_id' => $over->id, 'qty' => 3],
+        ['product_id' => $short->id, 'qty' => -4],
+    ], 'DEV-001');
+
+    expect($rows)->toHaveCount(2)
+        ->and(stockService()->available($over->id, $warehouse->id))->toBe(3)
+        ->and(stockService()->available($short->id, $warehouse->id))->toBe(6)
+        ->and($rows->pluck('type', 'product_id')->all())->toBe([$over->id => 'IN', $short->id => 'OUT']);
+});
+
+it('syncAdjustment nets the same product listed on several lines', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $deviation = stockSource($warehouse);
+    stockService()->increase($product->id, $warehouse->id, 10, 'PB-001');
+
+    $rows = stockService()->syncAdjustment($deviation, $warehouse->id, [
+        ['product_id' => $product->id, 'qty' => 5],
+        ['product_id' => $product->id, 'qty' => -2],
+    ], 'DEV-001');
+
+    expect($rows)->toHaveCount(1)
+        ->and($rows->first()->qty)->toBe(3)
+        ->and(stockService()->available($product->id, $warehouse->id))->toBe(13);
+});
+
+it('syncAdjustment writes nothing when lines net to zero', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $deviation = stockSource($warehouse);
+
+    $rows = stockService()->syncAdjustment($deviation, $warehouse->id, [
+        ['product_id' => $product->id, 'qty' => 4],
+        ['product_id' => $product->id, 'qty' => -4],
+    ], 'DEV-001');
+
+    expect($rows)->toBeEmpty()
+        ->and(InventoryLedger::count())->toBe(0);
+});
+
+it('syncAdjustment refuses a shortage larger than the stock and writes nothing', function () {
+    $ok = stockProduct('P-OK');
+    $short = stockProduct('P-SHORT');
+    $warehouse = stockWarehouse();
+    $deviation = stockSource($warehouse);
+    stockService()->increase($short->id, $warehouse->id, 2, 'PB-001');
+    $rowsBefore = InventoryLedger::count();
+
+    expect(fn () => stockService()->syncAdjustment($deviation, $warehouse->id, [
+        ['product_id' => $ok->id, 'qty' => 3],
+        ['product_id' => $short->id, 'qty' => -5],
+    ], 'DEV-001'))->toThrow(InsufficientStockException::class);
+
+    expect(InventoryLedger::count())->toBe($rowsBefore)
+        ->and(stockService()->available($ok->id, $warehouse->id))->toBe(0);
+});
+
+it('syncAdjustment flips from shortage to overage by writing only the difference', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $deviation = stockSource($warehouse);
+    stockService()->increase($product->id, $warehouse->id, 10, 'PB-001');
+
+    stockService()->syncAdjustment($deviation, $warehouse->id, [['product_id' => $product->id, 'qty' => -6]], 'DEV-001');
+    $rows = stockService()->syncAdjustment($deviation, $warehouse->id, [['product_id' => $product->id, 'qty' => 3]], 'DEV-001');
+
+    expect($rows)->toHaveCount(1)
+        ->and($rows->first()->qty)->toBe(9)
+        ->and($rows->first()->reference_number)->toBe('REV-DEV-001')
+        ->and(stockService()->available($product->id, $warehouse->id))->toBe(13);
+});
+
+it('syncAdjustment cancels the whole effect when given no warehouse', function () {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $deviation = stockSource($warehouse);
+    stockService()->increase($product->id, $warehouse->id, 10, 'PB-001');
+    stockService()->syncAdjustment($deviation, $warehouse->id, [['product_id' => $product->id, 'qty' => -4]], 'DEV-001');
+
+    stockService()->syncAdjustment($deviation, null, [], 'DEV-001');
+
+    expect(stockService()->available($product->id, $warehouse->id))->toBe(10);
+});
+
+it('syncAdjustment rejects a zero or non-whole quantity', function (mixed $qty) {
+    $product = stockProduct();
+    $warehouse = stockWarehouse();
+    $deviation = stockSource($warehouse);
+
+    expect(fn () => stockService()->syncAdjustment($deviation, $warehouse->id, [
+        ['product_id' => $product->id, 'qty' => $qty],
+    ], 'DEV-001'))->toThrow(InvalidArgumentException::class);
+})->with([0, '1.5', 'abc']);

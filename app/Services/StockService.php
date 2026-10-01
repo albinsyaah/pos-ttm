@@ -160,7 +160,7 @@ class StockService
      *  - a purchase of 10 edited to 5 is refused if fewer than 5 are left in stock;
      *  - changing the warehouse takes stock out of the old one and into the new one.
      * Rows that cancel an earlier effect use the "REV-" reference prefix.
-     * Only IN / OUT rows are written; transfers use increase/decrease directly.
+     * Only IN / OUT rows are written; transfers between warehouses use syncTransfer().
      *
      * @param  'in'|'out'  $direction  'in' for purchases and sale returns, 'out' for sales and purchase returns.
      * @param  array<int, array{product_id: int|string, qty: int|string}>  $items
@@ -189,75 +189,99 @@ class StockService
             }
         }
 
-        return DB::transaction(function () use ($source, $desired, $direction, $sign, $referenceNumber, $date) {
-            // Lock first, then read what the source has done so far, so two
-            // edits of the same transaction cannot both act on stale numbers.
-            $productIds = array_map(fn ($key) => (int) explode(':', $key)[0], array_keys($desired));
-            foreach (array_keys($this->netBySource($source)) as $key) {
-                $productIds[] = (int) explode(':', $key)[0];
+        return $this->reconcile(
+            $source,
+            $desired,
+            $referenceNumber,
+            $date,
+            InventoryLedger::TYPE_IN,
+            InventoryLedger::TYPE_OUT
+        );
+    }
+
+    /**
+     * Same idea as sync(), for a transfer between two warehouses: stock goes
+     * out of $fromWarehouseId and into $toWarehouseId, as TRANSFER_OUT /
+     * TRANSFER_IN rows (the types the Stock Card report already knows).
+     *
+     * Pass null for both warehouses (or no items) to cancel the transfer. All
+     * changes are checked together, so a transfer is refused as a whole when
+     * the source warehouse is short, or when cancelling / reducing it would
+     * take back stock the destination warehouse has already used.
+     *
+     * @param  array<int, array{product_id: int|string, qty: int|string}>  $items
+     * @return Collection<int, InventoryLedger>  The rows written (empty if nothing changed).
+     *
+     * @throws InsufficientStockException
+     */
+    public function syncTransfer(
+        Model $source,
+        ?int $fromWarehouseId,
+        ?int $toWarehouseId,
+        array $items,
+        string $referenceNumber,
+        CarbonInterface|string|null $date = null
+    ): Collection {
+        if ($fromWarehouseId !== null && $fromWarehouseId === $toWarehouseId) {
+            throw new InvalidArgumentException('A transfer needs two different warehouses.');
+        }
+
+        $desired = [];
+        if ($fromWarehouseId !== null && $toWarehouseId !== null && $items !== []) {
+            foreach ($this->aggregate($items) as $productId => $qty) {
+                $desired[$productId.':'.$fromWarehouseId] = -$qty;
+                $desired[$productId.':'.$toWarehouseId] = $qty;
             }
-            if ($productIds === []) {
-                return collect();
+        }
+
+        return $this->reconcile(
+            $source,
+            $desired,
+            $referenceNumber,
+            $date,
+            InventoryLedger::TYPE_TRANSFER_IN,
+            InventoryLedger::TYPE_TRANSFER_OUT
+        );
+    }
+
+    /**
+     * Same idea as sync(), for a stock adjustment such as a stock-opname
+     * deviation: the quantities are signed, positive when stock is found
+     * above the system figure (written as IN) and negative when it is below
+     * (written as OUT), all in one warehouse.
+     *
+     * The same product on several lines is netted. Pass a null warehouse (or
+     * no items) to cancel the adjustment. A shortage is refused when the
+     * warehouse does not hold that much, and so is cancelling an overage
+     * whose stock has already been used.
+     *
+     * @param  array<int, array{product_id: int|string, qty: int|string}>  $items  qty is signed and never zero.
+     * @return Collection<int, InventoryLedger>  The rows written (empty if nothing changed).
+     *
+     * @throws InsufficientStockException
+     */
+    public function syncAdjustment(
+        Model $source,
+        ?int $warehouseId,
+        array $items,
+        string $referenceNumber,
+        CarbonInterface|string|null $date = null
+    ): Collection {
+        $desired = [];
+        if ($warehouseId !== null && $items !== []) {
+            foreach ($this->aggregateSigned($items) as $productId => $net) {
+                $desired[$productId.':'.$warehouseId] = $net;
             }
-            $this->lockProducts($productIds);
+        }
 
-            $current = $this->netBySource($source);
-
-            $plan = [];
-            foreach (array_unique(array_merge(array_keys($desired), array_keys($current))) as $key) {
-                $delta = ($desired[$key] ?? 0) - ($current[$key] ?? 0);
-                if ($delta === 0) {
-                    continue;
-                }
-                [$productId, $warehouse] = array_map('intval', explode(':', $key));
-                $plan[] = ['product_id' => $productId, 'warehouse_id' => $warehouse, 'delta' => $delta];
-            }
-
-            if ($plan === []) {
-                return collect();
-            }
-
-            usort($plan, fn ($a, $b) => [$a['product_id'], $a['warehouse_id']] <=> [$b['product_id'], $b['warehouse_id']]);
-
-            $shortages = [];
-            foreach ($plan as $line) {
-                if ($line['delta'] < 0) {
-                    $available = $this->available($line['product_id'], $line['warehouse_id']);
-                    if ($available < -$line['delta']) {
-                        $shortages[] = $this->shortageMessage(
-                            $direction === 'in' ? 'insufficient_reverse' : 'insufficient',
-                            $line['product_id'],
-                            $line['warehouse_id'],
-                            $available,
-                            -$line['delta']
-                        );
-                    }
-                }
-            }
-            if ($shortages !== []) {
-                throw InsufficientStockException::forShortages($shortages);
-            }
-
-            $moment = $this->resolveDate($date);
-            $created = collect();
-            foreach ($plan as $line) {
-                $undoesEarlierEffect = $line['delta'] * $sign < 0;
-
-                $created->push($this->write(
-                    $line['product_id'],
-                    $line['warehouse_id'],
-                    $line['delta'] > 0 ? InventoryLedger::TYPE_IN : InventoryLedger::TYPE_OUT,
-                    $line['delta'],
-                    $undoesEarlierEffect
-                        ? self::REVERSAL_PREFIX.$this->stripReversalPrefix($referenceNumber)
-                        : $referenceNumber,
-                    $moment,
-                    $source
-                ));
-            }
-
-            return $created;
-        });
+        return $this->reconcile(
+            $source,
+            $desired,
+            $referenceNumber,
+            $date,
+            InventoryLedger::TYPE_IN,
+            InventoryLedger::TYPE_OUT
+        );
     }
 
     /**
@@ -395,6 +419,108 @@ class StockService
     }
 
     /**
+     * Shared core of sync() and syncTransfer().
+     *
+     * $desired maps "product_id:warehouse_id" to the signed qty the source
+     * should have moved in total. It is compared with what the ledger rows
+     * tied to $source already add up to, and one row is written per
+     * difference. Every decrease is checked against the warehouse balance
+     * first, and nothing is written if any line is short.
+     *
+     * @param  array<string, int>  $desired
+     * @return Collection<int, InventoryLedger>
+     *
+     * @throws InsufficientStockException
+     */
+    private function reconcile(
+        Model $source,
+        array $desired,
+        string $referenceNumber,
+        CarbonInterface|string|null $date,
+        string $inType,
+        string $outType
+    ): Collection {
+        return DB::transaction(function () use ($source, $desired, $referenceNumber, $date, $inType, $outType) {
+            // Lock first, then read what the source has done so far, so two
+            // edits of the same transaction cannot both act on stale numbers.
+            $productIds = array_map(fn ($key) => (int) explode(':', $key)[0], array_keys($desired));
+            foreach (array_keys($this->netBySource($source)) as $key) {
+                $productIds[] = (int) explode(':', $key)[0];
+            }
+            if ($productIds === []) {
+                return collect();
+            }
+            $this->lockProducts($productIds);
+
+            $current = $this->netBySource($source);
+
+            $plan = [];
+            foreach (array_unique(array_merge(array_keys($desired), array_keys($current))) as $key) {
+                $already = $current[$key] ?? 0;
+                $delta = ($desired[$key] ?? 0) - $already;
+                if ($delta === 0) {
+                    continue;
+                }
+                [$productId, $warehouse] = array_map('intval', explode(':', $key));
+                $plan[] = [
+                    'product_id' => $productId,
+                    'warehouse_id' => $warehouse,
+                    'delta' => $delta,
+                    'already' => $already,
+                ];
+            }
+
+            if ($plan === []) {
+                return collect();
+            }
+
+            usort($plan, fn ($a, $b) => [$a['product_id'], $a['warehouse_id']] <=> [$b['product_id'], $b['warehouse_id']]);
+
+            $shortages = [];
+            foreach ($plan as $line) {
+                if ($line['delta'] < 0) {
+                    $available = $this->available($line['product_id'], $line['warehouse_id']);
+                    if ($available < -$line['delta']) {
+                        // Taking back stock this source had added, or taking out more?
+                        $shortages[] = $this->shortageMessage(
+                            $line['already'] > 0 ? 'insufficient_reverse' : 'insufficient',
+                            $line['product_id'],
+                            $line['warehouse_id'],
+                            $available,
+                            -$line['delta']
+                        );
+                    }
+                }
+            }
+            if ($shortages !== []) {
+                throw InsufficientStockException::forShortages($shortages);
+            }
+
+            $moment = $this->resolveDate($date);
+            $created = collect();
+            foreach ($plan as $line) {
+                // A row that moves stock the opposite way to what the source did
+                // before cancels an earlier effect, so it is marked as a reversal.
+                $undoesEarlierEffect = $line['already'] !== 0 && $line['delta'] * $line['already'] < 0;
+
+                $created->push($this->write(
+                    $line['product_id'],
+                    $line['warehouse_id'],
+                    $line['delta'] > 0 ? $inType : $outType,
+                    $line['delta'],
+                    $undoesEarlierEffect
+                        ? self::REVERSAL_PREFIX.$this->stripReversalPrefix($referenceNumber)
+                        : $referenceNumber,
+                    $moment,
+                    $source
+                ));
+            }
+
+            return $created;
+        });
+    }
+
+    /**
      * Append one ledger row. Must be called inside a transaction with the
      * product already locked.
      */
@@ -474,6 +600,34 @@ class StockService
             }
             if (filter_var($qty, FILTER_VALIDATE_INT) === false || (int) $qty <= 0) {
                 throw new InvalidArgumentException('Stock quantity must be a whole number greater than zero.');
+            }
+
+            $lines[$productId] = ($lines[$productId] ?? 0) + (int) $qty;
+        }
+
+        return $lines;
+    }
+
+    /**
+     * Like aggregate(), but quantities are signed: any whole number except
+     * zero, added up per product (a product may end up netting to zero).
+     *
+     * @param  array<int, array{product_id: int|string, qty: int|string}>  $items
+     * @return array<int, int>  product_id => net qty
+     */
+    private function aggregateSigned(array $items): array
+    {
+        $lines = [];
+
+        foreach ($items as $item) {
+            $productId = (int) ($item['product_id'] ?? 0);
+            $qty = $item['qty'] ?? null;
+
+            if ($productId <= 0) {
+                throw new InvalidArgumentException('Each stock line needs a valid product_id.');
+            }
+            if (filter_var($qty, FILTER_VALIDATE_INT) === false || (int) $qty === 0) {
+                throw new InvalidArgumentException('Adjustment quantity must be a whole number other than zero.');
             }
 
             $lines[$productId] = ($lines[$productId] ?? 0) + (int) $qty;

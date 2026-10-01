@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Exceptions\InsufficientStockException;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\InternalMutation;
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -89,6 +91,10 @@ class DeviationController extends Controller implements HasMiddleware
             ]);
 
             $deviation->internalMutationDetails()->createMany($data['items']);
+
+            // Only a "completed" deviation changes stock: overage adds, shortage
+            // removes. Refused (and rolled back) if the warehouse cannot cover a shortage.
+            $this->syncStock($deviation, $data);
         });
 
         return redirect()->route('transactions.deviations.index')->with('success', 'Deviation added successfully.');
@@ -110,6 +116,8 @@ class DeviationController extends Controller implements HasMiddleware
 
             $deviation->internalMutationDetails()->delete();
             $deviation->internalMutationDetails()->createMany($data['items']);
+
+            $this->syncStock($deviation, $data);
         });
 
         return redirect()->route('transactions.deviations.index')->with('success', 'Deviation updated successfully.');
@@ -117,12 +125,39 @@ class DeviationController extends Controller implements HasMiddleware
 
     public function destroy(InternalMutation $deviation): RedirectResponse
     {
-        DB::transaction(function () use ($deviation) {
-            $deviation->internalMutationDetails()->delete();
-            $deviation->delete();
-        });
+        try {
+            DB::transaction(function () use ($deviation) {
+                // Undo whatever this deviation did to stock (refused if an overage
+                // it added has already been used).
+                app(StockService::class)->syncAdjustment($deviation, null, [], $deviation->mutation_number);
+
+                $deviation->internalMutationDetails()->delete();
+                $deviation->delete();
+            });
+        } catch (InsufficientStockException $e) {
+            return back()->with('error', implode(' ', $e->shortages));
+        }
 
         return redirect()->route('transactions.deviations.index')->with('success', 'Deviation deleted successfully.');
+    }
+
+    /**
+     * The quantities are signed (positive = overage, negative = shortage), so
+     * a completed deviation brings the warehouse stock in line with the
+     * physical count. Pending, approved and rejected ones do not touch stock.
+     * Must be called inside the caller's DB::transaction().
+     */
+    protected function syncStock(InternalMutation $deviation, array $data): void
+    {
+        $counts = $data['status'] === 'completed';
+
+        app(StockService::class)->syncAdjustment(
+            $deviation,
+            $counts ? (int) $data['warehouse_id'] : null,
+            $counts ? $data['items'] : [],
+            $data['mutation_number'],
+            $data['mutation_date']
+        );
     }
 
     protected function validateDeviation(Request $request, ?int $ignoreId = null): array

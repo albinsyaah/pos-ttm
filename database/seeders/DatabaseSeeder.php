@@ -24,36 +24,36 @@ class DatabaseSeeder extends Seeder
 
             // Master data.
             EmployeeSeeder::class,
-            WarehouseSeeder::class,
-            BrandSeeder::class,
-            ItemTypeSeeder::class,
-            ProductGroupSeeder::class,
-            CustomerSeeder::class,
-            SupplierSeeder::class,
-            UserSeeder::class,
-            ProductSeeder::class,
-            PriceSetupSeeder::class,
-            AssetSeeder::class,
-            ChartOfAccountSeeder::class,
+            // WarehouseSeeder::class,
+            // BrandSeeder::class,
+            // ItemTypeSeeder::class,
+            // ProductGroupSeeder::class,
+            // CustomerSeeder::class,
+            // SupplierSeeder::class,
+            // UserSeeder::class,
+            // ProductSeeder::class,
+            // PriceSetupSeeder::class,
+            // AssetSeeder::class,
+            // ChartOfAccountSeeder::class,
 
             // Purchasing cycle (Procure to Pay).
-            PurchaseOrderSeeder::class,
-            PurchaseSeeder::class,
-            PurchaseReturnSeeder::class,
-            ApPaymentSeeder::class,
+            // PurchaseOrderSeeder::class,
+            // PurchaseSeeder::class,
+            // PurchaseReturnSeeder::class,
+            // ApPaymentSeeder::class,
 
             // Sales cycle (Order to Cash).
-            SalesOrderSeeder::class,
-            SaleSeeder::class,
-            SalesReturnSeeder::class,
-            ArPaymentSeeder::class,
+            // SalesOrderSeeder::class,
+            // SaleSeeder::class,
+            // SalesReturnSeeder::class,
+            // ArPaymentSeeder::class,
 
             // Warehouse-to-warehouse stock transfers.
-            InternalMutationSeeder::class,
+            // InternalMutationSeeder::class,
 
             // Accounting: derived from the transactions above.
-            GeneralLedgerSeeder::class,
-            CashFlowSeeder::class,
+            // GeneralLedgerSeeder::class,
+            // CashFlowSeeder::class,
         ]);
     }
 }
