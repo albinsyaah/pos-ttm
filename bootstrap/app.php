@@ -32,7 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Setting this callback replaces Laravel's default (expectsJson()), so
+        // keep that check too: fetch() calls that send "Accept: application/json"
+        // (e.g. the cashier product search) must get JSON errors (422/401/403),
+        // not a redirect to an HTML page.
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*'),
+            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
     })->create();

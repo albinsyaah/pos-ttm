@@ -190,13 +190,18 @@ it('keeps the history page behind the pricing.view permission', function () {
 
 // ---- Cashier terminal -----------------------------------------------------------------
 
-it('hands the cashier terminal the dated reference prices', function () {
+it('hands the cashier terminal the dated reference prices through the product search', function () {
     $user = priceTestUser(['transactions.point-of-sale-new.view']);
     $p = priceTestProduct('KSR-1');
     priceTestSetup($p, 1000, '2026-01-01');
     priceTestSetup($p, 1200, '2026-06-01');
+    $warehouse = \App\Models\Warehouse::create(['code' => 'WH-1', 'name' => 'Gudang 1']);
 
-    $this->actingAs($user)->get(route('transactions.point-of-sale-new.index'))
+    $this->actingAs($user)->get(route('transactions.point-of-sale-new.index'))->assertOk();
+
+    $this->actingAs($user)
+        ->getJson(route('transactions.point-of-sale-new.products', ['q' => 'KSR', 'warehouse_id' => $warehouse->id]))
         ->assertOk()
-        ->assertViewHas('priceBook', fn ($book) => count($book[$p->id]) === 2 && $book[$p->id][0]['amount'] === 1200.0);
+        ->assertJsonCount(2, 'data.0.prices')
+        ->assertJsonPath('data.0.prices.0.amount', 1200);
 });

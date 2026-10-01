@@ -211,6 +211,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'store', 'update', 'destroy']);
 
         Route::get('point-of-sale-new', [PointOfSaleNewController::class, 'index'])->name('point-of-sale-new.index');
+        Route::get('point-of-sale-new/products', [PointOfSaleNewController::class, 'products'])->name('point-of-sale-new.products');
         Route::post('point-of-sale-new', [PointOfSaleNewController::class, 'store'])->name('point-of-sale-new.store');
 
         Route::resource('point-of-sale', PointOfSaleController::class)

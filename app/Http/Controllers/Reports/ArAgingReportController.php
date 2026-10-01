@@ -53,7 +53,7 @@ class ArAgingReportController extends Controller
         $customers = Customer::orderBy('name')->get();
         $asOfDate = Carbon::parse($asOf);
 
-        $salesByCustomer = Sale::where('sale_date', '<=', $asOf)
+        $salesByCustomer = Sale::receivable()->where('sale_date', '<=', $asOf)
             ->orderBy('sale_date')
             ->orderBy('id')
             ->get()

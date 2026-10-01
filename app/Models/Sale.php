@@ -11,16 +11,32 @@ class Sale extends Model
 
     protected $table = 'sales';
 
+    public const PAYMENT_CASH = 'cash';
+
+    public const PAYMENT_CREDIT = 'credit';
+
     protected $fillable = [
         'invoice_number',
         'sale_date',
         'total_amount',
         'source',
+        'payment_type',
         'sales_order_id',
         'customer_id',
         'salesman_id',
         'warehouse_id'
     ];
+
+    /**
+     * Sales that count as a receivable (piutang): sold on credit to a
+     * registered customer. Cash sales never enter the receivable reports,
+     * even when a customer is attached to them.
+     */
+    public function scopeReceivable($query)
+    {
+        return $query->where('payment_type', self::PAYMENT_CREDIT)
+            ->whereNotNull('customer_id');
+    }
 
     public function salesOrder()
     {

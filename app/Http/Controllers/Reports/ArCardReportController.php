@@ -48,7 +48,7 @@ class ArCardReportController extends Controller
         $totalCredit = 0.0;
 
         if ($customer) {
-            $sales = Sale::where('customer_id', $customer->id)
+            $sales = Sale::receivable()->where('customer_id', $customer->id)
                 ->get()
                 ->map(fn ($sale) => [
                     'date' => $sale->sale_date,
@@ -60,7 +60,7 @@ class ArCardReportController extends Controller
                     'credit' => 0.0,
                 ]);
 
-            $salesReturns = SalesReturn::whereHas('sale', fn ($q) => $q->where('customer_id', $customer->id))
+            $salesReturns = SalesReturn::whereHas('sale', fn ($q) => $q->receivable()->where('customer_id', $customer->id))
                 ->with('sale')
                 ->get()
                 ->map(fn ($return) => [

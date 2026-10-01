@@ -35,7 +35,7 @@ class DashboardController extends Controller
         $lowStockProducts = $this->lowStockProducts();
         $lowStockCount = $lowStockProducts->count();
 
-        $receivablesOutstanding = Sale::sum('total_amount') - ArPayment::sum('amount');
+        $receivablesOutstanding = Sale::receivable()->sum('total_amount') - ArPayment::sum('amount');
         $payablesOutstanding = Purchase::sum('total_amount') - ApPayment::sum('amount');
 
         // "Pending" = raised but not yet fulfilled by an actual sale/purchase.

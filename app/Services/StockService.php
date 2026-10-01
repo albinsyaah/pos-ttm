@@ -58,6 +58,34 @@ class StockService
     }
 
     /**
+     * Current stock of several products in one warehouse, in one round trip:
+     * [product_id => balance]. Products with no ledger rows are reported as 0.
+     *
+     * @param  iterable<int>  $productIds
+     * @return array<int, int>
+     */
+    public function availableMany(iterable $productIds, int $warehouseId): array
+    {
+        $ids = collect($productIds)->map(fn ($id) => (int) $id)->unique()->values();
+        if ($ids->isEmpty()) {
+            return [];
+        }
+
+        // The balance is a running total, so the newest row per product holds it.
+        $latestRowIds = InventoryLedger::where('warehouse_id', $warehouseId)
+            ->whereIn('product_id', $ids)
+            ->selectRaw('max(id) as last_id')
+            ->groupBy('product_id')
+            ->pluck('last_id');
+
+        $balances = $latestRowIds->isEmpty()
+            ? collect()
+            : InventoryLedger::whereIn('id', $latestRowIds)->pluck('balance', 'product_id');
+
+        return $ids->mapWithKeys(fn ($id) => [$id => (int) ($balances[$id] ?? 0)])->all();
+    }
+
+    /**
      * Add stock for one product.
      */
     public function increase(
