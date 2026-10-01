@@ -53,6 +53,11 @@ class PositionReportController extends Controller
                 'products.id as product_id',
                 'products.code as product_code',
                 'products.name as product_name',
+                'products.unit_name',
+                'products.pack_name',
+                'products.pack_qty',
+                'products.box_name',
+                'products.box_qty',
                 'warehouses.id as warehouse_id',
                 'warehouses.name as warehouse_name',
                 'inventory_ledgers.balance'

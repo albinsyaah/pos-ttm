@@ -277,6 +277,16 @@ return [
         'product_group' => 'Product Group',
         'no_products_found' => 'No products found.',
         'delete_product' => 'Delete product?',
+        'packaging' => 'Unit / Pack / Box',
+        'packaging_hint' => 'Stock is counted in the unit. Pack and box are optional; fill in how many units each one holds (whole numbers only).',
+        'unit_name' => 'Unit',
+        'pack_name' => 'Pack name',
+        'pack_qty' => 'Units per pack',
+        'box_name' => 'Box name',
+        'stock' => 'Stock',
+        'box_qty' => 'Units per box',
+        'name_required_with_qty' => 'Enter the :kind name too.',
+        'box_must_exceed_pack' => 'A box must hold more units than a pack.',
     ],
 
     // Assets

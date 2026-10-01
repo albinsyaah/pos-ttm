@@ -277,6 +277,16 @@ return [
         'product_group' => 'Grup Produk',
         'no_products_found' => 'Barang tidak ditemukan.',
         'delete_product' => 'Hapus barang?',
+        'packaging' => 'Satuan / Pack / Box',
+        'packaging_hint' => 'Stok dihitung dalam satuan. Pack dan box boleh kosong; isi berapa satuan di dalam masing-masing (bilangan bulat, tanpa desimal).',
+        'unit_name' => 'Satuan',
+        'pack_name' => 'Nama pack',
+        'pack_qty' => 'Isi per pack (satuan)',
+        'box_name' => 'Nama box',
+        'stock' => 'Stok',
+        'box_qty' => 'Isi per box (satuan)',
+        'name_required_with_qty' => 'Isi juga nama :kind.',
+        'box_must_exceed_pack' => 'Isi box harus lebih besar dari isi pack.',
     ],
 
     // Assets
