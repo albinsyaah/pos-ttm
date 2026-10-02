@@ -27,7 +27,10 @@ use App\Http\Controllers\Reports\ArPaymentReportController;
 use App\Http\Controllers\Reports\DeviationReportController;
 use App\Http\Controllers\Reports\ExpenditureReportController;
 use App\Http\Controllers\Reports\InventoryReportController;
+use App\Http\Controllers\Reports\PaymentMethodReportController;
 use App\Http\Controllers\Reports\PositionReportController;
+use App\Http\Controllers\Reports\ProductSalesReportController;
+use App\Http\Controllers\Reports\SalesmanReportController;
 use App\Http\Controllers\Reports\PurchaseOrderReportController;
 use App\Http\Controllers\Reports\PurchaseReportController;
 use App\Http\Controllers\Reports\PurchaseReturnReportController;
@@ -325,6 +328,18 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('sales-summary', [SalesSummaryReportController::class, 'index'])
             ->middleware('permission:reports.sales-summary.view')
             ->name('sales-summary');
+
+        Route::get('sales-by-product', [ProductSalesReportController::class, 'index'])
+            ->middleware('permission:reports.sales-by-product.view')
+            ->name('sales-by-product');
+
+        Route::get('salesman', [SalesmanReportController::class, 'index'])
+            ->middleware('permission:reports.salesman.view')
+            ->name('salesman');
+
+        Route::get('payment-methods', [PaymentMethodReportController::class, 'index'])
+            ->middleware('permission:reports.payment-methods.view')
+            ->name('payment-methods');
 
         Route::get('sales-returns', [SalesReturnReportController::class, 'index'])
             ->middleware('permission:reports.sales-returns.view')

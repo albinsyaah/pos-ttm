@@ -358,6 +358,21 @@
                    class="sidebar-item sub {{ request()->routeIs('reports.sales-summary') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
                    @if(request()->routeIs('reports.sales-summary')) aria-current="page" @endif>{{ __('app.sidebar.sales_report_2') }}</a>
                 @endcan
+                @can('reports.sales-by-product.view')
+                <a href="{{ route('reports.sales-by-product') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.sales-by-product') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.sales-by-product')) aria-current="page" @endif>{{ __('insight.sidebar.sales_by_product') }}</a>
+                @endcan
+                @can('reports.salesman.view')
+                <a href="{{ route('reports.salesman') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.salesman') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.salesman')) aria-current="page" @endif>{{ __('insight.sidebar.salesman') }}</a>
+                @endcan
+                @can('reports.payment-methods.view')
+                <a href="{{ route('reports.payment-methods') }}"
+                   class="sidebar-item sub {{ request()->routeIs('reports.payment-methods') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"
+                   @if(request()->routeIs('reports.payment-methods')) aria-current="page" @endif>{{ __('insight.sidebar.payment_methods') }}</a>
+                @endcan
                 @can('reports.sales-returns.view')
                 <a href="{{ route('reports.sales-returns') }}"
                    class="sidebar-item sub {{ request()->routeIs('reports.sales-returns') ? 'active' : '' }} flex items-center pl-11 pr-4 py-2"

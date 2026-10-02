@@ -39,3 +39,13 @@ inquiryForm?.addEventListener('submit', () => {
   clearTimeout(searchDebounce);
   showLoading();
 });
+
+// Price history: each product row has a hidden detail row, opened by its "Riwayat harga" button.
+document.querySelectorAll('[data-history-toggle]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const row = document.querySelector(`[data-history-row="${button.dataset.historyToggle}"]`);
+    if (!row) return;
+    const open = row.classList.toggle('hidden') === false;
+    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+});

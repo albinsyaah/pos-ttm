@@ -4,6 +4,7 @@
 @section('page-title', __('app.reports.sales_summary.title'))
 
 @section('content')
+@php use App\Support\Money; @endphp
 
     <form id="ssReportFilterForm" action="{{ route('reports.sales-summary') }}" method="GET"
         class="report-filter-form flex items-center justify-between flex-wrap gap-4">
@@ -66,7 +67,7 @@
         </div>
     </form>
 
-    <div class="grid sm:grid-cols-2 gap-4 mt-6 report-summary">
+    <div class="grid sm:grid-cols-3 gap-4 mt-6 report-summary">
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
                 {{ __('app.reports.sales_summary.summary_total_sales') }}</p>
@@ -75,8 +76,14 @@
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
                 {{ __('app.reports.sales_summary.summary_total_amount') }}</p>
-            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">Rp{{ number_format((float) $totalAmount) }}
+            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">{{ Money::rupiah($totalAmount) }}
             </p>
+        </div>
+        <div class="bg-white rounded-3xl p-5" id="freeGoodsLossCard">
+            <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
+                {{ __('insight.sales_summary.free_goods_loss') }}</p>
+            <p class="text-2xl font-extrabold text-[var(--bad-600)] mt-1">{{ Money::rupiah($freeLoss['total']) }}</p>
+            <p class="text-xs text-[var(--ink-400)] mt-1">{{ __('insight.sales_summary.free_goods_loss_hint') }}</p>
         </div>
     </div>
 
@@ -87,7 +94,7 @@
                 <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
                     {{ __('app.reports.sales_summary.channel_' . $sourceOption) }}</p>
                 <p class="text-lg font-extrabold text-[var(--ink-900)] mt-1">
-                    Rp{{ number_format((float) ($channel->total_amount ?? 0)) }}</p>
+                    {{ Money::rupiah($channel->total_amount ?? 0) }}</p>
                 <p class="text-xs text-[var(--ink-400)] mt-1">
                     {{ number_format($channel->total_count ?? 0) }} {{ __('app.reports.sales_summary.transactions') }}
                 </p>
@@ -121,7 +128,7 @@
             <i class="fa-solid fa-circle-notch fa-spin text-xl text-[var(--brand-600)]"></i>
         </div>
 
-        <table class="w-full text-sm min-w-[960px]">
+        <table class="w-full text-sm min-w-[1040px]">
             <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-semibold">{{ __('app.sales.invoice_number') }}</th>
@@ -131,6 +138,7 @@
                     <th class="font-semibold">{{ __('app.reports.sales_summary.channel') }}</th>
                     <th class="font-semibold">{{ __('app.sales.items') }}</th>
                     <th class="font-semibold">{{ __('app.sales.total') }}</th>
+                    <th class="font-semibold">{{ __('insight.sales_summary.free_loss_column') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -148,11 +156,14 @@
                             </span>
                         </td>
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">Rp{{ number_format((float) $sale->total_amount) }}</td>
+                        <td class="text-[var(--ink-700)]">{{ Money::rupiah($sale->total_amount) }}</td>
+                        <td class="{{ isset($freeLoss['by_sale'][$sale->id]) ? 'text-[var(--bad-600)] font-semibold' : 'text-[var(--ink-400)]' }}">
+                            {{ isset($freeLoss['by_sale'][$sale->id]) ? Money::rupiah($freeLoss['by_sale'][$sale->id]) : '—' }}
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="8" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.reports.sales_summary.no_data') }}
                         </td>
@@ -165,6 +176,38 @@
     <div class="mt-6">
         {{ $sales->links() }}
     </div>
+
+    @if (count($freeLoss['by_product']))
+        <div id="freeGoodsBreakdown" class="bg-white rounded-3xl mt-8 overflow-x-auto">
+            <div class="p-5 pb-2">
+                <h3 class="font-semibold text-lg text-[var(--ink-900)]">{{ __('insight.sales_summary.free_goods_title') }}</h3>
+                <p class="text-xs text-[var(--ink-400)] mt-0.5">{{ __('insight.sales_summary.free_goods_basis') }}</p>
+            </div>
+            <table class="w-full text-sm min-w-[640px]">
+                <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+                    <tr class="text-left border-b border-gray-100">
+                        <th class="p-5 font-semibold">{{ __('insight.common.product') }}</th>
+                        <th class="font-semibold text-right">{{ __('insight.sales_summary.free_qty') }}</th>
+                        <th class="font-semibold text-right pr-5">{{ __('insight.sales_summary.free_goods_loss') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($freeLoss['by_product'] as $row)
+                        <tr class="table-row border-b border-gray-50">
+                            <td class="p-5 font-medium text-[var(--ink-900)]">
+                                {{ $row['product']?->name ?: '—' }}
+                                @if ($row['unknown_cost'])
+                                    <span class="chip bg-[var(--warn-100)] text-[var(--warn-600)] ml-1">{{ __('insight.sales_summary.no_purchase_price') }}</span>
+                                @endif
+                            </td>
+                            <td class="text-right text-[var(--ink-700)]">{{ $row['product'] ? $row['product']->formatQuantity($row['qty']) : number_format($row['qty']) }}</td>
+                            <td class="text-right pr-5 text-[var(--bad-600)] font-semibold">{{ Money::rupiah($row['loss']) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
 @endsection
 

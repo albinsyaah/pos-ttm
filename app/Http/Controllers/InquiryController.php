@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\InventoryLedger;
 use App\Models\ItemType;
+use App\Models\PriceHistory;
 use App\Models\PriceSetup;
 use App\Models\Product;
 use App\Models\Warehouse;
@@ -15,8 +16,9 @@ use Illuminate\Support\Facades\DB;
 /**
  * Read-only "Inquiry" tool: lets any user with inquiry.view quickly search
  * products and see their current stock (per warehouse, from the latest
- * inventory_ledgers row per product/warehouse pair) and current price setups,
- * without needing access to the full Inventory / Pricing / Warehouse modules.
+ * inventory_ledgers row per product/warehouse pair), current price setups and
+ * the log of price changes, without needing access to the full Inventory /
+ * Pricing / Warehouse modules.
  */
 class InquiryController extends Controller
 {
@@ -54,6 +56,7 @@ class InquiryController extends Controller
             'warehouses' => Warehouse::orderBy('name')->get(),
             'stockByProduct' => $this->stockForProducts($productIds, $warehouseId),
             'pricesByProduct' => $this->pricesForProducts($productIds),
+            'historyByProduct' => $this->priceHistoryForProducts($productIds),
         ]);
     }
 
@@ -120,5 +123,29 @@ class InquiryController extends Controller
             ->groupBy('product_id')
             ->map(fn ($rows) => $rows->unique('price_category')->values())
             ->all();
+    }
+
+    /** How many recent price changes the Inquiry page shows per product. */
+    public const HISTORY_LIMIT = 10;
+
+    /**
+     * Latest price changes (who, when, from what to what) for each product on
+     * the page, newest first, keyed by product_id. One small query per product
+     * so each product keeps its own last HISTORY_LIMIT rows.
+     */
+    protected function priceHistoryForProducts(Collection $productIds): array
+    {
+        $history = [];
+
+        foreach ($productIds as $productId) {
+            $history[$productId] = PriceHistory::query()
+                ->with('user')
+                ->where('product_id', $productId)
+                ->orderByDesc('id')
+                ->limit(self::HISTORY_LIMIT)
+                ->get();
+        }
+
+        return $history;
     }
 }

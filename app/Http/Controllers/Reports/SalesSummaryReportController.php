@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Sale;
 use App\Models\Warehouse;
+use App\Services\SalesInsightService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\DB;
  * PointOfSaleController::SOURCE / SalesSpgController::SOURCE). It lets any
  * user with reports.view filter by date range, customer, warehouse and an
  * optional channel, and shows a per-channel breakdown alongside the grand
- * totals. No create/update/delete — this is reporting only.
+ * totals and the cost of the free items given away in those sales. No create/update/delete — this is reporting only.
  *
  * Permission check lives on the route itself (single action, no
  * HasMiddleware needed), matching the pattern used by the other report
@@ -32,7 +33,7 @@ class SalesSummaryReportController extends Controller
      */
     public const SOURCES = ['sales', 'pos', 'spg'];
 
-    public function index(Request $request)
+    public function index(Request $request, SalesInsightService $insight)
     {
         $search = trim((string) $request->query('q', ''));
         $customerId = $request->query('customer_id');
@@ -77,6 +78,10 @@ class SalesSummaryReportController extends Controller
             ->get()
             ->keyBy('source');
 
+        // Free items (lines priced Rp0) cost the shop their last purchase price.
+        // Computed over the whole filtered set so the card matches the filters.
+        $freeLoss = $insight->freeGoodsLoss($query);
+
         $sales = $query->paginate(20)->withQueryString();
 
         return view('reports.sales-summary.index', [
@@ -93,6 +98,7 @@ class SalesSummaryReportController extends Controller
             'totalSales' => $totalSales,
             'totalAmount' => $totalAmount,
             'bySource' => $bySource,
+            'freeLoss' => $freeLoss,
         ]);
     }
 }
