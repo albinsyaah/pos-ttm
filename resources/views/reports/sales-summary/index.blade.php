@@ -7,7 +7,7 @@
 @php use App\Support\Money; @endphp
 
     <form id="ssReportFilterForm" action="{{ route('reports.sales-summary') }}" method="GET"
-        class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+        class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="ssReportSearch">{{ __('app.reports.sales_summary.search_label') }}</label>
             <input id="ssReportSearch" name="q" type="search" value="{{ $search }}"

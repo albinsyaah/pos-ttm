@@ -5,7 +5,7 @@
 
 @section('content')
 
-    <form id="purchaseReportFilterForm" action="{{ route('reports.purchases') }}" method="GET" class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+    <form id="purchaseReportFilterForm" action="{{ route('reports.purchases') }}" method="GET" class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="purchaseReportSearch">{{ __('app.reports.purchase.search_label') }}</label>
             <input

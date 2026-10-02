@@ -32,7 +32,7 @@
 
     <div class="flex items-center justify-between flex-wrap gap-4">
         <div class="flex items-center gap-3">
-            <form action="{{ route('admin.users.index') }}" method="GET" class="relative">
+            <form action="{{ route('admin.users.index') }}" method="GET" class="relative" data-live-search="auto">
                 <label class="sr-only" for="userSearch">{{ __('app.users.search_users') }}</label>
                 <input
                     id="userSearch"

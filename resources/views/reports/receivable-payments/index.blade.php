@@ -6,7 +6,7 @@
 @section('content')
 
     <form id="arReportFilterForm" action="{{ route('reports.receivable-payments') }}" method="GET"
-        class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+        class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="arReportSearch">{{ __('app.reports.receivable_payment.search_label') }}</label>
             <input id="arReportSearch" name="q" type="search" value="{{ $search }}"

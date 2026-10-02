@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
-        <form action="{{ route('transactions.point-of-sale.index') }}" method="GET" class="relative">
+        <form action="{{ route('transactions.point-of-sale.index') }}" method="GET" class="relative" data-live-search="auto">
             <label class="sr-only" for="posSearch">{{ __('app.point_of_sale.search_transactions') }}</label>
             <input
                 id="posSearch"

@@ -6,7 +6,7 @@
 @section('content')
 
     <form id="apReportFilterForm" action="{{ route('reports.payable-payments') }}" method="GET"
-        class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+        class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="apReportSearch">{{ __('app.reports.payable_payment.search_label') }}</label>
             <input id="apReportSearch" name="q" type="search" value="{{ $search }}"

@@ -34,11 +34,58 @@
             </a>
         @endcan
 
+        @can('suppliers.view')
+            <a href="{{ route('suppliers.index') }}"
+               class="sidebar-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('suppliers.*')) aria-current="page" @endif>
+                <i class="fa-solid fa-truck-field w-4 text-center"></i> {{ __('app.sidebar.supplier') }}
+            </a>
+        @endcan
+
+        @can('inquiry.view')
+            <a href="{{ route('inquiry.index') }}"
+               class="sidebar-item {{ request()->routeIs('inquiry.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('inquiry.*')) aria-current="page" @endif>
+                <i class="fa-solid fa-magnifying-glass-chart w-4 text-center"></i> {{ __('app.sidebar.inquiry') }}
+            </a>
+        @endcan
+
         @can('customers.view')
             <a href="{{ \Illuminate\Support\Facades\Route::has('customers.index') ? route('customers.index') : '#' }}"
                class="sidebar-item {{ request()->routeIs('customers.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
                @if(request()->routeIs('customers.*')) aria-current="page" @endif>
                 <i class="fa-solid fa-users w-4 text-center"></i> {{ __('app.sidebar.customer') }}
+            </a>
+        @endcan
+
+        {{-- Kepegawaian --}}
+        @canany(\App\Support\AccessControl::viewPermissions('hr'))
+        <div class="nav-group {{ request()->routeIs('hr.*') ? 'open' : '' }}">
+            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="{{ request()->routeIs('hr.*') ? 'true' : 'false' }}">
+                <i class="fa-solid fa-id-badge w-4 text-center"></i>
+                <span class="flex-1 text-left">{{ __('app.sidebar.hr') }}</span>
+                <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
+            </button>
+            <div class="nav-panel">
+                @can('hr.employees.view')
+                <a href="{{ route('hr.employees.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('hr.employees.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('hr.employees.*')) aria-current="page" @endif>{{ __('app.sidebar.employee') }}</a>
+                @endcan
+                @can('hr.salesmen.view')
+                <a href="{{ route('hr.salesmen.index') }}"
+                   class="sidebar-item sub {{ request()->routeIs('hr.salesmen.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
+                   @if(request()->routeIs('hr.salesmen.*')) aria-current="page" @endif>{{ __('app.sidebar.salesman') }}</a>
+                @endcan
+            </div>
+        </div>
+        @endcanany
+
+        @can('assets.view')
+            <a href="{{ route('assets.index') }}"
+               class="sidebar-item {{ request()->routeIs('assets.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
+               @if(request()->routeIs('assets.*')) aria-current="page" @endif>
+                <i class="fa-solid fa-box w-4 text-center"></i> {{ __('app.sidebar.asset') }}
             </a>
         @endcan
 
@@ -74,14 +121,6 @@
             </div>
         </div>
         @endcanany
-
-        @can('assets.view')
-            <a href="{{ route('assets.index') }}"
-               class="sidebar-item {{ request()->routeIs('assets.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
-               @if(request()->routeIs('assets.*')) aria-current="page" @endif>
-                <i class="fa-solid fa-box w-4 text-center"></i> {{ __('app.sidebar.asset') }}
-            </a>
-        @endcan
 
         {{-- Harga (Price): setup + change history --}}
         @can('pricing.view')
@@ -135,14 +174,6 @@
         </div>
         @endcanany
 
-        @can('suppliers.view')
-            <a href="{{ route('suppliers.index') }}"
-               class="sidebar-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
-               @if(request()->routeIs('suppliers.*')) aria-current="page" @endif>
-                <i class="fa-solid fa-truck-field w-4 text-center"></i> {{ __('app.sidebar.supplier') }}
-            </a>
-        @endcan
-
         @can('warehouses.view')
             <a href="{{ route('warehouses.index') }}"
                class="sidebar-item {{ request()->routeIs('warehouses.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
@@ -150,29 +181,6 @@
                 <i class="fa-solid fa-warehouse w-4 text-center"></i> {{ __('app.sidebar.warehouse') }}
             </a>
         @endcan
-
-        {{-- Kepegawaian --}}
-        @canany(\App\Support\AccessControl::viewPermissions('hr'))
-        <div class="nav-group {{ request()->routeIs('hr.*') ? 'open' : '' }}">
-            <button class="nav-toggle sidebar-item w-full flex items-center gap-3 px-4 py-2.5" aria-expanded="{{ request()->routeIs('hr.*') ? 'true' : 'false' }}">
-                <i class="fa-solid fa-id-badge w-4 text-center"></i>
-                <span class="flex-1 text-left">{{ __('app.sidebar.hr') }}</span>
-                <i class="fa-solid fa-chevron-right nav-chevron text-xs"></i>
-            </button>
-            <div class="nav-panel">
-                @can('hr.employees.view')
-                <a href="{{ route('hr.employees.index') }}"
-                   class="sidebar-item sub {{ request()->routeIs('hr.employees.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
-                   @if(request()->routeIs('hr.employees.*')) aria-current="page" @endif>{{ __('app.sidebar.employee') }}</a>
-                @endcan
-                @can('hr.salesmen.view')
-                <a href="{{ route('hr.salesmen.index') }}"
-                   class="sidebar-item sub {{ request()->routeIs('hr.salesmen.*') ? 'active' : '' }} flex items-center gap-3 pl-11 pr-4 py-2"
-                   @if(request()->routeIs('hr.salesmen.*')) aria-current="page" @endif>{{ __('app.sidebar.salesman') }}</a>
-                @endcan
-            </div>
-        </div>
-        @endcanany
 
         {{-- Transaksi --}}
         @canany(\App\Support\AccessControl::viewPermissions('transactions'))
@@ -431,14 +439,6 @@
             </div>
         </div>
         @endcanany
-
-        @can('inquiry.view')
-            <a href="{{ route('inquiry.index') }}"
-               class="sidebar-item {{ request()->routeIs('inquiry.*') ? 'active' : '' }} flex items-center gap-3 px-4 py-2.5"
-               @if(request()->routeIs('inquiry.*')) aria-current="page" @endif>
-                <i class="fa-solid fa-magnifying-glass-chart w-4 text-center"></i> {{ __('app.sidebar.inquiry') }}
-            </a>
-        @endcan
 
         @role('Super Admin')
             <div class="my-3 border-t border-gray-100"></div>

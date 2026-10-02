@@ -6,7 +6,7 @@
 @section('content')
 
     <form id="arAgingReportFilterForm" action="{{ route('reports.receivable-aging') }}" method="GET"
-        class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+        class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="arAgingReportSearch">{{ __('app.reports.receivable_aging.search_label') }}</label>
             <input id="arAgingReportSearch" name="q" type="search" value="{{ $search }}"

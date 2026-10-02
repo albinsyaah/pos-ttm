@@ -6,7 +6,7 @@
 @section('content')
 @php use App\Support\Money; @endphp
 
-    <form id="inquiryFilterForm" action="{{ route('inquiry.index') }}" method="GET" class="flex items-center justify-between flex-wrap gap-4">
+    <form id="inquiryFilterForm" action="{{ route('inquiry.index') }}" method="GET" class="flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="inquirySearch">{{ __('app.inquiry.search_products') }}</label>
             <input

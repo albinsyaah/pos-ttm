@@ -7,7 +7,7 @@
 @php use App\Support\Money; @endphp
 
     <form id="insightFilterForm" action="{{ route('reports.salesman') }}" method="GET"
-        class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+        class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="insightSearch">{{ __('insight.salesman.search_label') }}</label>
             <input id="insightSearch" name="q" type="search" value="{{ $search }}"

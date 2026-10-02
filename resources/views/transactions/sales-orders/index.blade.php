@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
-        <form action="{{ route('transactions.sales-orders.index') }}" method="GET" class="relative">
+        <form action="{{ route('transactions.sales-orders.index') }}" method="GET" class="relative" data-live-search="auto">
             <label class="sr-only" for="salesOrderSearch">{{ __('app.sales_orders.search_sales_orders') }}</label>
             <input
                 id="salesOrderSearch"

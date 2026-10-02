@@ -6,7 +6,7 @@
 @section('content')
 
     <form id="inventoryReportFilterForm" action="{{ route('reports.inventory') }}" method="GET"
-        class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+        class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="inventoryReportSearch">{{ __('app.reports.inventory.search_label') }}</label>
             <input id="inventoryReportSearch" name="q" type="search" value="{{ $search }}"
