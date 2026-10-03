@@ -68,6 +68,7 @@
                     <th class="font-semibold">{{ __('insight.common.product') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.salesman.paid_qty') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.salesman.free_qty') }}</th>
+                    <th class="font-semibold text-right">{{ __('insight.returns.returned_qty') }}</th>
                     <th class="font-semibold text-right pr-5">{{ __('insight.common.revenue') }}</th>
                 </tr>
             </thead>
@@ -80,6 +81,7 @@
                         </td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td class="text-right pr-5">{{ Money::rupiah($group['revenue']) }}</td>
                     </tr>
                     @foreach ($group['rows'] as $row)
@@ -88,12 +90,13 @@
                             <td class="text-[var(--ink-700)]">{{ $row['product']->name }}</td>
                             <td class="text-right text-[var(--ink-700)]">{{ $row['paid_qty'] > 0 ? $row['product']->formatQuantity($row['paid_qty']) : '—' }}</td>
                             <td class="text-right text-[var(--ink-400)]">{{ $row['free_qty'] > 0 ? $row['product']->formatQuantity($row['free_qty']) : '—' }}</td>
+                            <td class="text-right {{ $row['returned_qty'] > 0 ? 'text-[var(--bad-600)] font-semibold' : 'text-[var(--ink-400)]' }}">{{ $row['returned_qty'] > 0 ? $row['product']->formatQuantity($row['returned_qty']) : '—' }}</td>
                             <td class="text-right pr-5 text-[var(--ink-700)]">{{ Money::rupiah($row['revenue']) }}</td>
                         </tr>
                     @endforeach
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="6" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('insight.salesman.no_data') }}
                         </td>

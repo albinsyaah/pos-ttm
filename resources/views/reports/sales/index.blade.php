@@ -57,7 +57,7 @@
         </div>
     </form>
 
-    <div class="grid sm:grid-cols-2 gap-4 mt-6 report-summary">
+    <div class="grid sm:grid-cols-3 gap-4 mt-6 report-summary">
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
                 {{ __('app.reports.sale.summary_total_sales') }}</p>
@@ -66,8 +66,15 @@
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
                 {{ __('app.reports.sale.summary_total_amount') }}</p>
-            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">Rp{{ number_format((float) $totalAmount) }}
+            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1" id="netSalesAmount">Rp{{ number_format((float) $totalAmount) }}
             </p>
+            <p class="text-xs text-[var(--ink-400)] mt-1">{{ __('insight.returns.net_hint') }}</p>
+        </div>
+        <div class="bg-white rounded-3xl p-5" id="salesReturnsCard">
+            <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
+                {{ __('insight.returns.sales_returns') }}</p>
+            <p class="text-2xl font-extrabold text-[var(--bad-600)] mt-1">Rp{{ number_format((float) $returnsTotal) }}</p>
+            <p class="text-xs text-[var(--ink-400)] mt-1">{{ __('insight.returns.gross_sales') }}: Rp{{ number_format((float) $grossAmount) }}</p>
         </div>
     </div>
 
@@ -103,6 +110,7 @@
                     <th class="font-semibold">{{ __('app.sales.warehouse') }}</th>
                     <th class="font-semibold">{{ __('app.sales.items') }}</th>
                     <th class="font-semibold">{{ __('app.sales.total') }}</th>
+                    <th class="font-semibold">{{ __('insight.returns.return_column') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -115,10 +123,13 @@
                         <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">Rp{{ number_format((float) $sale->total_amount) }}</td>
+                        <td class="{{ (float) $sale->returned_total > 0 ? 'text-[var(--bad-600)] font-semibold' : 'text-[var(--ink-400)]' }}">
+                            {{ (float) $sale->returned_total > 0 ? 'Rp'.number_format((float) $sale->returned_total) : '—' }}
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="7" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.reports.sale.no_data') }}
                         </td>

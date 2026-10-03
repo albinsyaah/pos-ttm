@@ -7,12 +7,14 @@ use App\Models\Employee;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleDetail;
+use App\Services\SalesInsightService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
  * What each salesman has sold: per salesman, every product with the paid
- * quantity, the free quantity (lines priced Rp0) and the revenue.
+ * quantity, the free quantity (lines priced Rp0) and the revenue. Paid quantity and revenue
+ * are net of sales returns (the returned quantity is shown beside them).
  * Sales without a salesman are not part of this report. Read-only.
  */
 class SalesmanReportController extends Controller
@@ -27,6 +29,7 @@ class SalesmanReportController extends Controller
         $base = SaleDetail::query()
             ->join('sales', 'sales.id', '=', 'sale_details.sale_id')
             ->join('products', 'products.id', '=', 'sale_details.product_id')
+            ->leftJoinSub(SalesInsightService::returnedPerPaidLine(), 'rl', 'rl.line_id', '=', 'sale_details.id')
             ->whereNotNull('sales.salesman_id')
             ->when($salesmanId, fn ($q) => $q->where('sales.salesman_id', $salesmanId))
             ->when($dateFrom, fn ($q) => $q->whereDate('sales.sale_date', '>=', $dateFrom))
@@ -40,9 +43,10 @@ class SalesmanReportController extends Controller
 
         $lines = (clone $base)
             ->selectRaw('sales.salesman_id, sale_details.product_id,
-                SUM(CASE WHEN sale_details.price > 0 THEN sale_details.qty ELSE 0 END) as paid_qty,
+                SUM(CASE WHEN sale_details.price > 0 THEN sale_details.qty - COALESCE(rl.rqty, 0) ELSE 0 END) as paid_qty,
+                COALESCE(SUM(rl.rqty), 0) as returned_qty,
                 SUM(CASE WHEN sale_details.price > 0 THEN 0 ELSE sale_details.qty END) as free_qty,
-                SUM(sale_details.qty * sale_details.price) as revenue')
+                SUM((sale_details.qty - COALESCE(rl.rqty, 0)) * sale_details.price) as revenue')
             ->groupBy('sales.salesman_id', 'sale_details.product_id')
             ->get();
 
@@ -61,6 +65,7 @@ class SalesmanReportController extends Controller
                     'product' => $products->get($line->product_id),
                     'paid_qty' => (int) $line->paid_qty,
                     'free_qty' => (int) $line->free_qty,
+                    'returned_qty' => (int) $line->returned_qty,
                     'revenue' => (float) $line->revenue,
                 ])
                 ->filter(fn ($row) => $row['product'] !== null)

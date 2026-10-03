@@ -53,6 +53,7 @@ use App\Http\Controllers\Transactions\ItemRequestController;
 use App\Http\Controllers\DigitalReceiptController;
 use App\Http\Controllers\Print\SalePrintController;
 use App\Http\Controllers\Transactions\PointOfSaleController;
+use App\Http\Controllers\Transactions\PointOfSaleIndukController;
 use App\Http\Controllers\Transactions\PointOfSaleNewController;
 use App\Http\Controllers\Transactions\PurchaseController;
 use App\Http\Controllers\Transactions\PurchaseOrderController;
@@ -241,6 +242,11 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('point-of-sale-new', [PointOfSaleNewController::class, 'index'])->name('point-of-sale-new.index');
         Route::get('point-of-sale-new/products', [PointOfSaleNewController::class, 'products'])->name('point-of-sale-new.products');
         Route::post('point-of-sale-new', [PointOfSaleNewController::class, 'store'])->name('point-of-sale-new.store');
+
+        // Head cashier's terminal: same screen, plus driver name, large receipt and delivery note.
+        Route::get('point-of-sale-induk', [PointOfSaleIndukController::class, 'index'])->name('point-of-sale-induk.index');
+        Route::get('point-of-sale-induk/products', [PointOfSaleIndukController::class, 'products'])->name('point-of-sale-induk.products');
+        Route::post('point-of-sale-induk', [PointOfSaleIndukController::class, 'store'])->name('point-of-sale-induk.store');
 
         Route::resource('point-of-sale', PointOfSaleController::class)
             ->only(['index', 'store', 'update', 'destroy'])

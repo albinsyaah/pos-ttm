@@ -98,6 +98,12 @@ class PayableService
             ->filter(fn (array $row) => $row['outstanding'] > 0);
     }
 
+    /** Everything still owed to suppliers: the sum of the open invoices' balances. */
+    public function totalOutstanding(): float
+    {
+        return round((float) $this->openInvoices()->sum('outstanding'), 2);
+    }
+
     /** Balance of one invoice, or 0 if it is not payable (pending or cancelled). */
     public function outstandingFor(int $purchaseId, ?int $excludePaymentId = null): float
     {

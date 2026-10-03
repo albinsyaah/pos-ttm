@@ -31,6 +31,7 @@ class PaymentMethodReportController extends Controller
             'cash_sales' => collect($rows)->sum('cash_sales'),
             'ar_count' => collect($rows)->sum('ar_count'),
             'ar_received' => collect($rows)->sum('ar_received'),
+            'returns' => collect($rows)->sum('returns'),
             'income' => collect($rows)->sum('income'),
             'ap_paid' => collect($rows)->sum('ap_paid'),
         ];

@@ -66,7 +66,9 @@ class SalesSummaryReportController extends Controller
         // paginating. total_amount is already stored on the row (see
         // Transactions\SaleController), so this is a plain sum.
         $totalSales = (clone $query)->count();
-        $totalAmount = (clone $query)->sum('total_amount');
+        $grossAmount = (float) (clone $query)->sum('total_amount');
+        $returned = $insight->returnsForSales($query);
+        $totalAmount = $grossAmount - $returned['total'];
 
         // Per-channel breakdown (count + amount for each of sales/pos/spg
         // within the current filters), computed as one grouped aggregate
@@ -78,11 +80,16 @@ class SalesSummaryReportController extends Controller
             ->get()
             ->keyBy('source');
 
+        // Net of returns, per channel.
+        foreach ($bySource as $channelKey => $channel) {
+            $channel->total_amount = (float) $channel->total_amount - ($returned['by_source'][$channelKey] ?? 0.0);
+        }
+
         // Free items (lines priced Rp0) cost the shop their last purchase price.
         // Computed over the whole filtered set so the card matches the filters.
         $freeLoss = $insight->freeGoodsLoss($query);
 
-        $sales = $query->paginate(20)->withQueryString();
+        $sales = $query->withSum('salesReturns as returned_total', 'total_amount')->paginate(20)->withQueryString();
 
         return view('reports.sales-summary.index', [
             'sales' => $sales,
@@ -99,6 +106,8 @@ class SalesSummaryReportController extends Controller
             'totalAmount' => $totalAmount,
             'bySource' => $bySource,
             'freeLoss' => $freeLoss,
+            'grossAmount' => $grossAmount,
+            'returnsTotal' => $returned['total'],
         ]);
     }
 }

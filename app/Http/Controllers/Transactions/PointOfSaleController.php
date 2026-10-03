@@ -78,6 +78,7 @@ class PointOfSaleController extends Controller implements HasMiddleware
                 'sales_order_id' => null,
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
+                'driver_name' => $data['driver_name'],
                 'warehouse_id' => $data['warehouse_id'],
             ]);
 
@@ -102,6 +103,7 @@ class PointOfSaleController extends Controller implements HasMiddleware
                 'total_amount' => $data['total_amount'],
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
+                'driver_name' => $data['driver_name'],
                 'warehouse_id' => $data['warehouse_id'],
             ]);
 
@@ -143,6 +145,7 @@ class PointOfSaleController extends Controller implements HasMiddleware
             'sale_date' => ['required', 'date'],
             'customer_id' => ['nullable', 'exists:customers,id'],
             'salesman_id' => ['nullable', 'exists:employees,id'],
+            'driver_name' => ['nullable', 'string', 'max:100'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
@@ -160,6 +163,7 @@ class PointOfSaleController extends Controller implements HasMiddleware
 
         $data['customer_id'] = $data['customer_id'] ?? null;
         $data['salesman_id'] = $data['salesman_id'] ?? null;
+        $data['driver_name'] = filled($data['driver_name'] ?? null) ? trim($data['driver_name']) : null;
 
         return $data;
     }

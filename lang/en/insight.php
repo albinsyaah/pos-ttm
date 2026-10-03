@@ -15,6 +15,18 @@ return [
         'inactive' => 'inactive',
     ],
 
+    'returns' => [
+        'sales_returns' => 'Sales Returns',
+        'gross_sales' => 'Gross sales',
+        'net_hint' => 'After sales returns',
+        'return_column' => 'Returns',
+        'returned_qty' => 'Returned',
+    ],
+
+    'terminal' => [
+        'head_title' => 'Point of Sales (Head Cashier)',
+    ],
+
     'sidebar' => [
         'sales_by_product' => 'Sales by Product',
         'salesman' => 'Salesman Report',
@@ -62,9 +74,10 @@ return [
         'receivable_payments' => 'Receivable Payments',
         'income' => 'Income',
         'total_income' => 'Total Income',
+        'refunds' => 'Cash Refunds',
         'supplier_paid' => 'Supplier Payments',
         'no_data' => 'No payment method data yet.',
-        'note' => 'Income = cash sales + receivable payments received. A credit sale only counts once the customer pays. Supplier payments are money out and are not added to income. Returns are not deducted yet.',
+        'note' => 'Income = cash sales + receivable payments received. A credit sale only counts once the customer pays. Supplier payments are money out and are not added to income. Returns of cash sales are deducted from the method the original sale was paid with; returns of credit sales lower the receivable instead.',
     ],
 
     'salesman' => [

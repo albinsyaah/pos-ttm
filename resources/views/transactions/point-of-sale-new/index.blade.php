@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
-@section('title', __('app.point_of_sale_new.title'))
-@section('page-title', __('app.point_of_sale_new.title'))
+@php $isHead = ($terminalMode ?? 'cashier') === 'head'; @endphp
+@section('title', $isHead ? __('insight.terminal.head_title') : __('app.point_of_sale_new.title'))
+@section('page-title', $isHead ? __('insight.terminal.head_title') : __('app.point_of_sale_new.title'))
 
 @push('styles')
 <style>
@@ -72,23 +73,23 @@
     {{-- After a sale: offer the receipt of that sale (only to users allowed to print it). --}}
     @if(session('printed_sale_id'))
         @php $printedSaleId = (int) session('printed_sale_id'); @endphp
-        @canany(['print.receipt-small', 'print.receipt-large', 'print.delivery-note'])
+        @canany($isHead ? ['print.receipt-small', 'print.receipt-large', 'print.delivery-note'] : ['print.receipt-small'])
             <div class="flex flex-wrap items-center gap-3 bg-white rounded-2xl px-5 py-3 mb-6 text-sm">
                 <span class="font-semibold text-[var(--ink-900)]">{{ __('app.print.print_this_sale') }}</span>
                 @can('print.receipt-small')
                     <a href="{{ route('transactions.sales.print.receipt-small', $printedSaleId) }}?auto=1" target="_blank" rel="noopener" class="underline text-[var(--brand-600)]">{{ __('app.print.small_receipt') }}</a>
                 @endcan
-                @can('print.receipt-large')
+                @if($isHead) @can('print.receipt-large')
                     <a href="{{ route('transactions.sales.print.receipt-large', $printedSaleId) }}" target="_blank" rel="noopener" class="underline text-[var(--brand-600)]">{{ __('app.print.large_receipt') }}</a>
-                @endcan
-                @can('print.delivery-note')
+                @endcan @endif
+                @if($isHead) @can('print.delivery-note')
                     <a href="{{ route('transactions.sales.print.delivery-note', $printedSaleId) }}" target="_blank" rel="noopener" class="underline text-[var(--brand-600)]">{{ __('app.print.delivery_note') }}</a>
-                @endcan
+                @endcan @endif
             </div>
         @endcanany
     @endif
 
-    <form id="posNewForm" method="POST" action="{{ route('transactions.point-of-sale-new.store') }}" class="grid lg:grid-cols-3 gap-6 items-start">
+    <form id="posNewForm" method="POST" action="{{ route($routePrefix.'.store') }}" class="grid lg:grid-cols-3 gap-6 items-start">
         @csrf
 
         {{-- Left: warehouse, product search and the cart --}}
@@ -196,10 +197,12 @@
                     </select>
                 </div>
 
+                @if($isHead)
                 <div>
                     <label for="driver_name" class="pos-label">{{ __('app.print.driver_optional') }}</label>
                     <input id="driver_name" name="driver_name" type="text" maxlength="100" autocomplete="off" value="{{ old('driver_name') }}" class="pos-field" />
                 </div>
+                @endif
 
                 <div>
                     <span class="pos-label">{{ __('app.point_of_sale_new.payment') }}</span>
@@ -266,7 +269,7 @@
     ])->mapWithKeys(fn ($key) => [$key => __('app.point_of_sale_new.'.$key)])->all();
 @endphp
     <script>
-        window.POS_SEARCH_URL = @json(route('transactions.point-of-sale-new.products'));
+        window.POS_SEARCH_URL = @json(route($routePrefix.'.products'));
         window.POS_LABELS = @json($labels);
         // Rows of a refused submission (e.g. not enough stock), so the cart is not lost.
         window.POS_CART_SEED = @json($cartSeed);

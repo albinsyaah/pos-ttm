@@ -7,6 +7,7 @@ use App\Http\Controllers\Transactions\SaleController;
 use App\Models\Customer;
 use App\Models\Sale;
 use App\Models\Warehouse;
+use App\Services\SalesInsightService;
 use Illuminate\Http\Request;
 
 /**
@@ -27,7 +28,7 @@ use Illuminate\Http\Request;
  */
 class SaleReportController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, SalesInsightService $insight)
     {
         $search = trim((string) $request->query('q', ''));
         $customerId = $request->query('customer_id');
@@ -59,9 +60,11 @@ class SaleReportController extends Controller
         // paginating. total_amount is already stored on the row (see
         // Transactions\SaleController), so this is a plain sum.
         $totalSales = (clone $query)->count();
-        $totalAmount = (clone $query)->sum('total_amount');
+        $grossAmount = (float) (clone $query)->sum('total_amount');
+        $returned = $insight->returnsForSales($query);
+        $totalAmount = $grossAmount - $returned['total'];
 
-        $sales = $query->paginate(20)->withQueryString();
+        $sales = $query->withSum('salesReturns as returned_total', 'total_amount')->paginate(20)->withQueryString();
 
         return view('reports.sales.index', [
             'sales' => $sales,
@@ -74,6 +77,8 @@ class SaleReportController extends Controller
             'warehouses' => Warehouse::orderBy('name')->get(),
             'totalSales' => $totalSales,
             'totalAmount' => $totalAmount,
+            'grossAmount' => $grossAmount,
+            'returnsTotal' => $returned['total'],
         ]);
     }
 }

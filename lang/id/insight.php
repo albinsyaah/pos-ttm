@@ -15,6 +15,18 @@ return [
         'inactive' => 'nonaktif',
     ],
 
+    'returns' => [
+        'sales_returns' => 'Retur Penjualan',
+        'gross_sales' => 'Penjualan kotor',
+        'net_hint' => 'Sudah dikurangi retur',
+        'return_column' => 'Retur',
+        'returned_qty' => 'Retur',
+    ],
+
+    'terminal' => [
+        'head_title' => 'Point of Sales Induk',
+    ],
+
     'sidebar' => [
         'sales_by_product' => 'Penjualan per Barang',
         'salesman' => 'Laporan Salesman',
@@ -62,9 +74,10 @@ return [
         'receivable_payments' => 'Pembayaran Piutang',
         'income' => 'Penghasilan',
         'total_income' => 'Total Penghasilan',
+        'refunds' => 'Retur Tunai',
         'supplier_paid' => 'Bayar Hutang Supplier',
         'no_data' => 'Belum ada data metode pembayaran.',
-        'note' => 'Penghasilan = penjualan langsung + pembayaran piutang yang diterima. Penjualan kredit baru dihitung saat pelanggan membayar. Pembayaran hutang supplier adalah uang keluar dan tidak ikut dijumlahkan ke penghasilan. Retur belum dikurangkan.',
+        'note' => 'Penghasilan = penjualan langsung + pembayaran piutang yang diterima. Penjualan kredit baru dihitung saat pelanggan membayar. Pembayaran hutang supplier adalah uang keluar dan tidak ikut dijumlahkan ke penghasilan. Retur penjualan tunai dikurangkan dari metode yang dipakai saat penjualan asal, sedangkan retur penjualan kredit mengurangi piutang.',
     ],
 
     'salesman' => [

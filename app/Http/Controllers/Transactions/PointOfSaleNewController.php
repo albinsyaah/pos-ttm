@@ -31,16 +31,29 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
      */
     public const SOURCE = 'pos';
 
+    /**
+     * The terminal comes in two modes that share this code. This class is the cashier ("kasir
+     * biasa"): small receipt only, no driver name. PointOfSaleIndukController extends it for the
+     * head cashier ("kasir induk"): driver name, large receipt and delivery note as well.
+     * Each mode has its own routes and its own permission, so the Role screen decides who
+     * may open which one.
+     */
+    public const MODE = 'cashier';
+
+    public const ROUTE = 'transactions.point-of-sale-new';
+
+    public const PERMISSION = 'transactions.point-of-sale-new';
+
     /** How many matches the product search returns at most. */
     private const SEARCH_LIMIT = 20;
 
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:transactions.point-of-sale-new.view', only: ['index']),
+            new Middleware('permission:'.static::PERMISSION.'.view', only: ['index']),
             // The search feeds the terminal, so either terminal permission may use it.
-            new Middleware('permission:transactions.point-of-sale-new.view|transactions.point-of-sale-new.manage', only: ['products']),
-            new Middleware('permission:transactions.point-of-sale-new.manage', only: ['store']),
+            new Middleware('permission:'.static::PERMISSION.'.view|'.static::PERMISSION.'.manage', only: ['products']),
+            new Middleware('permission:'.static::PERMISSION.'.manage', only: ['store']),
         ];
     }
 
@@ -58,6 +71,8 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
         $paymentMethods = PaymentMethod::active()->orderBy('id')->get();
 
         return view('transactions.point-of-sale-new.index', [
+            'terminalMode' => static::MODE,
+            'routePrefix' => static::ROUTE,
             'customers' => Customer::orderBy('name')->get(),
             'warehouses' => Warehouse::orderBy('name')->get(),
             'salesmen' => Employee::orderBy('name')->get(),
@@ -171,7 +186,8 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
                 'customer_id' => $data['customer_id'] ?? null,
                 'salesman_id' => $data['salesman_id'] ?? null,
                 'warehouse_id' => $data['warehouse_id'],
-                'driver_name' => filled($data['driver_name'] ?? null) ? trim($data['driver_name']) : null,
+                // Only the head cashier's terminal records a driver; the cashier's has no such field.
+                'driver_name' => static::MODE === 'head' && filled($data['driver_name'] ?? null) ? trim($data['driver_name']) : null,
             ]);
 
             $sale->saleDetails()->createMany($items);
@@ -186,7 +202,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
         // Stay on the terminal (fresh cart) so the cashier can ring up the
         // next transaction immediately, rather than bouncing to a list page.
         // The id lets the terminal offer a "print receipt" link for this sale.
-        return redirect()->route('transactions.point-of-sale-new.index')
+        return redirect()->route(static::ROUTE.'.index')
             ->with('success', "Transaction {$data['invoice_number']} completed successfully.")
             ->with('printed_sale_id', $sale->id);
     }

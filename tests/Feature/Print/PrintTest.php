@@ -278,10 +278,10 @@ it('saves, changes and clears the driver name on the Sales page', function () {
     expect($sale->fresh()->driver_name)->toBeNull();
 });
 
-it('saves the driver name from the cashier terminal and offers the receipt afterwards', function () {
+it('ignores a driver name sent to the cashier terminal and offers only the small receipt', function () {
     prtLogin([
         'transactions.point-of-sale-new.view', 'transactions.point-of-sale-new.manage',
-        'print.receipt-small',
+        'print.receipt-small', 'print.receipt-large', 'print.delivery-note',
     ]);
     [$product, $warehouse] = prtStockedProduct();
 
@@ -294,13 +294,15 @@ it('saves the driver name from the cashier terminal and offers the receipt after
     ]);
 
     $sale = Sale::where('invoice_number', 'INV-POS-DRV')->firstOrFail();
-    expect($sale->driver_name)->toBe('Pak Joko');
+    expect($sale->driver_name)->toBeNull();
     $response->assertRedirect(route('transactions.point-of-sale-new.index'))
         ->assertSessionHas('printed_sale_id', $sale->id);
 
     $this->get(route('transactions.point-of-sale-new.index'))
         ->assertOk()
-        ->assertSee(route('transactions.sales.print.receipt-small', $sale->id).'?auto=1', false);
+        ->assertSee(route('transactions.sales.print.receipt-small', $sale->id).'?auto=1', false)
+        ->assertDontSee('print/receipt-large', false)
+        ->assertDontSee('print/delivery-note', false);
 });
 
 it('does not offer print links to a cashier without print permissions', function () {

@@ -67,7 +67,7 @@
         </div>
     </form>
 
-    <div class="grid sm:grid-cols-3 gap-4 mt-6 report-summary">
+    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-6 report-summary">
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
                 {{ __('app.reports.sales_summary.summary_total_sales') }}</p>
@@ -76,8 +76,15 @@
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
                 {{ __('app.reports.sales_summary.summary_total_amount') }}</p>
-            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">{{ Money::rupiah($totalAmount) }}
+            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1" id="netSalesAmount">{{ Money::rupiah($totalAmount) }}
             </p>
+            <p class="text-xs text-[var(--ink-400)] mt-1">{{ __('insight.returns.net_hint') }}</p>
+        </div>
+        <div class="bg-white rounded-3xl p-5" id="salesReturnsCard">
+            <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
+                {{ __('insight.returns.sales_returns') }}</p>
+            <p class="text-2xl font-extrabold text-[var(--bad-600)] mt-1">{{ Money::rupiah($returnsTotal) }}</p>
+            <p class="text-xs text-[var(--ink-400)] mt-1">{{ __('insight.returns.gross_sales') }}: {{ Money::rupiah($grossAmount) }}</p>
         </div>
         <div class="bg-white rounded-3xl p-5" id="freeGoodsLossCard">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
@@ -128,7 +135,7 @@
             <i class="fa-solid fa-circle-notch fa-spin text-xl text-[var(--brand-600)]"></i>
         </div>
 
-        <table class="w-full text-sm min-w-[1040px]">
+        <table class="w-full text-sm min-w-[1140px]">
             <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-semibold">{{ __('app.sales.invoice_number') }}</th>
@@ -138,6 +145,7 @@
                     <th class="font-semibold">{{ __('app.reports.sales_summary.channel') }}</th>
                     <th class="font-semibold">{{ __('app.sales.items') }}</th>
                     <th class="font-semibold">{{ __('app.sales.total') }}</th>
+                    <th class="font-semibold">{{ __('insight.returns.return_column') }}</th>
                     <th class="font-semibold">{{ __('insight.sales_summary.free_loss_column') }}</th>
                 </tr>
             </thead>
@@ -157,13 +165,16 @@
                         </td>
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">{{ Money::rupiah($sale->total_amount) }}</td>
+                        <td class="{{ (float) $sale->returned_total > 0 ? 'text-[var(--bad-600)] font-semibold' : 'text-[var(--ink-400)]' }}">
+                            {{ (float) $sale->returned_total > 0 ? Money::rupiah($sale->returned_total) : '—' }}
+                        </td>
                         <td class="{{ isset($freeLoss['by_sale'][$sale->id]) ? 'text-[var(--bad-600)] font-semibold' : 'text-[var(--ink-400)]' }}">
                             {{ isset($freeLoss['by_sale'][$sale->id]) ? Money::rupiah($freeLoss['by_sale'][$sale->id]) : '—' }}
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="9" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.reports.sales_summary.no_data') }}
                         </td>

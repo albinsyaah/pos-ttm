@@ -10,6 +10,9 @@ use App\Models\PurchaseOrder;
 use App\Models\Sale;
 use App\Models\SaleDetail;
 use App\Models\SalesOrder;
+use App\Models\SalesReturn;
+use App\Services\PayableService;
+use App\Services\ReceivableService;
 use App\Services\SalesInsightService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,7 +27,7 @@ class DashboardController extends Controller
      */
     protected int $lowStockThreshold = 10;
 
-    public function index(Request $request, SalesInsightService $insight)
+    public function index(Request $request, SalesInsightService $insight, PayableService $payables, ReceivableService $receivables)
     {
         $today = Carbon::today();
 
@@ -50,14 +53,16 @@ class DashboardController extends Controller
         $lowStockProducts = $this->lowStockProducts();
         $lowStockCount = $lowStockProducts->count();
 
-        $receivablesOutstanding = Sale::receivable()->sum('total_amount') - ArPayment::sum('amount');
-        $payablesOutstanding = Purchase::sum('total_amount') - ApPayment::sum('amount');
+        // Same figures as the per-invoice screens: receivables as in the aging report,
+        // payables as the sum of the open purchase invoices (net of returns and payments).
+        $receivablesOutstanding = $receivables->totalOutstanding();
+        $payablesOutstanding = $payables->totalOutstanding();
 
         // "Pending" = raised but not yet fulfilled by an actual sale/purchase.
         $pendingSalesOrders = SalesOrder::whereDoesntHave('sales')->count();
         $pendingPurchaseOrders = PurchaseOrder::whereDoesntHave('purchases')->count();
 
-        $days = $this->weeklySalesChart($today);
+        $days = $this->weeklySalesChart($today, $insight);
         $topProducts = $insight->topProducts($rangeFrom, $rangeTo, 10);
         $incomeByMethod = $insight->incomeByMethod($rangeFrom, $rangeTo);
         $topCustomers = $this->topCustomers();
@@ -113,7 +118,7 @@ class DashboardController extends Controller
      * Daily sales totals for this week vs the same weekday last week,
      * feeding the bar chart on the dashboard.
      */
-    protected function weeklySalesChart(Carbon $today): array
+    protected function weeklySalesChart(Carbon $today, SalesInsightService $insight): array
     {
         $startOfThisWeek = $today->copy()->startOfWeek();
         $startOfLastWeek = $startOfThisWeek->copy()->subWeek();
@@ -128,6 +133,10 @@ class DashboardController extends Controller
             ->groupBy('day')
             ->pluck('total', 'day');
 
+        // Sales returns count on the day they were made.
+        $thisWeekReturns = $insight->returnsByDay($startOfThisWeek->toDateString(), $startOfThisWeek->copy()->endOfWeek()->toDateString());
+        $lastWeekReturns = $insight->returnsByDay($startOfLastWeek->toDateString(), $startOfLastWeek->copy()->endOfWeek()->toDateString());
+
         $days = [];
         for ($i = 0; $i < 7; $i++) {
             $thisDay = $startOfThisWeek->copy()->addDays($i);
@@ -135,8 +144,8 @@ class DashboardController extends Controller
 
             $days[] = [
                 'label' => $thisDay->format('D'),
-                'this' => (float) ($thisWeekSales[$thisDay->toDateString()] ?? 0),
-                'last' => (float) ($lastWeekSales[$lastDay->toDateString()] ?? 0),
+                'this' => (float) ($thisWeekSales[$thisDay->toDateString()] ?? 0) - (float) ($thisWeekReturns[$thisDay->toDateString()] ?? 0),
+                'last' => (float) ($lastWeekSales[$lastDay->toDateString()] ?? 0) - (float) ($lastWeekReturns[$lastDay->toDateString()] ?? 0),
             ];
         }
 
@@ -148,9 +157,15 @@ class DashboardController extends Controller
      */
     protected function topCustomers()
     {
+        // Revenue per customer, net of the sales returns on their invoices.
+        $returned = SalesReturn::query()
+            ->selectRaw('sale_id, SUM(total_amount) as returned')
+            ->groupBy('sale_id');
+
         return Sale::query()
             ->join('customers', 'customers.id', '=', 'sales.customer_id')
-            ->selectRaw('customers.id, customers.name, customers.code, COUNT(sales.id) as orders, SUM(sales.total_amount) as total')
+            ->leftJoinSub($returned, 'r', 'r.sale_id', '=', 'sales.id')
+            ->selectRaw('customers.id, customers.name, customers.code, COUNT(sales.id) as orders, SUM(sales.total_amount) - COALESCE(SUM(r.returned), 0) as total')
             ->groupBy('customers.id', 'customers.name', 'customers.code')
             ->orderByDesc('total')
             ->limit(5)

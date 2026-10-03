@@ -55,7 +55,7 @@
             <i class="fa-solid fa-circle-notch fa-spin text-xl text-[var(--brand-600)]"></i>
         </div>
 
-        <table class="w-full text-sm min-w-[860px]">
+        <table class="w-full text-sm min-w-[940px]">
             <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-semibold">{{ __('insight.payment_methods.method') }}</th>
@@ -63,6 +63,7 @@
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.cash_sales') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.receivable_count') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.receivable_payments') }}</th>
+                    <th class="font-semibold text-right">{{ __('insight.payment_methods.refunds') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.income') }}</th>
                     <th class="font-semibold text-right pr-5">{{ __('insight.payment_methods.supplier_paid') }}</th>
                 </tr>
@@ -78,12 +79,13 @@
                         <td class="text-right text-[var(--ink-700)]">{{ Money::rupiah($row['cash_sales']) }}</td>
                         <td class="text-right text-[var(--ink-400)]">{{ number_format($row['ar_count']) }}</td>
                         <td class="text-right text-[var(--ink-700)]">{{ Money::rupiah($row['ar_received']) }}</td>
+                        <td class="text-right {{ $row['returns'] > 0 ? 'text-[var(--bad-600)]' : 'text-[var(--ink-400)]' }}">{{ $row['returns'] > 0 ? '-'.Money::rupiah($row['returns']) : '—' }}</td>
                         <td class="text-right font-semibold text-[var(--ink-900)]">{{ Money::rupiah($row['income']) }}</td>
                         <td class="text-right pr-5 text-[var(--ink-700)]">{{ Money::rupiah($row['ap_paid']) }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="8" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('insight.payment_methods.no_data') }}
                         </td>
@@ -98,6 +100,7 @@
                         <td class="text-right">{{ Money::rupiah($totals['cash_sales']) }}</td>
                         <td class="text-right">{{ number_format($totals['ar_count']) }}</td>
                         <td class="text-right">{{ Money::rupiah($totals['ar_received']) }}</td>
+                        <td class="text-right">{{ $totals['returns'] > 0 ? '-'.Money::rupiah($totals['returns']) : '—' }}</td>
                         <td class="text-right">{{ Money::rupiah($totals['income']) }}</td>
                         <td class="text-right pr-5">{{ Money::rupiah($totals['ap_paid']) }}</td>
                     </tr>

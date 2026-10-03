@@ -61,12 +61,13 @@
             <i class="fa-solid fa-circle-notch fa-spin text-xl text-[var(--brand-600)]"></i>
         </div>
 
-        <table class="w-full text-sm min-w-[900px]">
+        <table class="w-full text-sm min-w-[980px]">
             <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-semibold">{{ __('insight.common.product') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.by_product.price') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.by_product.qty') }}</th>
+                    <th class="font-semibold text-right">{{ __('insight.returns.returned_qty') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.common.revenue') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.by_product.sales_count') }}</th>
                     <th class="font-semibold pl-6">{{ __('insight.by_product.period') }}</th>
@@ -90,6 +91,7 @@
                             @endif
                         </td>
                         <td class="text-right text-[var(--ink-700)]">{{ $product ? $product->formatQuantity((int) $row->qty) : number_format($row->qty) }}</td>
+                        <td class="text-right {{ (int) $row->returned_qty > 0 ? 'text-[var(--bad-600)] font-semibold' : 'text-[var(--ink-400)]' }}">{{ (int) $row->returned_qty > 0 ? number_format($row->returned_qty) : '—' }}</td>
                         <td class="text-right text-[var(--ink-900)] font-semibold">{{ Money::rupiah($row->revenue) }}</td>
                         <td class="text-right text-[var(--ink-400)]">{{ number_format($row->sales_count) }}</td>
                         <td class="pl-6 text-[var(--ink-400)] whitespace-nowrap">
@@ -101,7 +103,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="7" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('insight.by_product.no_data') }}
                         </td>
