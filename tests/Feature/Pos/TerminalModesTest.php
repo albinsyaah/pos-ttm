@@ -92,7 +92,8 @@ it('has the driver field and posts to its own route on the head cashier terminal
         ->assertSee('Point of Sales Induk')
         ->assertSee('name="driver_name"', false)
         ->assertSee(route('transactions.point-of-sale-induk.store'), false)
-        ->assertSee(route('transactions.point-of-sale-induk.products'), false)
+        // The search URL is printed through @json, which escapes the slashes.
+        ->assertSee(json_encode(route('transactions.point-of-sale-induk.products')), false)
         ->assertDontSee(route('transactions.point-of-sale-new.store'), false);
 });
 
@@ -165,8 +166,11 @@ it('refuses a head cashier sale without the manage permission', function () {
 
 it('lets the head terminal search products with either of its permissions', function () {
     tmLogin(['transactions.point-of-sale-induk.manage']);
+    [, $warehouse] = tmStock();
 
-    $this->getJson(route('transactions.point-of-sale-induk.products', ['q' => 'pupuk']))->assertOk();
+    $this->getJson(route('transactions.point-of-sale-induk.products', ['q' => 'pupuk', 'warehouse_id' => $warehouse->id]))
+        ->assertOk()
+        ->assertJsonCount(1, 'data');
 });
 
 it('shows each terminal link in the menu only to roles that may open it', function () {
