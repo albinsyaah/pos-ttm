@@ -65,6 +65,7 @@
                                         data-return-number="{{ $salesReturn->return_number }}"
                                         data-return-date="{{ \Illuminate\Support\Carbon::parse($salesReturn->return_date)->format('Y-m-d') }}"
                                         data-sale-id="{{ $salesReturn->sale_id }}"
+                                        data-return-id="{{ $salesReturn->id }}"
                                         data-total-amount="{{ $salesReturn->total_amount }}"
                                         data-items="{{ $salesReturn->salesReturnDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty])->toJson() }}"
                                     >
@@ -126,7 +127,7 @@
                     </div>
                     <div>
                         <label for="sale_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.sales_returns.sale') }}</label>
-                        <select id="sale_id" name="sale_id" required
+                        <select id="sale_id" name="sale_id" required data-lines-url="{{ route('transactions.sales-returns.lines', ['sale' => '__ID__']) }}"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                             <option value="">{{ __('app.common.select') }}</option>
                             @foreach($sales as $sale)
@@ -186,13 +187,11 @@
             <td class="p-2">
                 <select name="items[__INDEX__][product_id]" required class="item-product w-full rounded-lg bg-[var(--surface)] py-2 px-2.5 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                     <option value="">{{ __('app.common.select') }}</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->code }} — {{ $product->name }}</option>
-                    @endforeach
                 </select>
             </td>
             <td class="p-2">
                 <input type="number" name="items[__INDEX__][qty]" min="1" step="1" required class="item-qty w-full rounded-lg bg-[var(--surface)] py-2 px-2.5 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                <div class="item-hint hidden mt-1 text-[10px] text-[var(--ink-500)]"></div>
             </td>
             <td class="p-2 text-right">
                 <button type="button" class="remove-item-btn icon-btn" aria-label="{{ __('app.purchase_orders.remove') }}">
@@ -248,5 +247,7 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-triangle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    <script src="{{ asset('js/product-picker.js') }}"></script>
+    <script src="{{ asset('js/return-lines.js') }}"></script>
     <script src="{{ asset('js/transactions-sales-returns.js') }}"></script>
 @endpush

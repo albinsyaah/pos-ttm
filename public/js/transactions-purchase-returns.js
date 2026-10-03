@@ -15,6 +15,13 @@ const noItemsMessage = document.getElementById('noItemsMessage');
 
 let rowIndex = 0;
 
+// Products on the chosen invoice, limited to what may still be returned.
+// Id of the return being edited (null when adding): its own quantities count as still available.
+let editingReturnId = null;
+const returnLines = ReturnLines.create({ sourceSelect: purchaseIdInput, rowsBody: itemRowsBody });
+
+purchaseIdInput.addEventListener('change', () => returnLines.load(purchaseIdInput.value, editingReturnId));
+
 function openModal(modal) {
   modal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
@@ -38,8 +45,7 @@ function addItemRow(values = {}) {
   const row = wrapper.firstElementChild;
   itemRowsBody.appendChild(row);
 
-  if (values.product_id) row.querySelector('.item-product').value = values.product_id;
-  if (values.qty !== undefined) row.querySelector('.item-qty').value = values.qty;
+  returnLines.attachRow(row, values);
   if (values.reason) row.querySelector('.item-reason').value = values.reason;
 
   row.querySelector('.remove-item-btn').addEventListener('click', () => {
@@ -64,6 +70,8 @@ document.getElementById('addPurchaseReturnBtn')?.addEventListener('click', (e) =
   purchaseReturnForm.action = e.currentTarget.dataset.action;
   purchaseReturnFormMethod.innerHTML = '';
   purchaseReturnModalTitle.textContent = __t('Add Purchase Return');
+  editingReturnId = null;
+  returnLines.load('', null);
   resetItemRows();
   addItemRow();
   openModal(purchaseReturnModal);
@@ -72,7 +80,7 @@ document.getElementById('addPurchaseReturnBtn')?.addEventListener('click', (e) =
 
 // Open "Edit Purchase Return" for each row
 document.querySelectorAll('.edit-purchase-return-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', async () => {
     purchaseReturnForm.reset();
     purchaseReturnForm.action = btn.dataset.action;
     purchaseReturnFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
@@ -84,6 +92,9 @@ document.querySelectorAll('.edit-purchase-return-btn').forEach((btn) => {
     totalAmountInput.value = btn.dataset.totalAmount || '';
 
     resetItemRows();
+    editingReturnId = btn.dataset.returnId || null;
+    // Load the invoice's products first; this return's own quantities still count as available.
+    await returnLines.load(purchaseIdInput.value, editingReturnId);
     try {
       const items = JSON.parse(btn.dataset.items || '[]');
       items.forEach((item) => addItemRow(item));

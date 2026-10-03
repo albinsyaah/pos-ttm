@@ -10,6 +10,7 @@ use App\Models\Sale;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnDetail;
 use App\Services\StockService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -24,7 +25,7 @@ class SalesReturnController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:transactions.sales-returns.view', only: ['index']),
+            new Middleware('permission:transactions.sales-returns.view', only: ['index', 'lines']),
             new Middleware('permission:transactions.sales-returns.manage', only: ['store', 'update', 'destroy']),
         ];
     }
@@ -115,6 +116,35 @@ class SalesReturnController extends Controller implements HasMiddleware
         return redirect()->route('transactions.sales-returns.index')->with('success', __('Sales return deleted successfully.'));
     }
 
+    /**
+     * The products on one sale, for the return form: how many were sold, how many
+     * other returns already took back, how many may still be returned. When a
+     * return is being edited its own id is passed as ?exclude so its lines count
+     * as still available.
+     */
+    public function lines(Request $request, Sale $sale): JsonResponse
+    {
+        $exclude = (int) $request->query('exclude', 0) ?: null;
+
+        return response()->json([
+            'source' => $sale->invoice_number,
+            'returnable' => true,
+            'message' => null,
+            'lines' => $this->returnLines($this->sumByProduct($sale->saleDetails()), $this->returnedOn($sale, $exclude)),
+        ]);
+    }
+
+    /** product_id => qty already returned on this sale by returns other than $ignoreId. */
+    protected function returnedOn(Sale $sale, ?int $ignoreId = null): array
+    {
+        return $this->sumByProduct(
+            SalesReturnDetail::query()->whereHas('salesReturn', function ($q) use ($sale, $ignoreId) {
+                $q->where('sale_id', $sale->id)
+                    ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId));
+            })
+        );
+    }
+
     protected function validateSalesReturn(Request $request, ?int $ignoreId = null): array
     {
         $data = $request->validate([
@@ -141,12 +171,7 @@ class SalesReturnController extends Controller implements HasMiddleware
             $sale->invoice_number,
             $data['items'],
             $this->sumByProduct($sale->saleDetails()),
-            $this->sumByProduct(
-                SalesReturnDetail::query()->whereHas('salesReturn', function ($q) use ($sale, $ignoreId) {
-                    $q->where('sale_id', $sale->id)
-                        ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId));
-                })
-            )
+            $this->returnedOn($sale, $ignoreId)
         );
 
         // Stock goes back into the warehouse the sale was taken from.

@@ -9,6 +9,7 @@ use App\Models\Purchase;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnDetail;
 use App\Services\StockService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -24,7 +25,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:transactions.purchase-returns.view', only: ['index']),
+            new Middleware('permission:transactions.purchase-returns.view', only: ['index', 'lines']),
             new Middleware('permission:transactions.purchase-returns.manage', only: ['store', 'update', 'destroy']),
         ];
     }
@@ -111,6 +112,42 @@ class PurchaseReturnController extends Controller implements HasMiddleware
         return redirect()->route('transactions.purchase-returns.index')->with('success', __('Purchase return deleted successfully.'));
     }
 
+    /**
+     * The products on one purchase, for the return form (see SalesReturnController::lines).
+     * A purchase that has not been received yet has nothing to return.
+     */
+    public function lines(Request $request, Purchase $purchase): JsonResponse
+    {
+        $exclude = (int) $request->query('exclude', 0) ?: null;
+
+        if ($purchase->status !== 'received') {
+            return response()->json([
+                'source' => $purchase->invoice_number,
+                'returnable' => false,
+                'message' => __('stock.return_not_received', ['source' => $purchase->invoice_number]),
+                'lines' => [],
+            ]);
+        }
+
+        return response()->json([
+            'source' => $purchase->invoice_number,
+            'returnable' => true,
+            'message' => null,
+            'lines' => $this->returnLines($this->sumByProduct($purchase->purchaseDetails()), $this->returnedOn($purchase, $exclude)),
+        ]);
+    }
+
+    /** product_id => qty already returned on this purchase by returns other than $ignoreId. */
+    protected function returnedOn(Purchase $purchase, ?int $ignoreId = null): array
+    {
+        return $this->sumByProduct(
+            PurchaseReturnDetail::query()->whereHas('purchaseReturn', function ($q) use ($purchase, $ignoreId) {
+                $q->where('purchase_id', $purchase->id)
+                    ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId));
+            })
+        );
+    }
+
     protected function validatePurchaseReturn(Request $request, ?int $ignoreId = null): array
     {
         $data = $request->validate([
@@ -146,12 +183,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
             $purchase->invoice_number,
             $data['items'],
             $this->sumByProduct($purchase->purchaseDetails()),
-            $this->sumByProduct(
-                PurchaseReturnDetail::query()->whereHas('purchaseReturn', function ($q) use ($purchase, $ignoreId) {
-                    $q->where('purchase_id', $purchase->id)
-                        ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId));
-                })
-            )
+            $this->returnedOn($purchase, $ignoreId)
         );
 
         // Stock leaves the warehouse the purchase was received into.

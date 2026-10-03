@@ -214,6 +214,9 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('purchases', PurchaseController::class)
             ->only(['index', 'store', 'update', 'destroy']);
 
+        Route::get('purchase-returns/{purchase}/lines', [PurchaseReturnController::class, 'lines'])
+            ->name('purchase-returns.lines');
+
         Route::resource('purchase-returns', PurchaseReturnController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['purchase-returns' => 'purchaseReturn']);
@@ -251,6 +254,9 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('point-of-sale', PointOfSaleController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['point-of-sale' => 'pointOfSale']);
+
+        Route::get('sales-returns/{sale}/lines', [SalesReturnController::class, 'lines'])
+            ->name('sales-returns.lines');
 
         Route::resource('sales-returns', SalesReturnController::class)
             ->only(['index', 'store', 'update', 'destroy'])

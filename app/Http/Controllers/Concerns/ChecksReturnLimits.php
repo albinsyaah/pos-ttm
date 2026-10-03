@@ -58,4 +58,41 @@ trait ChecksReturnLimits
             throw ValidationException::withMessages(['items' => $messages]);
         }
     }
+
+    /**
+     * What the return form needs to know about one purchase / sale: the products
+     * on it with how many were bought / sold, how many earlier returns already
+     * took back, and how many may still go back. The form lists exactly these
+     * products, so a return can only be made for what is on the invoice.
+     *
+     * @param  array<int, int>  $original  product_id => qty on the purchase / sale.
+     * @param  array<int, int>  $alreadyReturned  product_id => qty on OTHER returns of the same document.
+     * @return array<int, array{product_id: int, code: string, name: string, original: int, returned: int, remaining: int}>
+     */
+    protected function returnLines(array $original, array $alreadyReturned): array
+    {
+        $products = Product::whereIn('id', array_keys($original))->get()->keyBy('id');
+
+        $lines = [];
+        foreach ($original as $productId => $qty) {
+            $product = $products->get($productId);
+            if (! $product) {
+                continue;
+            }
+
+            $returned = (int) ($alreadyReturned[$productId] ?? 0);
+            $lines[] = [
+                'product_id' => (int) $productId,
+                'code' => (string) $product->code,
+                'name' => (string) $product->name,
+                'original' => (int) $qty,
+                'returned' => $returned,
+                'remaining' => max(0, (int) $qty - $returned),
+            ];
+        }
+
+        usort($lines, fn ($a, $b) => strcasecmp($a['name'], $b['name']));
+
+        return $lines;
+    }
 }
