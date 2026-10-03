@@ -71,7 +71,7 @@ class SalesOrderController extends Controller implements HasMiddleware
             $salesOrder->salesOrderDetails()->createMany($data['items']);
         });
 
-        return redirect()->route('transactions.sales-orders.index')->with('success', 'Sales order added successfully.');
+        return redirect()->route('transactions.sales-orders.index')->with('success', __('Sales order added successfully.'));
     }
 
     public function update(Request $request, SalesOrder $salesOrder): RedirectResponse
@@ -90,13 +90,13 @@ class SalesOrderController extends Controller implements HasMiddleware
             $salesOrder->salesOrderDetails()->createMany($data['items']);
         });
 
-        return redirect()->route('transactions.sales-orders.index')->with('success', 'Sales order updated successfully.');
+        return redirect()->route('transactions.sales-orders.index')->with('success', __('Sales order updated successfully.'));
     }
 
     public function destroy(SalesOrder $salesOrder): RedirectResponse
     {
         if ($salesOrder->sales()->exists()) {
-            return back()->with('error', 'This sales order already has sales recorded and cannot be deleted.');
+            return back()->with('error', __('This sales order already has sales recorded and cannot be deleted.'));
         }
 
         DB::transaction(function () use ($salesOrder) {
@@ -104,7 +104,7 @@ class SalesOrderController extends Controller implements HasMiddleware
             $salesOrder->delete();
         });
 
-        return redirect()->route('transactions.sales-orders.index')->with('success', 'Sales order deleted successfully.');
+        return redirect()->route('transactions.sales-orders.index')->with('success', __('Sales order deleted successfully.'));
     }
 
     protected function validateSalesOrder(Request $request, ?int $ignoreId = null): array

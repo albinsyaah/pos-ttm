@@ -41,7 +41,7 @@ class RoleController extends Controller
         $role = Role::create(['name' => $data['name'], 'guard_name' => 'web']);
         $role->syncPermissions($data['permissions']);
 
-        return redirect()->route('admin.roles.index')->with('success', 'Role created successfully.');
+        return redirect()->route('admin.roles.index')->with('success', __('Role created successfully.'));
     }
 
     public function update(Request $request, Role $role): RedirectResponse
@@ -59,22 +59,22 @@ class RoleController extends Controller
         $role->save();
         $role->syncPermissions($data['permissions']);
 
-        return redirect()->route('admin.roles.index')->with('success', 'Role updated successfully.');
+        return redirect()->route('admin.roles.index')->with('success', __('Role updated successfully.'));
     }
 
     public function destroy(Role $role): RedirectResponse
     {
         if ($role->name === self::PROTECTED_ROLE) {
-            return back()->with('error', 'The Super Admin role can\'t be deleted.');
+            return back()->with('error', __("The Super Admin role can't be deleted."));
         }
 
         if (User::role($role->name)->exists()) {
-            return back()->with('error', 'Reassign the users on this role before deleting it.');
+            return back()->with('error', __('Reassign the users on this role before deleting it.'));
         }
 
         $role->delete();
 
-        return redirect()->route('admin.roles.index')->with('success', 'Role deleted successfully.');
+        return redirect()->route('admin.roles.index')->with('success', __('Role deleted successfully.'));
     }
 
     protected function validateRole(Request $request, ?int $ignoreId = null): array

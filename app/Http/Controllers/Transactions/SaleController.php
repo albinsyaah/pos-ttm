@@ -91,7 +91,7 @@ class SaleController extends Controller implements HasMiddleware
             $this->syncSaleStock($sale, $data['items']);
         });
 
-        return redirect()->route('transactions.sales.index')->with('success', 'Sale added successfully.');
+        return redirect()->route('transactions.sales.index')->with('success', __('Sale added successfully.'));
     }
 
     public function update(Request $request, Sale $sale): RedirectResponse
@@ -118,13 +118,13 @@ class SaleController extends Controller implements HasMiddleware
             $this->syncSaleStock($sale, $data['items']);
         });
 
-        return redirect()->route('transactions.sales.index')->with('success', 'Sale updated successfully.');
+        return redirect()->route('transactions.sales.index')->with('success', __('Sale updated successfully.'));
     }
 
     public function destroy(Sale $sale): RedirectResponse
     {
         if ($sale->salesReturns()->exists()) {
-            return back()->with('error', 'This sale already has returns recorded and cannot be deleted.');
+            return back()->with('error', __('This sale already has returns recorded and cannot be deleted.'));
         }
 
         DB::transaction(function () use ($sale) {
@@ -135,7 +135,7 @@ class SaleController extends Controller implements HasMiddleware
             $sale->delete();
         });
 
-        return redirect()->route('transactions.sales.index')->with('success', 'Sale deleted successfully.');
+        return redirect()->route('transactions.sales.index')->with('success', __('Sale deleted successfully.'));
     }
 
     protected function validateSale(Request $request, ?int $ignoreId = null): array

@@ -55,7 +55,7 @@ class ArPaymentController extends Controller implements HasMiddleware
 
         ArPayment::create($data);
 
-        return redirect()->route('transactions.receivable-payments.index')->with('success', 'Receivable payment added successfully.');
+        return redirect()->route('transactions.receivable-payments.index')->with('success', __('Receivable payment added successfully.'));
     }
 
     public function update(Request $request, ArPayment $receivablePayment): RedirectResponse
@@ -64,14 +64,14 @@ class ArPaymentController extends Controller implements HasMiddleware
 
         $receivablePayment->update($data);
 
-        return redirect()->route('transactions.receivable-payments.index')->with('success', 'Receivable payment updated successfully.');
+        return redirect()->route('transactions.receivable-payments.index')->with('success', __('Receivable payment updated successfully.'));
     }
 
     public function destroy(ArPayment $receivablePayment): RedirectResponse
     {
         $receivablePayment->delete();
 
-        return redirect()->route('transactions.receivable-payments.index')->with('success', 'Receivable payment deleted successfully.');
+        return redirect()->route('transactions.receivable-payments.index')->with('success', __('Receivable payment deleted successfully.'));
     }
 
     /**

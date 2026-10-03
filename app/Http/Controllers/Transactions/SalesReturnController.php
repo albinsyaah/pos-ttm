@@ -73,7 +73,7 @@ class SalesReturnController extends Controller implements HasMiddleware
             $this->syncStock($salesReturn, $data);
         });
 
-        return redirect()->route('transactions.sales-returns.index')->with('success', 'Sales return added successfully.');
+        return redirect()->route('transactions.sales-returns.index')->with('success', __('Sales return added successfully.'));
     }
 
     public function update(Request $request, SalesReturn $salesReturn): RedirectResponse
@@ -94,7 +94,7 @@ class SalesReturnController extends Controller implements HasMiddleware
             $this->syncStock($salesReturn, $data);
         });
 
-        return redirect()->route('transactions.sales-returns.index')->with('success', 'Sales return updated successfully.');
+        return redirect()->route('transactions.sales-returns.index')->with('success', __('Sales return updated successfully.'));
     }
 
     public function destroy(SalesReturn $salesReturn): RedirectResponse
@@ -112,7 +112,7 @@ class SalesReturnController extends Controller implements HasMiddleware
             return back()->with('error', implode(' ', $e->shortages));
         }
 
-        return redirect()->route('transactions.sales-returns.index')->with('success', 'Sales return deleted successfully.');
+        return redirect()->route('transactions.sales-returns.index')->with('success', __('Sales return deleted successfully.'));
     }
 
     protected function validateSalesReturn(Request $request, ?int $ignoreId = null): array

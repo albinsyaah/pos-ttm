@@ -203,7 +203,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
         // next transaction immediately, rather than bouncing to a list page.
         // The id lets the terminal offer a "print receipt" link for this sale.
         return redirect()->route(static::ROUTE.'.index')
-            ->with('success', "Transaction {$sale->invoice_number} completed successfully.")
+            ->with('success', __('Transaction :number completed successfully.', ['number' => $sale->invoice_number]))
             ->with('printed_sale_id', $sale->id);
     }
 

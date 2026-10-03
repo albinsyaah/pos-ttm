@@ -47,7 +47,7 @@ class WarehouseController extends Controller implements HasMiddleware
 
         Warehouse::create($data);
 
-        return redirect()->route('warehouses.index')->with('success', 'Warehouse added successfully.');
+        return redirect()->route('warehouses.index')->with('success', __('Warehouse added successfully.'));
     }
 
     public function update(Request $request, Warehouse $warehouse): RedirectResponse
@@ -56,7 +56,7 @@ class WarehouseController extends Controller implements HasMiddleware
 
         $warehouse->update($data);
 
-        return redirect()->route('warehouses.index')->with('success', 'Warehouse updated successfully.');
+        return redirect()->route('warehouses.index')->with('success', __('Warehouse updated successfully.'));
     }
 
     public function destroy(Warehouse $warehouse): RedirectResponse
@@ -68,12 +68,12 @@ class WarehouseController extends Controller implements HasMiddleware
             || $warehouse->toWarehouseInternalMutations()->exists()
             || $warehouse->inventoryLedgers()->exists()
         ) {
-            return back()->with('error', 'This warehouse still has transaction records and cannot be deleted.');
+            return back()->with('error', __('This warehouse still has transaction records and cannot be deleted.'));
         }
 
         $warehouse->delete();
 
-        return redirect()->route('warehouses.index')->with('success', 'Warehouse deleted successfully.');
+        return redirect()->route('warehouses.index')->with('success', __('Warehouse deleted successfully.'));
     }
 
     protected function validateWarehouse(Request $request, ?int $ignoreId = null): array

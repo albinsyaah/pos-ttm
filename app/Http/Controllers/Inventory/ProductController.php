@@ -81,7 +81,7 @@ class ProductController extends Controller implements HasMiddleware
 
         Product::create($data);
 
-        return redirect()->route('inventory.products.index')->with('success', 'Product added successfully.');
+        return redirect()->route('inventory.products.index')->with('success', __('Product added successfully.'));
     }
 
     public function update(Request $request, Product $product): RedirectResponse
@@ -90,7 +90,7 @@ class ProductController extends Controller implements HasMiddleware
 
         $product->update($data);
 
-        return redirect()->route('inventory.products.index')->with('success', 'Product updated successfully.');
+        return redirect()->route('inventory.products.index')->with('success', __('Product updated successfully.'));
     }
 
     public function destroy(Product $product): RedirectResponse
@@ -100,12 +100,12 @@ class ProductController extends Controller implements HasMiddleware
             || $product->saleDetails()->exists();
 
         if ($hasMovement) {
-            return back()->with('error', 'This product already has transaction history and cannot be deleted.');
+            return back()->with('error', __('This product already has transaction history and cannot be deleted.'));
         }
 
         $product->delete();
 
-        return redirect()->route('inventory.products.index')->with('success', 'Product deleted successfully.');
+        return redirect()->route('inventory.products.index')->with('success', __('Product deleted successfully.'));
     }
 
     protected function validateProduct(Request $request, ?int $ignoreId = null): array

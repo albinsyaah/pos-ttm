@@ -89,7 +89,7 @@ class PointOfSaleController extends Controller implements HasMiddleware
             $this->syncSaleStock($sale, $data['items']);
         });
 
-        return redirect()->route('transactions.point-of-sale.index')->with('success', 'Point of sale transaction added successfully.');
+        return redirect()->route('transactions.point-of-sale.index')->with('success', __('Point of sale transaction added successfully.'));
     }
 
     public function update(Request $request, Sale $pointOfSale): RedirectResponse
@@ -115,13 +115,13 @@ class PointOfSaleController extends Controller implements HasMiddleware
             $this->syncSaleStock($pointOfSale, $data['items']);
         });
 
-        return redirect()->route('transactions.point-of-sale.index')->with('success', 'Point of sale transaction updated successfully.');
+        return redirect()->route('transactions.point-of-sale.index')->with('success', __('Point of sale transaction updated successfully.'));
     }
 
     public function destroy(Sale $pointOfSale): RedirectResponse
     {
         if ($pointOfSale->salesReturns()->exists()) {
-            return back()->with('error', 'This transaction already has returns recorded and cannot be deleted.');
+            return back()->with('error', __('This transaction already has returns recorded and cannot be deleted.'));
         }
 
         DB::transaction(function () use ($pointOfSale) {
@@ -132,7 +132,7 @@ class PointOfSaleController extends Controller implements HasMiddleware
             $pointOfSale->delete();
         });
 
-        return redirect()->route('transactions.point-of-sale.index')->with('success', 'Point of sale transaction deleted successfully.');
+        return redirect()->route('transactions.point-of-sale.index')->with('success', __('Point of sale transaction deleted successfully.'));
     }
 
     protected function validatePointOfSale(Request $request, ?int $ignoreId = null): array

@@ -25,7 +25,7 @@ document.getElementById('addCashManagementBtn')?.addEventListener('click', (e) =
   cashManagementForm.reset();
   cashManagementForm.action = e.currentTarget.dataset.action;
   cashManagementFormMethod.innerHTML = '';
-  cashManagementModalTitle.textContent = 'Add Cash Transaction';
+  cashManagementModalTitle.textContent = __t('Add Cash Transaction');
   openModal(cashManagementModal);
   cashManagementDateInput?.focus();
 });
@@ -36,7 +36,7 @@ document.querySelectorAll('.edit-cash-management-btn').forEach((btn) => {
     cashManagementForm.reset();
     cashManagementForm.action = btn.dataset.action;
     cashManagementFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    cashManagementModalTitle.textContent = 'Edit Cash Transaction';
+    cashManagementModalTitle.textContent = __t('Edit Cash Transaction');
 
     cashManagementDateInput.value = btn.dataset.transactionDate || '';
     cashManagementTypeSelect.value = btn.dataset.type || '';

@@ -97,7 +97,7 @@ document.querySelectorAll('.edit-purchase-order-btn').forEach((btn) => {
     purchaseOrderForm.reset();
     purchaseOrderForm.action = btn.dataset.action;
     purchaseOrderFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    purchaseOrderModalTitle.textContent = 'Edit Purchase Order';
+    purchaseOrderModalTitle.textContent = __t('Edit Purchase Order');
 
     poNumberInput.value = btn.dataset.poNumber || '';
     orderDateInput.value = btn.dataset.orderDate || '';

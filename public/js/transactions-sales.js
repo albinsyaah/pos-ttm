@@ -87,7 +87,7 @@ document.getElementById('addSaleBtn')?.addEventListener('click', (e) => {
   saleForm.reset();
   saleForm.action = e.currentTarget.dataset.action;
   saleFormMethod.innerHTML = '';
-  saleModalTitle.textContent = 'Add Sale';
+  saleModalTitle.textContent = __t('Add Sale');
   resetItemRows();
   addItemRow();
   openModal(saleModal);
@@ -100,7 +100,7 @@ document.querySelectorAll('.edit-sale-btn').forEach((btn) => {
     saleForm.reset();
     saleForm.action = btn.dataset.action;
     saleFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    saleModalTitle.textContent = 'Edit Sale';
+    saleModalTitle.textContent = __t('Edit Sale');
 
     invoiceNumberInput.value = btn.dataset.invoiceNumber || '';
     saleDateInput.value = btn.dataset.saleDate || '';

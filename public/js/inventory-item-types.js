@@ -21,7 +21,7 @@ document.getElementById('addItemTypeBtn')?.addEventListener('click', (e) => {
   itemTypeForm.reset();
   itemTypeForm.action = e.currentTarget.dataset.action;
   itemTypeFormMethod.innerHTML = '';
-  itemTypeModalTitle.textContent = 'Add Jenis Barang';
+  itemTypeModalTitle.textContent = __t('Add Item Type');
   openModal(itemTypeModal);
   itemTypeNameInput?.focus();
 });
@@ -32,7 +32,7 @@ document.querySelectorAll('.edit-item-type-btn').forEach((btn) => {
     itemTypeForm.reset();
     itemTypeForm.action = btn.dataset.action;
     itemTypeFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    itemTypeModalTitle.textContent = 'Edit Jenis Barang';
+    itemTypeModalTitle.textContent = __t('Edit Item Type');
 
     itemTypeNameInput.value = btn.dataset.name || '';
 

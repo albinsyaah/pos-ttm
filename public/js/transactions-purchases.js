@@ -86,7 +86,7 @@ document.getElementById('addPurchaseBtn')?.addEventListener('click', (e) => {
   purchaseForm.reset();
   purchaseForm.action = e.currentTarget.dataset.action;
   purchaseFormMethod.innerHTML = '';
-  purchaseModalTitle.textContent = 'Add Purchase';
+  purchaseModalTitle.textContent = __t('Add Purchase');
   resetItemRows();
   addItemRow();
   openModal(purchaseModal);
@@ -99,7 +99,7 @@ document.querySelectorAll('.edit-purchase-btn').forEach((btn) => {
     purchaseForm.reset();
     purchaseForm.action = btn.dataset.action;
     purchaseFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    purchaseModalTitle.textContent = 'Edit Purchase';
+    purchaseModalTitle.textContent = __t('Edit Purchase');
 
     invoiceNumberInput.value = btn.dataset.invoiceNumber || '';
     purchaseDateInput.value = btn.dataset.purchaseDate || '';

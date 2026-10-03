@@ -23,7 +23,7 @@ document.getElementById('addSalesmanBtn')?.addEventListener('click', (e) => {
   salesmanForm.reset();
   salesmanForm.action = e.currentTarget.dataset.action;
   salesmanFormMethod.innerHTML = '';
-  salesmanModalTitle.textContent = 'Add Salesman';
+  salesmanModalTitle.textContent = __t('Add Salesman');
   openModal(salesmanModal);
   codeInput?.focus();
 });
@@ -34,7 +34,7 @@ document.querySelectorAll('.edit-salesman-btn').forEach((btn) => {
     salesmanForm.reset();
     salesmanForm.action = btn.dataset.action;
     salesmanFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    salesmanModalTitle.textContent = 'Edit Salesman';
+    salesmanModalTitle.textContent = __t('Edit Salesman');
 
     codeInput.value = btn.dataset.code || '';
     nameInput.value = btn.dataset.name || '';

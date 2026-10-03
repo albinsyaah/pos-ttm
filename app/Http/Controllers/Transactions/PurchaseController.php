@@ -94,7 +94,7 @@ class PurchaseController extends Controller implements HasMiddleware
             $this->syncStock($purchase, $data);
         });
 
-        return redirect()->route('transactions.purchases.index')->with('success', 'Purchase added successfully.');
+        return redirect()->route('transactions.purchases.index')->with('success', __('Purchase added successfully.'));
     }
 
     public function update(Request $request, Purchase $purchase): RedirectResponse
@@ -123,13 +123,13 @@ class PurchaseController extends Controller implements HasMiddleware
             $this->syncStock($purchase, $data);
         });
 
-        return redirect()->route('transactions.purchases.index')->with('success', 'Purchase updated successfully.');
+        return redirect()->route('transactions.purchases.index')->with('success', __('Purchase updated successfully.'));
     }
 
     public function destroy(Purchase $purchase): RedirectResponse
     {
         if ($purchase->purchaseReturns()->exists()) {
-            return back()->with('error', 'This purchase already has returns recorded and cannot be deleted.');
+            return back()->with('error', __('This purchase already has returns recorded and cannot be deleted.'));
         }
 
         if ($purchase->payments()->exists()) {
@@ -148,7 +148,7 @@ class PurchaseController extends Controller implements HasMiddleware
             return back()->with('error', implode(' ', $e->shortages));
         }
 
-        return redirect()->route('transactions.purchases.index')->with('success', 'Purchase deleted successfully.');
+        return redirect()->route('transactions.purchases.index')->with('success', __('Purchase deleted successfully.'));
     }
 
     /**

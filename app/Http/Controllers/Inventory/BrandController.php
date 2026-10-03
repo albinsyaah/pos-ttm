@@ -44,7 +44,7 @@ class BrandController extends Controller implements HasMiddleware
 
         Brand::create($data);
 
-        return redirect()->route('inventory.brands.index')->with('success', 'Brand added successfully.');
+        return redirect()->route('inventory.brands.index')->with('success', __('Brand added successfully.'));
     }
 
     public function update(Request $request, Brand $brand): RedirectResponse
@@ -53,18 +53,18 @@ class BrandController extends Controller implements HasMiddleware
 
         $brand->update($data);
 
-        return redirect()->route('inventory.brands.index')->with('success', 'Brand updated successfully.');
+        return redirect()->route('inventory.brands.index')->with('success', __('Brand updated successfully.'));
     }
 
     public function destroy(Brand $brand): RedirectResponse
     {
         if ($brand->products()->exists()) {
-            return back()->with('error', 'This brand is still used by one or more products.');
+            return back()->with('error', __('This brand is still used by one or more products.'));
         }
 
         $brand->delete();
 
-        return redirect()->route('inventory.brands.index')->with('success', 'Brand deleted successfully.');
+        return redirect()->route('inventory.brands.index')->with('success', __('Brand deleted successfully.'));
     }
 
     protected function validateBrand(Request $request): array

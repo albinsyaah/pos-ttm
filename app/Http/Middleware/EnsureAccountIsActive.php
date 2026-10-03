@@ -23,7 +23,7 @@ class EnsureAccountIsActive
             $request->session()->regenerateToken();
 
             return redirect()->route('login')
-                ->withErrors(['username' => 'Your account has been disabled. Contact your administrator.']);
+                ->withErrors(['username' => __('Your account has been disabled. Contact your administrator.')]);
         }
 
         return $next($request);

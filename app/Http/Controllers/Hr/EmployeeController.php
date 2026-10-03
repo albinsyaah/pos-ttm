@@ -49,7 +49,7 @@ class EmployeeController extends Controller implements HasMiddleware
 
         Employee::create($data);
 
-        return redirect()->route('hr.employees.index')->with('success', 'Employee added successfully.');
+        return redirect()->route('hr.employees.index')->with('success', __('Employee added successfully.'));
     }
 
     public function update(Request $request, Employee $employee): RedirectResponse
@@ -58,7 +58,7 @@ class EmployeeController extends Controller implements HasMiddleware
 
         $employee->update($data);
 
-        return redirect()->route('hr.employees.index')->with('success', 'Employee updated successfully.');
+        return redirect()->route('hr.employees.index')->with('success', __('Employee updated successfully.'));
     }
 
     public function destroy(Employee $employee): RedirectResponse
@@ -68,12 +68,12 @@ class EmployeeController extends Controller implements HasMiddleware
             || $employee->sales()->exists()
             || $employee->internalMutations()->exists()
         ) {
-            return back()->with('error', 'This employee is still linked to other records and cannot be deleted.');
+            return back()->with('error', __('This employee is still linked to other records and cannot be deleted.'));
         }
 
         $employee->delete();
 
-        return redirect()->route('hr.employees.index')->with('success', 'Employee deleted successfully.');
+        return redirect()->route('hr.employees.index')->with('success', __('Employee deleted successfully.'));
     }
 
     protected function validateEmployee(Request $request, ?int $ignoreId = null): array

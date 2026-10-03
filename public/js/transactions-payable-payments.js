@@ -113,7 +113,7 @@ document.getElementById('addPayablePaymentBtn')?.addEventListener('click', (e) =
   payablePaymentForm.reset();
   payablePaymentForm.action = e.currentTarget.dataset.action;
   payablePaymentFormMethod.innerHTML = '';
-  payablePaymentModalTitle.textContent = 'Add Payable Payment';
+  payablePaymentModalTitle.textContent = __t('Add Payable Payment');
   resetInvoiceSelect(payablePaymentForm.dataset.textChooseSupplier);
   openModal(payablePaymentModal);
   paymentNumberInput?.focus();
@@ -126,7 +126,7 @@ document.querySelectorAll('.edit-payable-payment-btn').forEach((btn) => {
     payablePaymentForm.reset();
     payablePaymentForm.action = btn.dataset.action;
     payablePaymentFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    payablePaymentModalTitle.textContent = 'Edit Payable Payment';
+    payablePaymentModalTitle.textContent = __t('Edit Payable Payment');
 
     paymentNumberInput.value = btn.dataset.paymentNumber || '';
     paymentDateInput.value = btn.dataset.paymentDate || '';

@@ -26,7 +26,7 @@ document.getElementById('addReceivablePaymentBtn')?.addEventListener('click', (e
   receivablePaymentForm.reset();
   receivablePaymentForm.action = e.currentTarget.dataset.action;
   receivablePaymentFormMethod.innerHTML = '';
-  receivablePaymentModalTitle.textContent = 'Add Receivable Payment';
+  receivablePaymentModalTitle.textContent = __t('Add Receivable Payment');
   openModal(receivablePaymentModal);
   paymentNumberInput?.focus();
 });
@@ -38,7 +38,7 @@ document.querySelectorAll('.edit-receivable-payment-btn').forEach((btn) => {
     receivablePaymentForm.reset();
     receivablePaymentForm.action = btn.dataset.action;
     receivablePaymentFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    receivablePaymentModalTitle.textContent = 'Edit Receivable Payment';
+    receivablePaymentModalTitle.textContent = __t('Edit Receivable Payment');
 
     paymentNumberInput.value = btn.dataset.paymentNumber || '';
     paymentDateInput.value = btn.dataset.paymentDate || '';

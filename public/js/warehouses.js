@@ -23,7 +23,7 @@ document.getElementById('addWarehouseBtn')?.addEventListener('click', (e) => {
   warehouseForm.reset();
   warehouseForm.action = e.currentTarget.dataset.action;
   warehouseFormMethod.innerHTML = '';
-  warehouseModalTitle.textContent = 'Add Warehouse';
+  warehouseModalTitle.textContent = __t('Add Warehouse');
   openModal(warehouseModal);
   codeInput?.focus();
 });
@@ -34,7 +34,7 @@ document.querySelectorAll('.edit-warehouse-btn').forEach((btn) => {
     warehouseForm.reset();
     warehouseForm.action = btn.dataset.action;
     warehouseFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    warehouseModalTitle.textContent = 'Edit Warehouse';
+    warehouseModalTitle.textContent = __t('Edit Warehouse');
 
     codeInput.value = btn.dataset.code || '';
     nameInput.value = btn.dataset.name || '';

@@ -97,7 +97,7 @@ class DeviationController extends Controller implements HasMiddleware
             $this->syncStock($deviation, $data);
         });
 
-        return redirect()->route('transactions.deviations.index')->with('success', 'Deviation added successfully.');
+        return redirect()->route('transactions.deviations.index')->with('success', __('Deviation added successfully.'));
     }
 
     public function update(Request $request, InternalMutation $deviation): RedirectResponse
@@ -120,7 +120,7 @@ class DeviationController extends Controller implements HasMiddleware
             $this->syncStock($deviation, $data);
         });
 
-        return redirect()->route('transactions.deviations.index')->with('success', 'Deviation updated successfully.');
+        return redirect()->route('transactions.deviations.index')->with('success', __('Deviation updated successfully.'));
     }
 
     public function destroy(InternalMutation $deviation): RedirectResponse
@@ -138,7 +138,7 @@ class DeviationController extends Controller implements HasMiddleware
             return back()->with('error', implode(' ', $e->shortages));
         }
 
-        return redirect()->route('transactions.deviations.index')->with('success', 'Deviation deleted successfully.');
+        return redirect()->route('transactions.deviations.index')->with('success', __('Deviation deleted successfully.'));
     }
 
     /**

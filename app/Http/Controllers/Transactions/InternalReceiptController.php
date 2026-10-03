@@ -92,7 +92,7 @@ class InternalReceiptController extends Controller implements HasMiddleware
             $this->syncStock($internalReceipt, $data);
         });
 
-        return redirect()->route('transactions.internal-receipts.index')->with('success', 'Internal receipt added successfully.');
+        return redirect()->route('transactions.internal-receipts.index')->with('success', __('Internal receipt added successfully.'));
     }
 
     public function update(Request $request, InternalMutation $internalReceipt): RedirectResponse
@@ -115,7 +115,7 @@ class InternalReceiptController extends Controller implements HasMiddleware
             $this->syncStock($internalReceipt, $data);
         });
 
-        return redirect()->route('transactions.internal-receipts.index')->with('success', 'Internal receipt updated successfully.');
+        return redirect()->route('transactions.internal-receipts.index')->with('success', __('Internal receipt updated successfully.'));
     }
 
     public function destroy(InternalMutation $internalReceipt): RedirectResponse
@@ -133,7 +133,7 @@ class InternalReceiptController extends Controller implements HasMiddleware
             return back()->with('error', implode(' ', $e->shortages));
         }
 
-        return redirect()->route('transactions.internal-receipts.index')->with('success', 'Internal receipt deleted successfully.');
+        return redirect()->route('transactions.internal-receipts.index')->with('success', __('Internal receipt deleted successfully.'));
     }
 
     /**

@@ -62,7 +62,7 @@ document.getElementById('addSalesReturnBtn')?.addEventListener('click', (e) => {
   salesReturnForm.reset();
   salesReturnForm.action = e.currentTarget.dataset.action;
   salesReturnFormMethod.innerHTML = '';
-  salesReturnModalTitle.textContent = 'Add Sales Return';
+  salesReturnModalTitle.textContent = __t('Add Sales Return');
   resetItemRows();
   addItemRow();
   openModal(salesReturnModal);
@@ -75,7 +75,7 @@ document.querySelectorAll('.edit-sales-return-btn').forEach((btn) => {
     salesReturnForm.reset();
     salesReturnForm.action = btn.dataset.action;
     salesReturnFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    salesReturnModalTitle.textContent = 'Edit Sales Return';
+    salesReturnModalTitle.textContent = __t('Edit Sales Return');
 
     returnNumberInput.value = btn.dataset.returnNumber || '';
     returnDateInput.value = btn.dataset.returnDate || '';

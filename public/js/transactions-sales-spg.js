@@ -85,7 +85,7 @@ document.getElementById('addSalesSpgBtn')?.addEventListener('click', (e) => {
   salesSpgForm.reset();
   salesSpgForm.action = e.currentTarget.dataset.action;
   salesSpgFormMethod.innerHTML = '';
-  salesSpgModalTitle.textContent = 'Add Transaction';
+  salesSpgModalTitle.textContent = __t('Add Transaction');
   resetItemRows();
   addItemRow();
   openModal(salesSpgModal);
@@ -98,7 +98,7 @@ document.querySelectorAll('.edit-sales-spg-btn').forEach((btn) => {
     salesSpgForm.reset();
     salesSpgForm.action = btn.dataset.action;
     salesSpgFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    salesSpgModalTitle.textContent = 'Edit Transaction';
+    salesSpgModalTitle.textContent = __t('Edit Transaction');
 
     invoiceNumberInput.value = btn.dataset.invoiceNumber || '';
     saleDateInput.value = btn.dataset.saleDate || '';

@@ -58,7 +58,7 @@ class UserController extends Controller
         // up as a role *name* instead and throws RoleDoesNotExist.
         $user->syncRoles($roles);
 
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        return redirect()->route('admin.users.index')->with('success', __('User created successfully.'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
@@ -103,17 +103,17 @@ class UserController extends Controller
             $user->syncRoles($roles->filter());
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users.index')->with('success', __('User updated successfully.'));
     }
 
     public function toggleActive(User $user): RedirectResponse
     {
         if ($user->id === Auth::id()) {
-            return back()->with('error', "You can't disable your own account.");
+            return back()->with('error', __("You can't disable your own account."));
         }
 
         if ($user->isSuperAdmin() && $user->is_active && $this->activeSuperAdminCount() <= 1) {
-            return back()->with('error', 'At least one active Super Admin must remain.');
+            return back()->with('error', __('At least one active Super Admin must remain.'));
         }
 
         $user->update(['is_active' => ! $user->is_active]);
@@ -124,16 +124,16 @@ class UserController extends Controller
     public function destroy(User $user): RedirectResponse
     {
         if ($user->id === Auth::id()) {
-            return back()->with('error', "You can't delete your own account.");
+            return back()->with('error', __("You can't delete your own account."));
         }
 
         if ($user->isSuperAdmin() && $this->activeSuperAdminCount() <= 1) {
-            return back()->with('error', 'At least one Super Admin must remain.');
+            return back()->with('error', __('At least one Super Admin must remain.'));
         }
 
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')->with('success', __('User deleted successfully.'));
     }
 
     protected function activeSuperAdminCount(): int

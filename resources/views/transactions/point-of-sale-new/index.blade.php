@@ -37,6 +37,8 @@
     .pos-error { color: var(--bad-600); font-size: .7rem; margin-top: .25rem; }
     .pos-link { margin-top: .35rem; font-size: .7rem; font-weight: 600; color: var(--brand-600); background: none; border: 0; padding: 0; cursor: pointer; }
     .pos-link:hover { color: var(--brand-700); }
+    /* display below would beat Tailwind's .hidden, so the badge was visible on every line */
+    .pos-badge-free.hidden { display: none; }
     .pos-badge-free { display: inline-block; margin-left: .4rem; padding: .05rem .5rem; border-radius: 999px; background: var(--good-100); color: var(--good-600); font-size: .65rem; font-weight: 700; vertical-align: middle; }
     .pos-flash { animation: pos-flash .7s ease; }
     @keyframes pos-flash { from { background: var(--brand-100); } to { background: transparent; } }

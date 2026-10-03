@@ -98,7 +98,7 @@ class ApPaymentController extends Controller implements HasMiddleware
             ApPayment::create($data);
         });
 
-        return redirect()->route('transactions.payable-payments.index')->with('success', 'Payable payment added successfully.');
+        return redirect()->route('transactions.payable-payments.index')->with('success', __('Payable payment added successfully.'));
     }
 
     public function update(Request $request, ApPayment $payablePayment): RedirectResponse
@@ -111,14 +111,14 @@ class ApPaymentController extends Controller implements HasMiddleware
             $payablePayment->update($data);
         });
 
-        return redirect()->route('transactions.payable-payments.index')->with('success', 'Payable payment updated successfully.');
+        return redirect()->route('transactions.payable-payments.index')->with('success', __('Payable payment updated successfully.'));
     }
 
     public function destroy(ApPayment $payablePayment): RedirectResponse
     {
         $payablePayment->delete();
 
-        return redirect()->route('transactions.payable-payments.index')->with('success', 'Payable payment deleted successfully.');
+        return redirect()->route('transactions.payable-payments.index')->with('success', __('Payable payment deleted successfully.'));
     }
 
     /**

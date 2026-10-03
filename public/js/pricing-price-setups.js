@@ -24,7 +24,7 @@ document.getElementById('addPriceSetupBtn')?.addEventListener('click', (e) => {
   priceSetupForm.reset();
   priceSetupForm.action = e.currentTarget.dataset.action;
   priceSetupFormMethod.innerHTML = '';
-  priceSetupModalTitle.textContent = 'Add Setup Harga';
+  priceSetupModalTitle.textContent = __t('Add Price Setup');
   openModal(priceSetupModal);
   priceSetupProductSelect?.focus();
 });
@@ -35,7 +35,7 @@ document.querySelectorAll('.edit-price-setup-btn').forEach((btn) => {
     priceSetupForm.reset();
     priceSetupForm.action = btn.dataset.action;
     priceSetupFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    priceSetupModalTitle.textContent = 'Edit Setup Harga';
+    priceSetupModalTitle.textContent = __t('Edit Price Setup');
 
     priceSetupProductSelect.value = btn.dataset.productId || '';
     priceSetupCategoryInput.value = btn.dataset.priceCategory || '';

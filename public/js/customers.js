@@ -24,7 +24,7 @@ document.getElementById('addCustomerBtn')?.addEventListener('click', (e) => {
   customerForm.reset();
   customerForm.action = e.currentTarget.dataset.action;
   customerFormMethod.innerHTML = '';
-  customerModalTitle.textContent = 'Add Customer';
+  customerModalTitle.textContent = __t('Add Customer');
   openModal(customerModal);
   codeInput?.focus();
 });
@@ -35,7 +35,7 @@ document.querySelectorAll('.edit-customer-btn').forEach((btn) => {
     customerForm.reset();
     customerForm.action = btn.dataset.action;
     customerFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    customerModalTitle.textContent = 'Edit Customer';
+    customerModalTitle.textContent = __t('Edit Customer');
 
     codeInput.value = btn.dataset.code || '';
     nameInput.value = btn.dataset.name || '';

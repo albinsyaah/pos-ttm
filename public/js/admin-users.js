@@ -35,7 +35,7 @@ document.getElementById('addUserBtn')?.addEventListener('click', (e) => {
   userForm.reset();
   userForm.action = e.currentTarget.dataset.action;
   userFormMethod.innerHTML = '';
-  userModalTitle.textContent = 'Add User';
+  userModalTitle.textContent = __t('Add User');
   intendedActionInput.value = e.currentTarget.dataset.action;
   intendedTitleInput.value = 'Add User';
   passwordInput.required = true;
@@ -54,7 +54,7 @@ document.querySelectorAll('.edit-user-btn').forEach((btn) => {
     userForm.reset();
     userForm.action = btn.dataset.action;
     userFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    userModalTitle.textContent = 'Edit User';
+    userModalTitle.textContent = __t('Edit User');
     intendedActionInput.value = btn.dataset.action;
     intendedTitleInput.value = 'Edit User';
 

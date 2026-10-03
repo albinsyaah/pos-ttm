@@ -13,7 +13,7 @@
 
         <div class="flex items-center gap-3 sm:gap-5 ml-auto">
 
-            <label class="relative hidden sm:block">
+            {{-- <label class="relative hidden sm:block">
                 <span class="sr-only">{{ __('app.layout.search_orders_products') }}</span>
                 <input
                     id="searchInput"
@@ -22,7 +22,7 @@
                     type="search"
                 />
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
-            </label>
+            </label> --}}
 
             {{-- <button id="newSaleBtn" class="hidden sm:flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
                 <i class="fa-solid fa-plus"></i> {{ __('app.layout.new_sale') }}

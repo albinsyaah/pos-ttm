@@ -64,7 +64,7 @@ document.getElementById('addInternalReceiptBtn')?.addEventListener('click', (e) 
   internalReceiptForm.reset();
   internalReceiptForm.action = e.currentTarget.dataset.action;
   internalReceiptFormMethod.innerHTML = '';
-  internalReceiptModalTitle.textContent = 'Add Internal Receipt';
+  internalReceiptModalTitle.textContent = __t('Add Internal Receipt');
   resetItemRows();
   addItemRow();
   openModal(internalReceiptModal);
@@ -77,7 +77,7 @@ document.querySelectorAll('.edit-internal-receipt-btn').forEach((btn) => {
     internalReceiptForm.reset();
     internalReceiptForm.action = btn.dataset.action;
     internalReceiptFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    internalReceiptModalTitle.textContent = 'Edit Internal Receipt';
+    internalReceiptModalTitle.textContent = __t('Edit Internal Receipt');
 
     mutationNumberInput.value = btn.dataset.mutationNumber || '';
     mutationDateInput.value = btn.dataset.mutationDate || '';

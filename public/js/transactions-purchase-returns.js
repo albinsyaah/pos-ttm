@@ -63,7 +63,7 @@ document.getElementById('addPurchaseReturnBtn')?.addEventListener('click', (e) =
   purchaseReturnForm.reset();
   purchaseReturnForm.action = e.currentTarget.dataset.action;
   purchaseReturnFormMethod.innerHTML = '';
-  purchaseReturnModalTitle.textContent = 'Add Purchase Return';
+  purchaseReturnModalTitle.textContent = __t('Add Purchase Return');
   resetItemRows();
   addItemRow();
   openModal(purchaseReturnModal);
@@ -76,7 +76,7 @@ document.querySelectorAll('.edit-purchase-return-btn').forEach((btn) => {
     purchaseReturnForm.reset();
     purchaseReturnForm.action = btn.dataset.action;
     purchaseReturnFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    purchaseReturnModalTitle.textContent = 'Edit Purchase Return';
+    purchaseReturnModalTitle.textContent = __t('Edit Purchase Return');
 
     returnNumberInput.value = btn.dataset.returnNumber || '';
     returnDateInput.value = btn.dataset.returnDate || '';

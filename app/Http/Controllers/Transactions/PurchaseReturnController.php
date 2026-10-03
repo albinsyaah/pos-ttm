@@ -74,7 +74,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
             $this->syncStock($purchaseReturn, $data);
         });
 
-        return redirect()->route('transactions.purchase-returns.index')->with('success', 'Purchase return added successfully.');
+        return redirect()->route('transactions.purchase-returns.index')->with('success', __('Purchase return added successfully.'));
     }
 
     public function update(Request $request, PurchaseReturn $purchaseReturn): RedirectResponse
@@ -95,7 +95,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
             $this->syncStock($purchaseReturn, $data);
         });
 
-        return redirect()->route('transactions.purchase-returns.index')->with('success', 'Purchase return updated successfully.');
+        return redirect()->route('transactions.purchase-returns.index')->with('success', __('Purchase return updated successfully.'));
     }
 
     public function destroy(PurchaseReturn $purchaseReturn): RedirectResponse
@@ -108,7 +108,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
             $purchaseReturn->delete();
         });
 
-        return redirect()->route('transactions.purchase-returns.index')->with('success', 'Purchase return deleted successfully.');
+        return redirect()->route('transactions.purchase-returns.index')->with('success', __('Purchase return deleted successfully.'));
     }
 
     protected function validatePurchaseReturn(Request $request, ?int $ignoreId = null): array

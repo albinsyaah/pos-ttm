@@ -91,7 +91,7 @@ class InternalExpenditureController extends Controller implements HasMiddleware
             $this->syncStock($internalExpenditure, $data);
         });
 
-        return redirect()->route('transactions.internal-expenditures.index')->with('success', 'Internal expenditure added successfully.');
+        return redirect()->route('transactions.internal-expenditures.index')->with('success', __('Internal expenditure added successfully.'));
     }
 
     public function update(Request $request, InternalMutation $internalExpenditure): RedirectResponse
@@ -114,7 +114,7 @@ class InternalExpenditureController extends Controller implements HasMiddleware
             $this->syncStock($internalExpenditure, $data);
         });
 
-        return redirect()->route('transactions.internal-expenditures.index')->with('success', 'Internal expenditure updated successfully.');
+        return redirect()->route('transactions.internal-expenditures.index')->with('success', __('Internal expenditure updated successfully.'));
     }
 
     public function destroy(InternalMutation $internalExpenditure): RedirectResponse
@@ -132,7 +132,7 @@ class InternalExpenditureController extends Controller implements HasMiddleware
             return back()->with('error', implode(' ', $e->shortages));
         }
 
-        return redirect()->route('transactions.internal-expenditures.index')->with('success', 'Internal expenditure deleted successfully.');
+        return redirect()->route('transactions.internal-expenditures.index')->with('success', __('Internal expenditure deleted successfully.'));
     }
 
     /**

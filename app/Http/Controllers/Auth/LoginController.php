@@ -27,7 +27,7 @@ class LoginController extends Controller
 
         if (! Auth::attempt($credentials, $remember)) {
             return back()
-                ->withErrors(['username' => 'Those credentials don\'t match our records.'])
+                ->withErrors(['username' => __("Those credentials don't match our records.")])
                 ->onlyInput('username');
         }
 
@@ -37,7 +37,7 @@ class LoginController extends Controller
             Auth::logout();
 
             return back()
-                ->withErrors(['username' => 'Your account has been disabled. Contact your administrator.'])
+                ->withErrors(['username' => __('Your account has been disabled. Contact your administrator.')])
                 ->onlyInput('username');
         }
 
@@ -51,7 +51,7 @@ class LoginController extends Controller
             Auth::logout();
 
             return back()
-                ->withErrors(['username' => 'Your role doesn\'t have access to any page yet. Contact your administrator.'])
+                ->withErrors(['username' => __("Your role doesn't have access to any page yet. Contact your administrator.")])
                 ->onlyInput('username');
         }
 

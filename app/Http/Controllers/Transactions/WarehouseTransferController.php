@@ -100,7 +100,7 @@ class WarehouseTransferController extends Controller implements HasMiddleware
             $this->syncStock($warehouseTransfer, $data);
         });
 
-        return redirect()->route('transactions.warehouse-transfers.index')->with('success', 'Warehouse transfer added successfully.');
+        return redirect()->route('transactions.warehouse-transfers.index')->with('success', __('Warehouse transfer added successfully.'));
     }
 
     public function update(Request $request, InternalMutation $warehouseTransfer): RedirectResponse
@@ -124,7 +124,7 @@ class WarehouseTransferController extends Controller implements HasMiddleware
             $this->syncStock($warehouseTransfer, $data);
         });
 
-        return redirect()->route('transactions.warehouse-transfers.index')->with('success', 'Warehouse transfer updated successfully.');
+        return redirect()->route('transactions.warehouse-transfers.index')->with('success', __('Warehouse transfer updated successfully.'));
     }
 
     public function destroy(InternalMutation $warehouseTransfer): RedirectResponse
@@ -142,7 +142,7 @@ class WarehouseTransferController extends Controller implements HasMiddleware
             return back()->with('error', implode(' ', $e->shortages));
         }
 
-        return redirect()->route('transactions.warehouse-transfers.index')->with('success', 'Warehouse transfer deleted successfully.');
+        return redirect()->route('transactions.warehouse-transfers.index')->with('success', __('Warehouse transfer deleted successfully.'));
     }
 
     /**

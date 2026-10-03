@@ -52,7 +52,7 @@ class GeneralLedgerController extends Controller implements HasMiddleware
 
         GeneralLedger::create($data);
 
-        return redirect()->route('finance.general-ledgers.index')->with('success', 'General ledger entry added successfully.');
+        return redirect()->route('finance.general-ledgers.index')->with('success', __('General ledger entry added successfully.'));
     }
 
     public function update(Request $request, GeneralLedger $generalLedger): RedirectResponse
@@ -61,14 +61,14 @@ class GeneralLedgerController extends Controller implements HasMiddleware
 
         $generalLedger->update($data);
 
-        return redirect()->route('finance.general-ledgers.index')->with('success', 'General ledger entry updated successfully.');
+        return redirect()->route('finance.general-ledgers.index')->with('success', __('General ledger entry updated successfully.'));
     }
 
     public function destroy(GeneralLedger $generalLedger): RedirectResponse
     {
         $generalLedger->delete();
 
-        return redirect()->route('finance.general-ledgers.index')->with('success', 'General ledger entry deleted successfully.');
+        return redirect()->route('finance.general-ledgers.index')->with('success', __('General ledger entry deleted successfully.'));
     }
 
     protected function validateLedger(Request $request): array

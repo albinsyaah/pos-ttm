@@ -57,7 +57,7 @@ class SalesmanController extends Controller implements HasMiddleware
 
         Employee::create($data);
 
-        return redirect()->route('hr.salesmen.index')->with('success', 'Salesman added successfully.');
+        return redirect()->route('hr.salesmen.index')->with('success', __('Salesman added successfully.'));
     }
 
     public function update(Request $request, Employee $salesman): RedirectResponse
@@ -67,18 +67,18 @@ class SalesmanController extends Controller implements HasMiddleware
 
         $salesman->update($data);
 
-        return redirect()->route('hr.salesmen.index')->with('success', 'Salesman updated successfully.');
+        return redirect()->route('hr.salesmen.index')->with('success', __('Salesman updated successfully.'));
     }
 
     public function destroy(Employee $salesman): RedirectResponse
     {
         if ($salesman->sales()->exists()) {
-            return back()->with('error', 'This salesman still has sales records and cannot be deleted.');
+            return back()->with('error', __('This salesman still has sales records and cannot be deleted.'));
         }
 
         $salesman->delete();
 
-        return redirect()->route('hr.salesmen.index')->with('success', 'Salesman deleted successfully.');
+        return redirect()->route('hr.salesmen.index')->with('success', __('Salesman deleted successfully.'));
     }
 
     protected function validateSalesman(Request $request, ?int $ignoreId = null): array

@@ -90,7 +90,7 @@ class SalesSpgController extends Controller implements HasMiddleware
             $this->syncSaleStock($sale, $data['items']);
         });
 
-        return redirect()->route('transactions.sales-spg.index')->with('success', 'Sales SPG transaction added successfully.');
+        return redirect()->route('transactions.sales-spg.index')->with('success', __('Sales SPG transaction added successfully.'));
     }
 
     public function update(Request $request, Sale $salesSpg): RedirectResponse
@@ -115,13 +115,13 @@ class SalesSpgController extends Controller implements HasMiddleware
             $this->syncSaleStock($salesSpg, $data['items']);
         });
 
-        return redirect()->route('transactions.sales-spg.index')->with('success', 'Sales SPG transaction updated successfully.');
+        return redirect()->route('transactions.sales-spg.index')->with('success', __('Sales SPG transaction updated successfully.'));
     }
 
     public function destroy(Sale $salesSpg): RedirectResponse
     {
         if ($salesSpg->salesReturns()->exists()) {
-            return back()->with('error', 'This transaction already has returns recorded and cannot be deleted.');
+            return back()->with('error', __('This transaction already has returns recorded and cannot be deleted.'));
         }
 
         DB::transaction(function () use ($salesSpg) {
@@ -132,7 +132,7 @@ class SalesSpgController extends Controller implements HasMiddleware
             $salesSpg->delete();
         });
 
-        return redirect()->route('transactions.sales-spg.index')->with('success', 'Sales SPG transaction deleted successfully.');
+        return redirect()->route('transactions.sales-spg.index')->with('success', __('Sales SPG transaction deleted successfully.'));
     }
 
     protected function validateSalesSpg(Request $request, ?int $ignoreId = null): array

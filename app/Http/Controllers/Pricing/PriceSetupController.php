@@ -58,7 +58,7 @@ class PriceSetupController extends Controller implements HasMiddleware
             PriceHistory::record(PriceHistory::CREATED, null, $created);
         });
 
-        return redirect()->route('pricing.price-setups.index')->with('success', 'Price setup added successfully.');
+        return redirect()->route('pricing.price-setups.index')->with('success', __('Price setup added successfully.'));
     }
 
     public function update(Request $request, PriceSetup $priceSetup): RedirectResponse
@@ -81,7 +81,7 @@ class PriceSetupController extends Controller implements HasMiddleware
             }
         });
 
-        return redirect()->route('pricing.price-setups.index')->with('success', 'Price setup updated successfully.');
+        return redirect()->route('pricing.price-setups.index')->with('success', __('Price setup updated successfully.'));
     }
 
     public function destroy(PriceSetup $priceSetup): RedirectResponse
@@ -92,7 +92,7 @@ class PriceSetupController extends Controller implements HasMiddleware
             PriceHistory::record(PriceHistory::DELETED, $before, null);
         });
 
-        return redirect()->route('pricing.price-setups.index')->with('success', 'Price setup deleted successfully.');
+        return redirect()->route('pricing.price-setups.index')->with('success', __('Price setup deleted successfully.'));
     }
 
     protected function validatePriceSetup(Request $request): array

@@ -23,7 +23,7 @@ document.getElementById('addPaymentMethodBtn')?.addEventListener('click', (e) =>
   paymentMethodForm.reset();
   paymentMethodForm.action = e.currentTarget.dataset.action;
   paymentMethodFormMethod.innerHTML = '';
-  paymentMethodModalTitle.textContent = 'Tambah Metode Pembayaran';
+  paymentMethodModalTitle.textContent = __t('Add Payment Method');
   methodIsCashInput.checked = false;
   methodIsActiveInput.checked = true;
   openModal(paymentMethodModal);
@@ -36,7 +36,7 @@ document.querySelectorAll('.edit-payment-method-btn').forEach((btn) => {
     paymentMethodForm.reset();
     paymentMethodForm.action = btn.dataset.action;
     paymentMethodFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    paymentMethodModalTitle.textContent = 'Ubah Metode Pembayaran';
+    paymentMethodModalTitle.textContent = __t('Edit Payment Method');
 
     methodNameInput.value = btn.dataset.name || '';
     methodIsCashInput.checked = btn.dataset.isCash === '1';
