@@ -62,7 +62,7 @@ class PurchaseOrderController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $purchaseOrder = PurchaseOrder::create([
-                'po_number' => $data['po_number'],
+                'po_number' => $data['po_number'] ?? null,
                 'order_date' => $data['order_date'],
                 'status' => $data['status'],
                 'supplier_id' => $data['supplier_id'],
@@ -80,7 +80,7 @@ class PurchaseOrderController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $purchaseOrder) {
             $purchaseOrder->update([
-                'po_number' => $data['po_number'],
+                'po_number' => $data['po_number'] ?? null,
                 'order_date' => $data['order_date'],
                 'status' => $data['status'],
                 'supplier_id' => $data['supplier_id'],
@@ -111,7 +111,7 @@ class PurchaseOrderController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'po_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('purchase_orders', 'po_number')->ignore($ignoreId),
             ],
             'order_date' => ['required', 'date'],

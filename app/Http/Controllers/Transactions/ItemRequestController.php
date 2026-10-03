@@ -74,7 +74,7 @@ class ItemRequestController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $itemRequest = InternalMutation::create([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -94,7 +94,7 @@ class ItemRequestController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $itemRequest) {
             $itemRequest->update([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -123,7 +123,7 @@ class ItemRequestController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'mutation_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('internal_mutations', 'mutation_number')->ignore($ignoreId),
             ],
             'mutation_date' => ['required', 'date'],

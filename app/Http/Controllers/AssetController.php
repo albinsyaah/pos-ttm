@@ -69,7 +69,7 @@ class AssetController extends Controller implements HasMiddleware
     {
         return $request->validate([
             'asset_code' => [
-                'required', 'string', 'max:50',
+                'nullable', 'string', 'max:50',
                 Rule::unique('assets', 'asset_code')->ignore($ignoreId),
             ],
             'name' => ['required', 'string', 'max:150'],

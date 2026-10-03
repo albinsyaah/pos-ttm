@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoNumber;
+use App\Services\NumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SalesOrder extends Model
 {
     use HasFactory;
+    use HasAutoNumber;
 
     protected $table = 'sales_orders';
 
@@ -29,5 +32,11 @@ class SalesOrder extends Model
     public function sales()
     {
         return $this->hasMany(Sale::class, 'sales_order_id');
+    }
+
+    /** Automatic number: see NumberingService. */
+    public function autoNumberConfig(): array
+    {
+        return ['column' => 'so_number', 'prefix' => NumberingService::TYPE_SALES_ORDER, 'date' => 'order_date'];
     }
 }

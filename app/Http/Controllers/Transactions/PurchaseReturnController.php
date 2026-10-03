@@ -61,7 +61,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $purchaseReturn = PurchaseReturn::create([
-                'return_number' => $data['return_number'],
+                'return_number' => $data['return_number'] ?? null,
                 'return_date' => $data['return_date'],
                 'total_amount' => $data['total_amount'],
                 'purchase_id' => $data['purchase_id'],
@@ -83,7 +83,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $purchaseReturn) {
             $purchaseReturn->update([
-                'return_number' => $data['return_number'],
+                'return_number' => $data['return_number'] ?? null,
                 'return_date' => $data['return_date'],
                 'total_amount' => $data['total_amount'],
                 'purchase_id' => $data['purchase_id'],
@@ -115,7 +115,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'return_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('purchase_returns', 'return_number')->ignore($ignoreId),
             ],
             'return_date' => ['required', 'date'],
@@ -180,7 +180,7 @@ class PurchaseReturnController extends Controller implements HasMiddleware
             (int) $data['warehouse_id'],
             $data['items'],
             'out',
-            $data['return_number'],
+            $purchaseReturn->return_number,
             $data['return_date']
         );
     }

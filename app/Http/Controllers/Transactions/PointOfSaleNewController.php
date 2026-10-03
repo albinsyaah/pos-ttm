@@ -134,7 +134,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'invoice_number' => ['required', 'string', 'max:100', 'unique:sales,invoice_number'],
+            'invoice_number' => ['nullable', 'string', 'max:100', 'unique:sales,invoice_number'],
             'sale_date' => ['required', 'date'],
             'payment_type' => ['nullable', Rule::in([Sale::PAYMENT_CASH, Sale::PAYMENT_CREDIT])],
             // How a paid-on-the-spot sale is settled (Tunai, Transfer, QRIS, ...). Credit sales have none yet.
@@ -176,7 +176,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
 
         $sale = DB::transaction(function () use ($data, $items, $totalAmount, $paymentType, $paymentMethodId) {
             $sale = Sale::create([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
                 'total_amount' => $totalAmount,
                 'source' => self::SOURCE,
@@ -203,7 +203,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
         // next transaction immediately, rather than bouncing to a list page.
         // The id lets the terminal offer a "print receipt" link for this sale.
         return redirect()->route(static::ROUTE.'.index')
-            ->with('success', "Transaction {$data['invoice_number']} completed successfully.")
+            ->with('success', "Transaction {$sale->invoice_number} completed successfully.")
             ->with('printed_sale_id', $sale->id);
     }
 

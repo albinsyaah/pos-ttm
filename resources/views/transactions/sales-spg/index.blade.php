@@ -117,8 +117,8 @@
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label for="invoice_number" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.sales_spg.invoice_number') }}</label>
-                        <input id="invoice_number" name="invoice_number" type="text" required maxlength="100"
-                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        <input id="invoice_number" name="invoice_number" type="text" readonly maxlength="100" placeholder="{{ __('app.auto_number') }}"
+                               class="cursor-not-allowed text-[var(--ink-400)] w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="sale_date" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.sales_spg.sale_date') }}</label>

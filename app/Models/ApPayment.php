@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoNumber;
+use App\Services\NumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ApPayment extends Model
 {
     use HasFactory;
+    use HasAutoNumber;
 
     protected $table = 'ap_payments';
 
@@ -33,5 +36,11 @@ class ApPayment extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
+
+    /** Automatic number: see NumberingService. */
+    public function autoNumberConfig(): array
+    {
+        return ['column' => 'payment_number', 'prefix' => NumberingService::TYPE_AP_PAYMENT, 'date' => 'payment_date'];
     }
 }

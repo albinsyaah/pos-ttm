@@ -114,8 +114,8 @@
                 <div class="space-y-4">
                     <div>
                         <label for="payment_number" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.receivable_payments.payment_number') }}</label>
-                        <input id="payment_number" name="payment_number" type="text" required maxlength="100"
-                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        <input id="payment_number" name="payment_number" type="text" readonly maxlength="100" placeholder="{{ __('app.auto_number') }}"
+                               class="cursor-not-allowed text-[var(--ink-400)] w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="payment_date" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.receivable_payments.payment_date') }}</label>

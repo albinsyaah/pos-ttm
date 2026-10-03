@@ -61,7 +61,7 @@ class SalesReturnController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $salesReturn = SalesReturn::create([
-                'return_number' => $data['return_number'],
+                'return_number' => $data['return_number'] ?? null,
                 'return_date' => $data['return_date'],
                 'total_amount' => $data['total_amount'],
                 'sale_id' => $data['sale_id'],
@@ -82,7 +82,7 @@ class SalesReturnController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $salesReturn) {
             $salesReturn->update([
-                'return_number' => $data['return_number'],
+                'return_number' => $data['return_number'] ?? null,
                 'return_date' => $data['return_date'],
                 'total_amount' => $data['total_amount'],
                 'sale_id' => $data['sale_id'],
@@ -119,7 +119,7 @@ class SalesReturnController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'return_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('sales_returns', 'return_number')->ignore($ignoreId),
             ],
             'return_date' => ['required', 'date'],
@@ -175,7 +175,7 @@ class SalesReturnController extends Controller implements HasMiddleware
             (int) $data['warehouse_id'],
             $data['items'],
             'in',
-            $data['return_number'],
+            $salesReturn->return_number,
             $data['return_date']
         );
     }

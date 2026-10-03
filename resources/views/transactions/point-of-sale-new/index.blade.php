@@ -181,7 +181,7 @@
             <div class="pos-stack">
                 <div>
                     <label for="invoice_number" class="pos-label">{{ __('app.point_of_sale_new.invoice_number') }}</label>
-                    <input id="invoice_number" name="invoice_number" type="text" required maxlength="100" value="{{ old('invoice_number') }}" class="pos-field" />
+                    <input id="invoice_number" name="invoice_number" type="text" readonly maxlength="100" placeholder="{{ __('app.auto_number') }}" value="" class="cursor-not-allowed text-[var(--ink-400)] pos-field" />
                 </div>
                 <div>
                     <label for="sale_date" class="pos-label">{{ __('app.point_of_sale_new.sale_date') }}</label>

@@ -62,7 +62,7 @@ class SalesOrderController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $salesOrder = SalesOrder::create([
-                'so_number' => $data['so_number'],
+                'so_number' => $data['so_number'] ?? null,
                 'order_date' => $data['order_date'],
                 'status' => $data['status'],
                 'customer_id' => $data['customer_id'],
@@ -80,7 +80,7 @@ class SalesOrderController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $salesOrder) {
             $salesOrder->update([
-                'so_number' => $data['so_number'],
+                'so_number' => $data['so_number'] ?? null,
                 'order_date' => $data['order_date'],
                 'status' => $data['status'],
                 'customer_id' => $data['customer_id'],
@@ -111,7 +111,7 @@ class SalesOrderController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'so_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('sales_orders', 'so_number')->ignore($ignoreId),
             ],
             'order_date' => ['required', 'date'],

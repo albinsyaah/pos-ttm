@@ -82,7 +82,7 @@ class ArPaymentController extends Controller implements HasMiddleware
     {
         return $request->validate([
             'payment_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('ar_payments', 'payment_number')->ignore($ignoreId),
             ],
             'amount' => ['required', 'numeric', 'min:0', 'max:9999999999999.99'],

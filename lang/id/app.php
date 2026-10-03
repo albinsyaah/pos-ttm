@@ -7,6 +7,9 @@ return [
     'lang_en' => 'Inggris',
     'lang_id' => 'Indonesia',
 
+    // Automatic numbers and codes (fields the system fills in)
+    'auto_number' => 'Otomatis saat disimpan',
+
     // Common / shared UI
     'common' => [
         'actions' => 'Aksi',

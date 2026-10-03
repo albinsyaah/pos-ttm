@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoNumber;
+use App\Services\NumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -9,6 +11,7 @@ use Illuminate\Support\Carbon;
 class Purchase extends Model
 {
     use HasFactory;
+    use HasAutoNumber;
 
     /** Days a supplier invoice may stay unpaid. */
     public const PAYMENT_TERM_DAYS = 30;
@@ -77,5 +80,11 @@ class Purchase extends Model
     public function purchaseReturns()
     {
         return $this->hasMany(PurchaseReturn::class, 'purchase_id');
+    }
+
+    /** Automatic number: see NumberingService. */
+    public function autoNumberConfig(): array
+    {
+        return ['column' => 'invoice_number', 'prefix' => NumberingService::TYPE_PURCHASE, 'date' => 'purchase_date'];
     }
 }

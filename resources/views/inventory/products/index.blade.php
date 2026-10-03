@@ -130,8 +130,8 @@
                 <div class="space-y-4">
                     <div>
                         <label for="code" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.code') }}</label>
-                        <input id="code" name="code" type="text" required maxlength="50"
-                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        <input id="code" name="code" type="text" readonly maxlength="50" placeholder="{{ __('app.auto_number') }}"
+                               class="cursor-not-allowed text-[var(--ink-400)] w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.name') }}</label>

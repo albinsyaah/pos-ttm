@@ -82,7 +82,7 @@ class DeviationController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $deviation = InternalMutation::create([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -106,7 +106,7 @@ class DeviationController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $deviation) {
             $deviation->update([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -155,7 +155,7 @@ class DeviationController extends Controller implements HasMiddleware
             $deviation,
             $counts ? (int) $data['warehouse_id'] : null,
             $counts ? $data['items'] : [],
-            $data['mutation_number'],
+            $deviation->mutation_number,
             $data['mutation_date']
         );
     }
@@ -164,7 +164,7 @@ class DeviationController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'mutation_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('internal_mutations', 'mutation_number')->ignore($ignoreId),
             ],
             'mutation_date' => ['required', 'date'],

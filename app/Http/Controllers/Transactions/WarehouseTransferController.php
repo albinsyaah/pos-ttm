@@ -84,7 +84,7 @@ class WarehouseTransferController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $warehouseTransfer = InternalMutation::create([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -109,7 +109,7 @@ class WarehouseTransferController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $warehouseTransfer) {
             $warehouseTransfer->update([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -159,7 +159,7 @@ class WarehouseTransferController extends Controller implements HasMiddleware
             $counts ? (int) $data['from_warehouse_id'] : null,
             $counts ? (int) $data['to_warehouse_id'] : null,
             $counts ? $data['items'] : [],
-            $data['mutation_number'],
+            $warehouseTransfer->mutation_number,
             $data['mutation_date']
         );
     }
@@ -168,7 +168,7 @@ class WarehouseTransferController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'mutation_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('internal_mutations', 'mutation_number')->ignore($ignoreId),
             ],
             'mutation_date' => ['required', 'date'],

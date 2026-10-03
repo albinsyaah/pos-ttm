@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoNumber;
+use App\Services\NumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -9,6 +11,7 @@ use Illuminate\Support\Str;
 class Sale extends Model
 {
     use HasFactory;
+    use HasAutoNumber;
 
     protected $table = 'sales';
 
@@ -87,5 +90,11 @@ class Sale extends Model
     public function salesReturns()
     {
         return $this->hasMany(SalesReturn::class, 'sale_id');
+    }
+
+    /** Automatic number: see NumberingService. */
+    public function autoNumberConfig(): array
+    {
+        return ['column' => 'invoice_number', 'prefix' => NumberingService::TYPE_SALE, 'date' => 'sale_date'];
     }
 }

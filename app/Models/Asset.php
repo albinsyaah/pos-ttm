@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Asset extends Model
 {
     use HasFactory;
+    use HasAutoNumber;
 
     protected $table = 'assets';
 
@@ -18,4 +20,9 @@ class Asset extends Model
         'value'
     ];
 
+    /** Automatic code: see NumberingService. */
+    public function autoNumberConfig(): array
+    {
+        return ['column' => 'asset_code', 'series' => 'asset', 'width' => 4];
+    }
 }

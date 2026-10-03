@@ -153,7 +153,7 @@ class ApPaymentController extends Controller implements HasMiddleware
 
         $data = $request->validate([
             'payment_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('ap_payments', 'payment_number')->ignore($payment?->id),
             ],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:9999999999999.99'],

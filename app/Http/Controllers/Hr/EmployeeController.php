@@ -80,7 +80,7 @@ class EmployeeController extends Controller implements HasMiddleware
     {
         return $request->validate([
             'code' => [
-                'required', 'string', 'max:50',
+                'nullable', 'string', 'max:50',
                 Rule::unique('employees', 'code')->ignore($ignoreId),
             ],
             'name' => ['required', 'string', 'max:150'],

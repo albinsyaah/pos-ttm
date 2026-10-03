@@ -80,7 +80,7 @@ class PurchaseController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $purchase = Purchase::create([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'purchase_date' => $data['purchase_date'],
                 'total_amount' => $data['total_amount'],
                 'status' => $data['status'],
@@ -105,7 +105,7 @@ class PurchaseController extends Controller implements HasMiddleware
             $this->assertPaymentsStillFit($purchase, $data);
 
             $purchase->update([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'purchase_date' => $data['purchase_date'],
                 'total_amount' => $data['total_amount'],
                 'status' => $data['status'],
@@ -191,7 +191,7 @@ class PurchaseController extends Controller implements HasMiddleware
             $counts ? (int) $data['warehouse_id'] : null,
             $counts ? $data['items'] : [],
             'in',
-            $data['invoice_number'],
+            $purchase->invoice_number,
             $data['purchase_date']
         );
     }
@@ -200,7 +200,7 @@ class PurchaseController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'invoice_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('purchases', 'invoice_number')->ignore($ignoreId),
             ],
             'purchase_date' => ['required', 'date'],

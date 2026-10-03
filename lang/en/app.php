@@ -7,6 +7,9 @@ return [
     'lang_en' => 'English',
     'lang_id' => 'Indonesian',
 
+    // Automatic numbers and codes (fields the system fills in)
+    'auto_number' => 'Generated automatically on save',
+
     // Common / shared UI
     'common' => [
         'actions' => 'Actions',

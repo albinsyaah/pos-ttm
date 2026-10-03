@@ -112,7 +112,7 @@ class ProductController extends Controller implements HasMiddleware
     {
         $validator = validator($request->all(), [
             'code' => [
-                'required', 'string', 'max:50',
+                'nullable', 'string', 'max:50',
                 Rule::unique('products', 'code')->ignore($ignoreId),
             ],
             'name' => ['required', 'string', 'max:150'],

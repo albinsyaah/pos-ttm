@@ -73,7 +73,7 @@ class SaleController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $sale = Sale::create([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
                 'total_amount' => $data['total_amount'],
                 'source' => self::SOURCE,
@@ -100,7 +100,7 @@ class SaleController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $sale) {
             $sale->update([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
                 'total_amount' => $data['total_amount'],
                 'sales_order_id' => $data['sales_order_id'],
@@ -142,7 +142,7 @@ class SaleController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'invoice_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('sales', 'invoice_number')->ignore($ignoreId),
             ],
             'sale_date' => ['required', 'date'],
