@@ -85,7 +85,7 @@ function posTestSearch(Warehouse $warehouse, string $q)
 
 // ---- Product search --------------------------------------------------------------------
 
-it('finds products by name and reports stock of the chosen warehouse only', function () {
+it('finds products by name and reports the stock of all warehouses together', function () {
     posTestLogin();
     $urea = posTestProduct('P-001', 'Pupuk Urea 50kg');
     posTestProduct('P-002', 'Pestisida Cair');
@@ -99,9 +99,10 @@ it('finds products by name and reports stock of the chosen warehouse only', func
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $urea->id)
         ->assertJsonPath('data.0.name', 'Pupuk Urea 50kg')
-        ->assertJsonPath('data.0.stock', 12);
+        ->assertJsonPath('data.0.stock', 111);   // 12 + 99: the sale is served from whichever warehouse has it
 
-    posTestSearch($other, 'urea')->assertJsonPath('data.0.stock', 99);
+    // Which warehouse is named (if any) makes no difference any more.
+    posTestSearch($other, 'urea')->assertJsonPath('data.0.stock', 111);
 });
 
 it('matches part of a name and also the product code', function () {
@@ -162,13 +163,13 @@ it('returns nothing for an empty search and caps the number of matches', functio
     posTestSearch($w, 'pupuk')->assertJsonCount(20, 'data');
 });
 
-it('needs a warehouse to search', function () {
+it('searches without naming a warehouse', function () {
     posTestLogin();
-    posTestProduct('P-001', 'Pupuk');
+    $p = posTestProduct('P-001', 'Pupuk');
 
     $this->getJson(route('transactions.point-of-sale-new.products', ['q' => 'pupuk']))
-        ->assertStatus(422)
-        ->assertJsonValidationErrors('warehouse_id');
+        ->assertOk()
+        ->assertJsonPath('data.0.id', $p->id);
 });
 
 it('keeps the search behind the terminal permissions', function () {

@@ -120,7 +120,8 @@
                   data-text-no-invoice="{{ __('app.payable_payments.no_invoice_legacy') }}"
                   data-text-due="{{ __('app.payable_payments.due') }}"
                   data-text-outstanding="{{ __('app.payable_payments.outstanding') }}"
-                  data-text-failed="{{ __('app.payable_payments.invoices_failed') }}">
+                  data-text-failed="{{ __('app.payable_payments.invoices_failed') }}"
+                  data-text-over="{{ __('app.payable_payments.over_amount') }}">
                 @csrf
                 <div id="payablePaymentFormMethod"></div>
 
@@ -141,7 +142,8 @@
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                             <option value="">{{ __('app.common.select') }}</option>
                             @foreach($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}">{{ $supplier->code }} — {{ $supplier->name }}</option>
+                                @php($owed = $supplierTotals[$supplier->id] ?? 0)
+                                <option value="{{ $supplier->id }}">{{ $supplier->code }} — {{ $supplier->name }} — {{ $owed > 0 ? __('app.payable_payments.owes').' Rp'.number_format($owed, 2) : __('app.payable_payments.owes_none') }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -166,6 +168,21 @@
                         <label for="amount" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.payable_payments.amount') }}</label>
                         <input id="amount" name="amount" type="number" step="0.01" min="0.01" required
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                    </div>
+
+                    <div id="balancePanel" class="hidden rounded-xl bg-[var(--surface)] p-3 text-xs text-[var(--ink-700)] space-y-1.5">
+                        <div data-bal="invoice-block" class="space-y-1.5">
+                            <div class="flex items-center justify-between"><span>{{ __('app.payable_payments.invoice_left') }}</span><strong data-bal="total"></strong></div>
+                            <div class="flex items-center justify-between"><span>{{ __('app.payable_payments.paying_now') }}</span><span data-bal="pay"></span></div>
+                            <div class="flex items-center justify-between border-t border-gray-200 pt-1.5"><span>{{ __('app.payable_payments.invoice_left_after') }}</span><strong data-bal="after"></strong></div>
+                            <p data-bal="over" class="hidden text-[var(--bad-600)]"></p>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-gray-200 pt-1.5">
+                            <span>{{ __('app.payable_payments.supplier_total') }}</span><strong data-bal="supplier-total"></strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>{{ __('app.payable_payments.supplier_total_after') }}</span><strong data-bal="supplier-after"></strong>
+                        </div>
                     </div>
                 </div>
 
@@ -231,5 +248,6 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-triangle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    <script src="{{ asset('js/payment-balance.js') }}"></script>
     <script src="{{ asset('js/transactions-payable-payments.js') }}"></script>
 @endpush

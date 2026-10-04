@@ -16,6 +16,8 @@
     table { width: 100%; border-collapse: collapse; }
     th { background: #f1f3f8; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
     th, td { padding: 7px 8px; border-bottom: 1px solid #d9dde8; vertical-align: top; }
+    .sources { margin-top: 16px; page-break-inside: avoid; }
+    .sources h3 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: #555; }
     .sign { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12mm; margin-top: 22mm; text-align: center; page-break-inside: avoid; }
     .sign .space { height: 24mm; border-bottom: 1px solid #000; }
     .sign .who { margin-top: 4px; font-weight: 600; }
@@ -38,7 +40,8 @@
         <dl>
             <dt>{{ __('app.print.invoice') }}</dt><dd>{{ $sale->invoice_number }}</dd>
             <dt>{{ __('app.print.date') }}</dt><dd>{{ \Illuminate\Support\Carbon::parse($sale->sale_date)->format('d M Y') }}</dd>
-            <dt>{{ __('app.print.from_warehouse') }}</dt><dd>{{ $sale->warehouse?->name ?? '—' }}</dd>
+            <dt>{{ __('app.print.from_warehouse') }}</dt>
+            <dd>{{ $sale->warehouse?->name ?? (count($sources) > 0 ? collect($sources)->pluck('warehouse')->implode(', ') : '—') }}</dd>
             <dt>{{ __('app.print.driver') }}</dt>
             <dd>
                 @if(filled($sale->driver_name)){{ $sale->driver_name }}@else<span class="blank-line"></span>@endif
@@ -74,6 +77,33 @@
             @endforeach
         </tbody>
     </table>
+
+    {{-- A sale served from several warehouses: say which warehouse each item was taken from. --}}
+    @if($sale->warehouse_id === null && count($sources) > 0)
+        <div class="sources">
+            <h3>{{ __('app.print.taken_from_warehouses') }}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:34%">{{ __('app.print.warehouse') }}</th>
+                        <th>{{ __('app.print.product') }}</th>
+                        <th style="width:28%">{{ __('app.print.qty') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($sources as $group)
+                        @foreach($group['items'] as $i => $row)
+                            <tr>
+                                <td>@if($i === 0)<strong>{{ $group['warehouse'] }}</strong>@endif</td>
+                                <td>{{ $row['name'] }}</td>
+                                <td>{{ $row['qty'] }}</td>
+                            </tr>
+                        @endforeach
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
     <div class="sign">
         <div>

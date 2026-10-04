@@ -104,6 +104,20 @@ class PayableService
         return round((float) $this->openInvoices()->sum('outstanding'), 2);
     }
 
+    /**
+     * supplier_id => what is still owed to that supplier (open invoices only).
+     *
+     * @param  int|null  $excludePaymentId  leave this payment out (when it is being edited)
+     * @return array<int, float>
+     */
+    public function totalsBySupplier(?int $excludePaymentId = null): array
+    {
+        return $this->openInvoices(null, $excludePaymentId)
+            ->groupBy(fn (array $row) => $row['purchase']->supplier_id)
+            ->map(fn ($rows) => round((float) $rows->sum('outstanding'), 2))
+            ->all();
+    }
+
     /** Balance of one invoice, or 0 if it is not payable (pending or cancelled). */
     public function outstandingFor(int $purchaseId, ?int $excludePaymentId = null): float
     {

@@ -50,7 +50,7 @@
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ $sale->invoice_number }}</td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($sale->sale_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $sale->customer?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: __('app.common.all_warehouses') }}</td>
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $sale->total_amount, 2) }}</td>
                         <td class="text-right pr-5">

@@ -65,6 +65,7 @@
                                         data-payment-method-id="{{ $payment->payment_method_id }}"
                                         data-payment-method-name="{{ $payment->paymentMethod?->name }}"
                                         data-amount="{{ $payment->amount }}"
+                                        data-payment-id="{{ $payment->id }}"
                                     >
                                         <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
@@ -99,7 +100,7 @@
 
     {{-- Add / Edit modal --}}
     <div id="receivablePaymentModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="receivablePaymentModalTitle">
-        <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-md">
+        <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-lg max-h-[92vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-5">
                 <h3 id="receivablePaymentModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">{{ __('app.receivable_payments.add_receivable_payment') }}</h3>
                 <button type="button" class="icon-btn modal-close" aria-label="Close">
@@ -107,7 +108,10 @@
                 </button>
             </div>
 
-            <form id="receivablePaymentForm" method="POST" action="{{ route('transactions.receivable-payments.store') }}">
+            <form id="receivablePaymentForm" method="POST" action="{{ route('transactions.receivable-payments.store') }}"
+                  data-outstanding-url="{{ route('transactions.receivable-payments.outstanding') }}"
+                  data-text-over="{{ __('app.receivable_payments.over_amount') }}"
+                  data-text-failed="{{ __('app.receivable_payments.balance_failed') }}">
                 @csrf
                 <div id="receivablePaymentFormMethod"></div>
 
@@ -128,7 +132,8 @@
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                             <option value="">{{ __('app.common.select') }}</option>
                             @foreach($customers as $customer)
-                                <option value="{{ $customer->id }}">{{ $customer->code }} — {{ $customer->name }}</option>
+                                @php($owed = $customerTotals[$customer->id] ?? 0)
+                                <option value="{{ $customer->id }}">{{ $customer->code }} — {{ $customer->name }} — {{ $owed > 0 ? __('app.receivable_payments.owes').' Rp'.number_format($owed, 2) : __('app.receivable_payments.owes_none') }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -145,6 +150,28 @@
                         <label for="amount" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.receivable_payments.amount') }}</label>
                         <input id="amount" name="amount" type="number" step="0.01" min="0" required
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                    </div>
+                    <div id="balancePanel" class="hidden rounded-xl bg-[var(--surface)] p-3 text-xs text-[var(--ink-700)] space-y-1.5">
+                        <div class="flex items-center justify-between"><span>{{ __('app.receivable_payments.total_owed') }}</span><strong data-bal="total"></strong></div>
+                        <div class="flex items-center justify-between"><span>{{ __('app.receivable_payments.paying_now') }}</span><span data-bal="pay"></span></div>
+                        <div class="flex items-center justify-between border-t border-gray-200 pt-1.5"><span>{{ __('app.receivable_payments.left_after') }}</span><strong data-bal="after"></strong></div>
+                        <p data-bal="over" class="hidden text-[var(--bad-600)]"></p>
+                        <div class="pt-1.5">
+                            <p class="text-[10px] uppercase tracking-wide text-[var(--ink-400)] mb-1">{{ __('app.receivable_payments.invoice_breakdown') }}</p>
+                            <div class="max-h-40 overflow-y-auto rounded-lg bg-white">
+                                <table class="w-full text-[11px]">
+                                    <thead>
+                                        <tr class="text-left text-[var(--ink-400)]">
+                                            <th class="py-1 px-2 font-medium">{{ __('app.receivable_payments.invoice') }}</th>
+                                            <th class="py-1 px-2 font-medium">{{ __('app.receivable_payments.invoice_date') }}</th>
+                                            <th class="py-1 px-2 font-medium text-right">{{ __('app.receivable_payments.invoice_left') }}</th>
+                                            <th class="py-1 px-2 font-medium text-right">{{ __('app.receivable_payments.invoice_after') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody data-bal="rows"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -210,5 +237,6 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-triangle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    <script src="{{ asset('js/payment-balance.js') }}"></script>
     <script src="{{ asset('js/transactions-receivable-payments.js') }}"></script>
 @endpush

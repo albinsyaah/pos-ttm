@@ -23,7 +23,6 @@
   const emptyMessage = document.getElementById('noItemsMessage');
   const grandTotalEl = document.getElementById('grandTotal');
   const cartCountEl = document.getElementById('cartCount');
-  const warehouseSelect = document.getElementById('warehouse_id');
   const searchInput = document.getElementById('productSearch');
   const resultsEl = document.getElementById('searchResults');
   const saleDateInput = document.getElementById('sale_date');
@@ -404,11 +403,6 @@
   }
 
   async function runSearch(term) {
-    if (!warehouseSelect.value) {
-      showStatus(t('choose_warehouse'));
-      return;
-    }
-
     cancelSearch();
     const controller = new AbortController();
     activeRequest = controller;
@@ -417,7 +411,6 @@
     try {
       const url = new URL(searchUrl, window.location.origin);
       url.searchParams.set('q', term);
-      url.searchParams.set('warehouse_id', warehouseSelect.value);
 
       const response = await fetch(url, {
         headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
@@ -467,31 +460,6 @@
 
   document.addEventListener('click', (event) => {
     if (!resultsEl.contains(event.target) && event.target !== searchInput) hideResults();
-  });
-
-  // ---- Warehouse ----------------------------------------------------------------
-
-  let currentWarehouse = warehouseSelect.value;
-
-  function syncSearchState() {
-    const ready = warehouseSelect.value !== '';
-    searchInput.disabled = !ready;
-    searchInput.placeholder = ready ? t('search_placeholder') : t('choose_warehouse');
-  }
-
-  warehouseSelect.addEventListener('change', () => {
-    // Stock in the cart belongs to the warehouse it was read from.
-    if (allRows().length > 0 && !window.confirm(t('confirm_clear_cart'))) {
-      warehouseSelect.value = currentWarehouse;
-      return;
-    }
-    cancelSearch();
-    hideResults();
-    searchInput.value = '';
-    clearCart();
-    currentWarehouse = warehouseSelect.value;
-    syncSearchState();
-    if (currentWarehouse !== '') searchInput.focus();
   });
 
   // ---- Sale date, payment type ----------------------------------------------------
@@ -552,7 +520,6 @@
     createRow(item, { qty: item.qty, price: item.price, free: item.price === 0 });
   });
 
-  syncSearchState();
   syncPayment();
   refreshCart();
 })();

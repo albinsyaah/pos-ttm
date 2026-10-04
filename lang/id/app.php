@@ -12,6 +12,7 @@ return [
 
     // Common / shared UI
     'common' => [
+        'all_warehouses' => 'Semua gudang',
         'actions' => 'Aksi',
         'code' => 'Kode',
         'name' => 'Nama',
@@ -138,7 +139,7 @@ return [
 
     // Login page
     'auth' => [
-        'sign_in_to_account' => 'Masuk ke akun POS Anda',
+        'sign_in_to_account' => 'Masuk ke akun PointDash Anda',
         'username' => 'Nama pengguna',
         'password' => 'Kata sandi',
         'enter_username' => 'Masukkan nama pengguna Anda',
@@ -840,6 +841,14 @@ return [
         'outstanding' => 'Sisa',
         'invoices_failed' => 'Faktur gagal dimuat. Coba lagi.',
         'amount_exceeds' => 'Jumlah melebihi sisa hutang faktur ini (:outstanding).',
+        'owes' => 'Hutang',
+        'owes_none' => 'Tidak ada hutang',
+        'invoice_left' => 'Sisa faktur ini',
+        'paying_now' => 'Dibayar sekarang',
+        'invoice_left_after' => 'Sisa faktur setelah bayar',
+        'over_amount' => 'Melebihi sisa faktur sebesar :amount.',
+        'supplier_total' => 'Total hutang ke supplier',
+        'supplier_total_after' => 'Total hutang ke supplier setelah bayar',
     ],
 
     // Transactions - Sales Orders
@@ -953,6 +962,7 @@ return [
         'search_label' => 'Cari produk',
         'search_placeholder' => 'Ketik nama produk untuk mencari…',
         'choose_warehouse' => 'Pilih gudang terlebih dahulu',
+        'stock_all_warehouses' => 'Stok yang tampil adalah total dari semua gudang. Barang diambil dari gudang yang memiliki stoknya.',
         'searching' => 'Mencari…',
         'no_results' => 'Produk tidak ditemukan',
         'search_failed' => 'Pencarian gagal. Silakan coba lagi.',
@@ -1033,6 +1043,18 @@ return [
         'method_giro' => 'Giro',
         'no_receivable_payments_found' => 'Tidak ada pembayaran piutang ditemukan.',
         'delete_receivable_payment' => 'Hapus pembayaran piutang?',
+        'owes' => 'Piutang',
+        'owes_none' => 'Tidak ada piutang',
+        'total_owed' => 'Total piutang pelanggan',
+        'paying_now' => 'Dibayar sekarang',
+        'left_after' => 'Sisa piutang setelah bayar',
+        'over_amount' => 'Melebihi total piutang sebesar :amount.',
+        'invoice_breakdown' => 'Rincian nota (dibayar mulai dari yang terlama)',
+        'invoice' => 'Nota',
+        'invoice_date' => 'Tanggal',
+        'invoice_left' => 'Sisa',
+        'invoice_after' => 'Setelah bayar',
+        'balance_failed' => 'Total piutang gagal dimuat. Coba lagi.',
     ],
 
     // Transaksi - Manajemen Kas
@@ -1255,6 +1277,8 @@ return [
         'free' => 'Gratis',
         'scan_for_digital' => 'Pindai untuk nota digital',
         'from_warehouse' => 'Dari gudang',
+        'taken_from_warehouses' => 'Pengambilan barang per gudang',
+        'warehouse' => 'Gudang',
         'deliver_to' => 'Dikirim ke',
         'driver' => 'Nama supir',
         'driver_optional' => 'Nama supir (opsional)',

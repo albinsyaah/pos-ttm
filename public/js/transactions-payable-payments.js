@@ -11,6 +11,7 @@ const paymentMethodInput = document.getElementById('payment_method');
 const amountInput = document.getElementById('amount');
 const purchaseSelect = document.getElementById('purchase_id');
 const invoiceHint = document.getElementById('invoiceHint');
+const balancePanel = document.getElementById('balancePanel');
 
 const money = (n) => Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -27,6 +28,7 @@ function resetInvoiceSelect(message) {
   invoiceHint.textContent = '';
   amountInput.removeAttribute('max');
   openInvoices = [];
+  PaymentBalance.hide(balancePanel);
 }
 
 function showInvoiceHint() {
@@ -34,11 +36,40 @@ function showInvoiceHint() {
   if (!invoice) {
     invoiceHint.textContent = '';
     amountInput.removeAttribute('max');
+    showBalance();
     return;
   }
   const t = payablePaymentForm.dataset;
   invoiceHint.textContent = `${t.textDue} ${invoice.due_date} · ${t.textOutstanding} ${money(invoice.outstanding)}`;
   amountInput.max = invoice.outstanding;
+  showBalance();
+}
+
+/**
+ * What is owed and what this payment takes off. The invoice block follows the
+ * chosen invoice; the supplier block is the sum of the supplier's open invoices
+ * (as listed by the server, which leaves out the payment being edited).
+ */
+function showBalance() {
+  if (!paymentSupplierIdInput.value || !balancePanel) {
+    PaymentBalance.hide(balancePanel);
+    return;
+  }
+
+  const pay = Number(amountInput.value) || 0;
+  const invoice = openInvoices.find((i) => String(i.id) === purchaseSelect.value);
+  const part = (name) => balancePanel.querySelector(`[data-bal="${name}"]`);
+
+  PaymentBalance.render(balancePanel, {
+    total: invoice ? invoice.outstanding : 0,
+    pay,
+    texts: { over: payablePaymentForm.dataset.textOver },
+  });
+  part('invoice-block').classList.toggle('hidden', !invoice);
+
+  const supplierTotal = openInvoices.reduce((sum, i) => sum + Number(i.outstanding), 0);
+  part('supplier-total').textContent = PaymentBalance.money(supplierTotal);
+  part('supplier-after').textContent = PaymentBalance.money(PaymentBalance.summarize(supplierTotal, pay).after);
 }
 
 /**
@@ -87,6 +118,7 @@ async function loadInvoices(supplierId, { paymentId = '', selectedId = '', legac
 }
 
 paymentSupplierIdInput?.addEventListener('change', () => loadInvoices(paymentSupplierIdInput.value));
+amountInput?.addEventListener('input', showBalance);
 
 purchaseSelect?.addEventListener('change', () => {
   showInvoiceHint();
@@ -95,6 +127,7 @@ purchaseSelect?.addEventListener('change', () => {
   if (invoice && (amountInput.value === '' || Number(amountInput.value) > invoice.outstanding)) {
     amountInput.value = invoice.outstanding;
   }
+  showBalance();
 });
 
 function openModal(modal) {

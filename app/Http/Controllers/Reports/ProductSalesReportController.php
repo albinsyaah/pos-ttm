@@ -30,7 +30,8 @@ class ProductSalesReportController extends Controller
             ->join('sales', 'sales.id', '=', 'sale_details.sale_id')
             ->join('products', 'products.id', '=', 'sale_details.product_id')
             ->leftJoinSub(SalesInsightService::returnedPerPaidLine(), 'rl', 'rl.line_id', '=', 'sale_details.id')
-            ->when($warehouseId, fn ($q) => $q->where('sales.warehouse_id', $warehouseId))
+            // Cashier-terminal sales have no warehouse of their own: match the product's own ledger rows.
+            ->when($warehouseId, fn ($q) => $q->fromWarehouseOfLine($warehouseId))
             ->when($dateFrom, fn ($q) => $q->whereDate('sales.sale_date', '>=', $dateFrom))
             ->when($dateTo, fn ($q) => $q->whereDate('sales.sale_date', '<=', $dateTo))
             ->when($search !== '', function ($q) use ($search) {

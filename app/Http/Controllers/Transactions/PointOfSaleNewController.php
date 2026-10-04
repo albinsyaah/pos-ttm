@@ -9,7 +9,6 @@ use App\Models\Employee;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\Sale;
-use App\Models\Warehouse;
 use App\Services\PriceService;
 use App\Services\StockService;
 use Illuminate\Http\JsonResponse;
@@ -67,39 +66,32 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
      */
     public function index(PriceService $prices, StockService $stock)
     {
-        $warehouseId = old('warehouse_id');
         $paymentMethods = PaymentMethod::active()->orderBy('id')->get();
 
         return view('transactions.point-of-sale-new.index', [
             'terminalMode' => static::MODE,
             'routePrefix' => static::ROUTE,
             'customers' => Customer::orderBy('name')->get(),
-            'warehouses' => Warehouse::orderBy('name')->get(),
             'salesmen' => Employee::orderBy('name')->get(),
             'paymentMethods' => $paymentMethods,
             // Preselect what the cashier chose before a refused submission, else Tunai.
             'selectedMethodId' => (int) (old('payment_method_id') ?: ($paymentMethods->firstWhere('is_cash', true)?->id ?? 0)),
-            'cartSeed' => $this->cartSeed(
-                (array) old('items', []),
-                $warehouseId ? (int) $warehouseId : null,
-                $prices,
-                $stock,
-            ),
+            'cartSeed' => $this->cartSeed((array) old('items', []), $prices, $stock),
         ]);
     }
 
     /**
      * Live product search for the cashier (JSON).
      *
-     * Matches on product name (and code), and reports, for the chosen
-     * warehouse, the stock on hand plus the dated Retail prices so the page
-     * can pick the reference price (harga patokan) for the sale date.
+     * Matches on product name (and code), and reports the stock on hand in all
+     * warehouses together (the sale is served from whichever warehouses have it)
+     * plus the dated Retail prices so the page can pick the reference price
+     * (harga patokan) for the sale date.
      */
     public function products(Request $request, PriceService $prices, StockService $stock): JsonResponse
     {
         $data = $request->validate([
             'q' => ['nullable', 'string', 'max:100'],
-            'warehouse_id' => ['required', 'exists:warehouses,id'],
         ]);
 
         $term = trim((string) ($data['q'] ?? ''));
@@ -117,7 +109,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             ->get();
 
         $ids = $products->pluck('id');
-        $stocks = $stock->availableMany($ids, (int) $data['warehouse_id']);
+        $stocks = $stock->totalAvailableMany($ids);
         $book = $prices->priceBook($ids);
 
         return response()->json([
@@ -145,7 +137,6 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             // A credit sale becomes a receivable, which only exists for a registered customer.
             'customer_id' => ['nullable', 'required_if:payment_type,'.Sale::PAYMENT_CREDIT, 'exists:customers,id'],
             'salesman_id' => ['nullable', 'exists:employees,id'],
-            'warehouse_id' => ['required', 'exists:warehouses,id'],
             // Printed on the delivery note (surat jalan).
             'driver_name' => ['nullable', 'string', 'max:100'],
             'items' => ['required', 'array', 'min:1'],
@@ -185,16 +176,18 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
                 'sales_order_id' => null,
                 'customer_id' => $data['customer_id'] ?? null,
                 'salesman_id' => $data['salesman_id'] ?? null,
-                'warehouse_id' => $data['warehouse_id'],
+                // No warehouse of its own: the stock is taken from whichever warehouses have it.
+                'warehouse_id' => null,
                 // Only the head cashier's terminal records a driver; the cashier's has no such field.
                 'driver_name' => static::MODE === 'head' && filled($data['driver_name'] ?? null) ? trim($data['driver_name']) : null,
             ]);
 
             $sale->saleDetails()->createMany($items);
 
-            // Take the items out of the chosen warehouse; refused (and rolled
-            // back) if a warehouse is short. Same product on two lines is added up.
-            $this->syncSaleStock($sale, $items);
+            // Take the items out of the warehouses that have them, most stock first; refused
+            // (and rolled back) if all warehouses together are short. Same product on two
+            // lines is added up.
+            $this->syncSaleStockFromAllWarehouses($sale, $items);
 
             return $sale;
         });
@@ -261,7 +254,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
      * @param  array<int, mixed>  $oldItems
      * @return array<int, array<string, mixed>>
      */
-    private function cartSeed(array $oldItems, ?int $warehouseId, PriceService $prices, StockService $stock): array
+    private function cartSeed(array $oldItems, PriceService $prices, StockService $stock): array
     {
         $rows = collect($oldItems)->filter(fn ($item) => is_array($item) && ! empty($item['product_id']));
         if ($rows->isEmpty()) {
@@ -270,7 +263,7 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
 
         $ids = $rows->pluck('product_id')->map(fn ($id) => (int) $id)->unique();
         $products = Product::whereIn('id', $ids)->get()->keyBy('id');
-        $stocks = $warehouseId ? $stock->availableMany($ids, $warehouseId) : [];
+        $stocks = $stock->totalAvailableMany($ids);
         $book = $prices->priceBook($ids);
 
         return $rows

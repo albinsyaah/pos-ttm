@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Print;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Warehouse;
+use App\Services\StockService;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Str;
@@ -54,10 +57,69 @@ class SalePrintController extends Controller implements HasMiddleware
 
     public function deliveryNote(Sale $sale)
     {
+        $sale = $this->load($sale);
+
         return view('prints.delivery-note', [
-            'sale' => $this->load($sale),
+            'sale' => $sale,
             'store' => config('store'),
+            'sources' => $this->warehouseSources($sale),
         ]);
+    }
+
+    /**
+     * Where the goods of a sale were taken from, per warehouse, for the delivery note:
+     * [['warehouse' => name, 'items' => [['name' => ..., 'qty' => ...], ...]], ...],
+     * warehouses and products in alphabetical order.
+     *
+     * A sale made on a cashier terminal has no warehouse of its own and may have been
+     * served from several, so this reads what the inventory ledger recorded for it. A sale
+     * that names its warehouse and has no ledger rows (older data) is listed under that
+     * warehouse with its lines.
+     *
+     * @return array<int, array{warehouse: string, items: array<int, array{name: string, qty: string}>}>
+     */
+    private function warehouseSources(Sale $sale): array
+    {
+        $moved = app(StockService::class)->movedBySource($sale);
+
+        if ($moved === [] && $sale->warehouse_id !== null) {
+            foreach ($sale->saleDetails as $detail) {
+                $moved[(int) $detail->product_id][(int) $sale->warehouse_id] = ($moved[(int) $detail->product_id][(int) $sale->warehouse_id] ?? 0) + (int) $detail->qty;
+            }
+        }
+
+        if ($moved === []) {
+            return [];
+        }
+
+        $perWarehouse = [];
+        foreach ($moved as $productId => $byWarehouse) {
+            foreach ($byWarehouse as $warehouseId => $qty) {
+                $perWarehouse[$warehouseId][$productId] = $qty;
+            }
+        }
+
+        $warehouses = Warehouse::whereIn('id', array_keys($perWarehouse))->pluck('name', 'id');
+        $products = Product::whereIn('id', array_keys($moved))->get()->keyBy('id');
+
+        $groups = [];
+        foreach ($perWarehouse as $warehouseId => $items) {
+            $rows = [];
+            foreach ($items as $productId => $qty) {
+                $product = $products->get($productId);
+                $rows[] = [
+                    'name' => $product?->name ?? '#'.$productId,
+                    'qty' => $product ? $product->formatQuantity((int) $qty) : (string) $qty,
+                ];
+            }
+            usort($rows, fn ($a, $b) => strcasecmp($a['name'], $b['name']));
+
+            $groups[] = ['warehouse' => (string) ($warehouses[$warehouseId] ?? '#'.$warehouseId), 'items' => $rows];
+        }
+
+        usort($groups, fn ($a, $b) => strcasecmp($a['warehouse'], $b['warehouse']));
+
+        return $groups;
     }
 
     /**

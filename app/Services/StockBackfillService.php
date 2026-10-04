@@ -294,6 +294,12 @@ class StockBackfillService
         }
 
         foreach (Sale::with('saleDetails')->lazyById(200) as $sale) {
+            // A cashier-terminal sale has no warehouse of its own: its stock is always written
+            // when it is saved (from whichever warehouses had it), so there is nothing to rebuild.
+            if ($sale->warehouse_id === null) {
+                continue;
+            }
+
             $warehouse = (int) $sale->warehouse_id;
             $items = $this->positiveItems($sale->saleDetails);
 
@@ -317,6 +323,11 @@ class StockBackfillService
         }
 
         foreach (SalesReturn::with(['sale', 'salesReturnDetails'])->lazyById(200) as $return) {
+            // Same for returns of such a sale: they went back to the warehouses the goods came from.
+            if ($return->sale !== null && $return->sale->warehouse_id === null) {
+                continue;
+            }
+
             $warehouse = (int) ($return->sale->warehouse_id ?? 0);
             $items = $this->positiveItems($return->salesReturnDetails);
 

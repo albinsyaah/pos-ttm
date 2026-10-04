@@ -55,6 +55,8 @@ class ApPaymentController extends Controller implements HasMiddleware
             'payablePayments' => $payablePayments,
             'search' => $search,
             'suppliers' => Supplier::orderBy('name')->get(),
+            // supplier_id => what is still owed to the supplier, shown next to the name in the form.
+            'supplierTotals' => $this->payables->totalsBySupplier(),
             'paymentMethods' => PaymentMethod::active()->orderBy('id')->get(),
         ]);
     }

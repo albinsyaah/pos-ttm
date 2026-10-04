@@ -156,7 +156,7 @@
                         <td class="text-[var(--ink-400)]">
                             {{ \Illuminate\Support\Carbon::parse($sale->sale_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $sale->customer?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: __('app.common.all_warehouses') }}</td>
                         <td>
                             <span
                                 class="badge-neutral inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">

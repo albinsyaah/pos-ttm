@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
 /**
@@ -83,6 +84,50 @@ class StockService
             : InventoryLedger::whereIn('id', $latestRowIds)->pluck('balance', 'product_id');
 
         return $ids->mapWithKeys(fn ($id) => [$id => (int) ($balances[$id] ?? 0)])->all();
+    }
+
+    /**
+     * Current stock of several products across ALL warehouses, in one round trip:
+     * [product_id => total]. Products with no ledger rows are reported as 0.
+     *
+     * @param  iterable<int>  $productIds
+     * @return array<int, int>
+     */
+    public function totalAvailableMany(iterable $productIds): array
+    {
+        $ids = collect($productIds)->map(fn ($id) => (int) $id)->unique()->values();
+        if ($ids->isEmpty()) {
+            return [];
+        }
+
+        $totals = $this->balancesByWarehouse($ids->all())
+            ->map(fn (array $perWarehouse) => (int) array_sum($perWarehouse));
+
+        return $ids->mapWithKeys(fn ($id) => [$id => (int) ($totals[$id] ?? 0)])->all();
+    }
+
+    /**
+     * Stock per warehouse for some products: [product_id => [warehouse_id => balance]].
+     * Only warehouses that have ledger rows for the product are listed.
+     *
+     * @param  array<int, int>  $productIds
+     * @return Collection<int, array<int, int>>
+     */
+    private function balancesByWarehouse(array $productIds): Collection
+    {
+        $latestRowIds = InventoryLedger::whereIn('product_id', $productIds)
+            ->selectRaw('max(id) as last_id')
+            ->groupBy('product_id', 'warehouse_id')
+            ->pluck('last_id');
+
+        if ($latestRowIds->isEmpty()) {
+            return collect();
+        }
+
+        return InventoryLedger::whereIn('id', $latestRowIds)
+            ->get(['product_id', 'warehouse_id', 'balance'])
+            ->groupBy('product_id')
+            ->map(fn ($rows) => $rows->mapWithKeys(fn ($row) => [(int) $row->warehouse_id => (int) $row->balance])->all());
     }
 
     /**
@@ -225,6 +270,266 @@ class StockService
             InventoryLedger::TYPE_IN,
             InventoryLedger::TYPE_OUT
         );
+    }
+
+    /**
+     * Sale stock for a sale that has no warehouse of its own (the cashier
+     * terminals): the goods are taken from whichever warehouses have them.
+     *
+     * Same difference-only behaviour as sync(), but the warehouse of every
+     * unit is decided here, under the product locks, so two cashiers selling
+     * the last units at the same moment cannot both count on them:
+     *  - a warehouse the sale already took from keeps supplying it first, so
+     *    editing or re-saving does not shuffle stock around for nothing;
+     *  - the rest comes from the warehouse with the most stock, then the next
+     *    (ties: the lower warehouse id), which keeps one sale in few warehouses;
+     *  - when all warehouses together are short, nothing is written and the
+     *    refusal names the product with its total stock.
+     *
+     * Pass null to cancel the sale's stock effect (delete).
+     *
+     * @param  array<int, array{product_id: int|string, qty: int|string}>|null  $items
+     * @return Collection<int, InventoryLedger>
+     *
+     * @throws InsufficientStockException
+     */
+    public function syncFromAllWarehouses(
+        Model $source,
+        ?array $items,
+        string $referenceNumber,
+        CarbonInterface|string|null $date = null
+    ): Collection {
+        return DB::transaction(function () use ($source, $items, $referenceNumber, $date) {
+            $needs = $items === null || $items === [] ? [] : $this->aggregate($items);
+
+            $taken = []; // [product_id => [warehouse_id => qty this sale already takes]]
+            foreach ($this->netBySource($source) as $key => $net) {
+                [$productId, $warehouseId] = array_map('intval', explode(':', $key));
+                if ($net < 0) {
+                    $taken[$productId][$warehouseId] = -$net;
+                }
+            }
+
+            $productIds = array_values(array_unique(array_merge(array_keys($needs), array_keys($taken))));
+            if ($productIds === []) {
+                return collect();
+            }
+
+            // Lock before reading any balance: what is read below stays true until commit.
+            $this->lockProducts($productIds);
+
+            $balances = $this->balancesByWarehouse(array_keys($needs));
+
+            $desired = [];
+            $shortages = [];
+            foreach ($needs as $productId => $qty) {
+                $mine = $taken[$productId] ?? [];
+
+                // Stock this sale could use: what the warehouse holds plus what the sale already holds there.
+                $free = $balances[$productId] ?? [];
+                foreach ($mine as $warehouseId => $held) {
+                    $free[$warehouseId] = ($free[$warehouseId] ?? 0) + $held;
+                }
+
+                $plan = $this->spread($qty, $free, $mine);
+
+                if ($plan === null) {
+                    $shortages[] = $this->shortageMessage('insufficient_all', $productId, 0, max(0, (int) array_sum($free)), $qty);
+
+                    continue;
+                }
+
+                foreach ($plan as $warehouseId => $take) {
+                    $desired[$productId.':'.$warehouseId] = -$take;
+                }
+            }
+
+            if ($shortages !== []) {
+                throw InsufficientStockException::forShortages($shortages);
+            }
+
+            return $this->reconcile($source, $desired, $referenceNumber, $date, InventoryLedger::TYPE_IN, InventoryLedger::TYPE_OUT);
+        });
+    }
+
+    /**
+     * Sale return stock for a sale that has no warehouse of its own: the goods
+     * go back into the warehouses the sale took them from.
+     *
+     * For each product, a warehouse can take back what the sale took from it
+     * minus what other returns of the same sale already put back there. A
+     * warehouse this return already used keeps getting it first; the rest goes
+     * to the warehouse the sale took most from.
+     *
+     * Pass null to cancel the return's stock effect (delete).
+     *
+     * @param  array<int, array{product_id: int|string, qty: int|string}>|null  $items
+     * @return Collection<int, InventoryLedger>
+     *
+     * @throws ValidationException
+     */
+    public function syncReturnToSaleWarehouses(
+        Model $return,
+        Model $sale,
+        ?array $items,
+        string $referenceNumber,
+        CarbonInterface|string|null $date = null
+    ): Collection {
+        return DB::transaction(function () use ($return, $sale, $items, $referenceNumber, $date) {
+            $needs = $items === null || $items === [] ? [] : $this->aggregate($items);
+
+            $mine = []; // what this return has put back so far
+            foreach ($this->netBySource($return) as $key => $net) {
+                [$productId, $warehouseId] = array_map('intval', explode(':', $key));
+                if ($net > 0) {
+                    $mine[$productId][$warehouseId] = $net;
+                }
+            }
+
+            $productIds = array_values(array_unique(array_merge(array_keys($needs), array_keys($mine))));
+            if ($productIds === []) {
+                return collect();
+            }
+
+            $this->lockProducts($productIds);
+
+            // What the sale took from each warehouse (net of later edits of the sale).
+            $took = [];
+            foreach ($this->netBySource($sale) as $key => $net) {
+                [$productId, $warehouseId] = array_map('intval', explode(':', $key));
+                if ($net < 0) {
+                    $took[$productId][$warehouseId] = -$net;
+                }
+            }
+
+            // What the sale's other returns already put back.
+            $others = [];
+            $otherReturnIds = $return::query()
+                ->where($sale->getForeignKey(), $sale->getKey())
+                ->when($return->exists, fn ($q) => $q->where($return->getKeyName(), '!=', $return->getKey()))
+                ->pluck($return->getKeyName());
+            if ($otherReturnIds->isNotEmpty()) {
+                InventoryLedger::where('source_type', $return->getMorphClass())
+                    ->whereIn('source_id', $otherReturnIds)
+                    ->get(['product_id', 'warehouse_id', 'qty'])
+                    ->each(function ($row) use (&$others) {
+                        $others[(int) $row->product_id][(int) $row->warehouse_id] = ($others[(int) $row->product_id][(int) $row->warehouse_id] ?? 0) + (int) $row->qty;
+                    });
+            }
+
+            $desired = [];
+            foreach ($needs as $productId => $qty) {
+                $room = [];
+                foreach (($took[$productId] ?? []) as $warehouseId => $amount) {
+                    $room[$warehouseId] = max(0, $amount - ($others[$productId][$warehouseId] ?? 0));
+                }
+
+                $plan = $this->spread($qty, $room, $mine[$productId] ?? []);
+
+                if ($plan === null) {
+                    // More than the sale can take back (it was edited after the return was planned):
+                    // keep the goods rather than lose them, in the warehouse the sale took most from.
+                    $plan = $this->spread($qty, $room, $mine[$productId] ?? [], true) ?? $this->fallbackWarehouse($productId, $took, $qty);
+                }
+
+                foreach ($plan as $warehouseId => $put) {
+                    $desired[$productId.':'.$warehouseId] = $put;
+                }
+            }
+
+            return $this->reconcile($return, $desired, $referenceNumber, $date, InventoryLedger::TYPE_IN, InventoryLedger::TYPE_OUT);
+        });
+    }
+
+    /**
+     * Where each warehouse supplied a sale (or took a return) from, for one source:
+     * [product_id => [warehouse_id => qty]], read from the ledger.
+     *
+     * @return array<int, array<int, int>>
+     */
+    public function movedBySource(Model $source): array
+    {
+        $result = [];
+        foreach ($this->netBySource($source) as $key => $net) {
+            [$productId, $warehouseId] = array_map('intval', explode(':', $key));
+            $result[$productId][$warehouseId] = abs($net);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Split $qty over warehouses. Warehouses in $sticky go first (up to what
+     * they can give), then the ones with most room. Returns [warehouse_id => qty]
+     * or null when the warehouses together cannot cover $qty. With $forceRemainder
+     * the missing part is put on the warehouse with most room instead of failing.
+     *
+     * @param  array<int, int>  $room  warehouse_id => most it can give
+     * @param  array<int, int>  $sticky  warehouse_id => qty it gave before
+     * @return array<int, int>|null
+     */
+    private function spread(int $qty, array $room, array $sticky, bool $forceRemainder = false): ?array
+    {
+        $room = array_filter(array_map(fn ($r) => max(0, (int) $r), $room), fn ($r) => $r > 0);
+
+        $plan = [];
+        $left = $qty;
+
+        $firstChoice = array_keys(array_filter($sticky, fn ($amount) => $amount > 0));
+        usort($firstChoice, fn ($a, $b) => [$sticky[$b], $a] <=> [$sticky[$a], $b]);
+
+        foreach ($firstChoice as $warehouseId) {
+            if ($left <= 0 || ! isset($room[$warehouseId])) {
+                continue;
+            }
+            $take = min($left, $sticky[$warehouseId], $room[$warehouseId]);
+            if ($take > 0) {
+                $plan[$warehouseId] = $take;
+                $room[$warehouseId] -= $take;
+                $left -= $take;
+            }
+        }
+
+        $others = array_keys($room);
+        usort($others, fn ($a, $b) => [$room[$b], $a] <=> [$room[$a], $b]);
+
+        foreach ($others as $warehouseId) {
+            if ($left <= 0) {
+                break;
+            }
+            $take = min($left, $room[$warehouseId]);
+            if ($take > 0) {
+                $plan[$warehouseId] = ($plan[$warehouseId] ?? 0) + $take;
+                $left -= $take;
+            }
+        }
+
+        if ($left > 0) {
+            if (! $forceRemainder || $plan === []) {
+                return null;
+            }
+            $biggest = array_key_first($plan);
+            $plan[$biggest] += $left;
+        }
+
+        ksort($plan);
+
+        return $plan;
+    }
+
+    /** Last resort for a return: the warehouse the sale took most of this product from. */
+    private function fallbackWarehouse(int $productId, array $took, int $qty): array
+    {
+        $options = $took[$productId] ?? [];
+        if ($options === []) {
+            throw ValidationException::withMessages([
+                'items' => [__('stock.return_no_source', ['product' => Product::find($productId)?->name ?? '#'.$productId])],
+            ]);
+        }
+
+        arsort($options);
+
+        return [array_key_first($options) => $qty];
     }
 
     /**

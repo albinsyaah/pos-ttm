@@ -12,6 +12,7 @@ return [
 
     // Common / shared UI
     'common' => [
+        'all_warehouses' => 'All warehouses',
         'actions' => 'Actions',
         'code' => 'Code',
         'name' => 'Name',
@@ -138,7 +139,7 @@ return [
 
     // Login page
     'auth' => [
-        'sign_in_to_account' => 'Sign in to your POS account',
+        'sign_in_to_account' => 'Sign in to your PointDash account',
         'username' => 'Username',
         'password' => 'Password',
         'enter_username' => 'Enter your username',
@@ -841,6 +842,14 @@ return [
         'outstanding' => 'Outstanding',
         'invoices_failed' => 'Could not load invoices. Try again.',
         'amount_exceeds' => 'The amount is more than what is still owed on this invoice (:outstanding).',
+        'owes' => 'Owed',
+        'owes_none' => 'Nothing owed',
+        'invoice_left' => 'Left on this invoice',
+        'paying_now' => 'Paying now',
+        'invoice_left_after' => 'Invoice left after payment',
+        'over_amount' => 'More than what is left on the invoice, by :amount.',
+        'supplier_total' => 'Total owed to supplier',
+        'supplier_total_after' => 'Total owed to supplier after payment',
     ],
 
     // Transactions - Sales Orders
@@ -954,6 +963,7 @@ return [
         'search_label' => 'Search product',
         'search_placeholder' => 'Type a product name to search…',
         'choose_warehouse' => 'Choose a warehouse first',
+        'stock_all_warehouses' => 'Stock shown is the total of all warehouses. Goods are taken from whichever warehouses have them.',
         'searching' => 'Searching…',
         'no_results' => 'No product found',
         'search_failed' => 'Search failed. Please try again.',
@@ -1034,6 +1044,18 @@ return [
         'method_giro' => 'Giro',
         'no_receivable_payments_found' => 'No receivable payments found.',
         'delete_receivable_payment' => 'Delete receivable payment?',
+        'owes' => 'Owes',
+        'owes_none' => 'Nothing owed',
+        'total_owed' => 'Total owed by customer',
+        'paying_now' => 'Paying now',
+        'left_after' => 'Receivable left after payment',
+        'over_amount' => 'More than the total owed, by :amount.',
+        'invoice_breakdown' => 'Invoice breakdown (paid oldest first)',
+        'invoice' => 'Invoice',
+        'invoice_date' => 'Date',
+        'invoice_left' => 'Left',
+        'invoice_after' => 'After payment',
+        'balance_failed' => 'Could not load the amount owed. Try again.',
     ],
 
     // Transactions - Cash Management
@@ -1256,6 +1278,8 @@ return [
         'free' => 'Free',
         'scan_for_digital' => 'Scan for the digital receipt',
         'from_warehouse' => 'From warehouse',
+        'taken_from_warehouses' => 'Goods taken per warehouse',
+        'warehouse' => 'Warehouse',
         'deliver_to' => 'Deliver to',
         'driver' => 'Driver name',
         'driver_optional' => 'Driver name (optional)',

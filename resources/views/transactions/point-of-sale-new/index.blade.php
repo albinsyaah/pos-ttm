@@ -94,27 +94,18 @@
     <form id="posNewForm" method="POST" action="{{ route($routePrefix.'.store') }}" class="grid lg:grid-cols-3 gap-6 items-start">
         @csrf
 
-        {{-- Left: warehouse, product search and the cart --}}
+        {{-- Left: product search and the cart. Stock is read from all warehouses together. --}}
         <div class="lg:col-span-2 bg-white rounded-3xl p-6">
-            <div class="mb-5 sm:w-1/2">
-                <label for="warehouse_id" class="pos-label">{{ __('app.point_of_sale_new.warehouse') }}</label>
-                <select id="warehouse_id" name="warehouse_id" required class="pos-field">
-                    <option value="">{{ __('app.common.select') }}</option>
-                    @foreach($warehouses as $warehouse)
-                        <option value="{{ $warehouse->id }}" @selected(old('warehouse_id') == $warehouse->id)>{{ $warehouse->code }} — {{ $warehouse->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
             <div class="pos-search-wrap">
                 <i class="fa-solid fa-magnifying-glass pos-search-icon"></i>
-                <input id="productSearch" type="search" autocomplete="off" spellcheck="false" disabled
+                <input id="productSearch" type="search" autocomplete="off" spellcheck="false"
                        class="pos-search"
-                       placeholder="{{ __('app.point_of_sale_new.choose_warehouse') }}"
+                       placeholder="{{ __('app.point_of_sale_new.search_placeholder') }}"
                        aria-label="{{ __('app.point_of_sale_new.search_label') }}"
                        aria-controls="searchResults" />
             </div>
             <div id="searchResults" class="pos-results hidden" role="listbox" aria-label="{{ __('app.point_of_sale_new.search_label') }}"></div>
+            <p class="mt-1.5 text-[11px] text-[var(--ink-400)]">{{ __('app.point_of_sale_new.stock_all_warehouses') }}</p>
 
             <div class="mt-6">
                 <div class="flex items-center justify-between mb-2">
@@ -264,8 +255,8 @@
 @php
     // Built in plain PHP: @json() cannot compile a multi-line array that contains __().
     $labels = collect([
-        'search_placeholder', 'choose_warehouse', 'searching', 'no_results', 'search_failed', 'stock',
-        'out_of_stock', 'stock_short', 'duplicate_paid_row', 'duplicate_free_row', 'confirm_clear_cart',
+        'search_placeholder', 'searching', 'no_results', 'search_failed', 'stock',
+        'out_of_stock', 'stock_short', 'duplicate_paid_row', 'duplicate_free_row',
         'cart_empty_toast', 'fix_cart', 'processing', 'complete_transaction', 'reference_price',
         'price_changed', 'no_reference_price', 'lines', 'free',
     ])->mapWithKeys(fn ($key) => [$key => __('app.point_of_sale_new.'.$key)])->all();

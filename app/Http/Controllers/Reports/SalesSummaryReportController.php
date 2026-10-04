@@ -54,7 +54,7 @@ class SalesSummaryReportController extends Controller
                 });
             })
             ->when($customerId, fn ($q) => $q->where('customer_id', $customerId))
-            ->when($warehouseId, fn ($q) => $q->where('warehouse_id', $warehouseId))
+            ->when($warehouseId, fn ($q) => $q->fromWarehouse($warehouseId))
             ->when($source, fn ($q) => $q->where('source', $source))
             ->when($dateFrom, fn ($q) => $q->whereDate('sale_date', '>=', $dateFrom))
             ->when($dateTo, fn ($q) => $q->whereDate('sale_date', '<=', $dateTo))

@@ -38,4 +38,21 @@ trait SyncsSaleStock
             $sale->sale_date
         );
     }
+
+    /**
+     * Same, for the cashier terminals: the sale has no warehouse of its own and its
+     * stock is taken from whichever warehouses have it (see
+     * StockService::syncFromAllWarehouses). Pass null to put the stock back.
+     *
+     * @param  array<int, array{product_id: int|string, qty: int|string}>|null  $items
+     */
+    protected function syncSaleStockFromAllWarehouses(Sale $sale, ?array $items = null): void
+    {
+        app(StockService::class)->syncFromAllWarehouses(
+            $sale,
+            $items,
+            $sale->invoice_number,
+            $sale->sale_date
+        );
+    }
 }

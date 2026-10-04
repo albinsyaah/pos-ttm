@@ -97,4 +97,24 @@ class Sale extends Model
     {
         return ['column' => 'invoice_number', 'prefix' => NumberingService::TYPE_SALE, 'date' => 'sale_date'];
     }
+
+    /**
+     * Sales that took stock from a warehouse: those that name it, plus sales made on a
+     * cashier terminal (no warehouse of their own) whose goods came from it, as the
+     * inventory ledger records. $productId narrows that to sales that took this product there.
+     */
+    public function scopeFromWarehouse($query, $warehouseId, $productColumn = null)
+    {
+        return $query->where(function ($q) use ($warehouseId, $productColumn) {
+            $q->where($this->qualifyColumn('warehouse_id'), $warehouseId)
+                ->orWhereExists(function ($ledger) use ($warehouseId, $productColumn) {
+                    $ledger->selectRaw('1')
+                        ->from('inventory_ledgers')
+                        ->whereColumn('inventory_ledgers.source_id', $this->qualifyColumn('id'))
+                        ->where('inventory_ledgers.source_type', $this->getMorphClass())
+                        ->where('inventory_ledgers.warehouse_id', $warehouseId)
+                        ->when($productColumn, fn ($q) => $q->whereColumn('inventory_ledgers.product_id', $productColumn));
+                });
+        });
+    }
 }

@@ -174,7 +174,8 @@ class SalesReturnController extends Controller implements HasMiddleware
             $this->returnedOn($sale, $ignoreId)
         );
 
-        // Stock goes back into the warehouse the sale was taken from.
+        // Stock goes back into the warehouse the sale was taken from. A sale made on a cashier
+        // terminal has none of its own (null): its goods go back to the warehouses they came from.
         $data['warehouse_id'] = $sale->warehouse_id;
 
         return $data;
@@ -195,6 +196,18 @@ class SalesReturnController extends Controller implements HasMiddleware
 
     protected function syncStock(SalesReturn $salesReturn, array $data): void
     {
+        if ($data['warehouse_id'] === null) {
+            app(StockService::class)->syncReturnToSaleWarehouses(
+                $salesReturn,
+                Sale::findOrFail($data['sale_id']),
+                $data['items'],
+                $salesReturn->return_number,
+                $data['return_date']
+            );
+
+            return;
+        }
+
         app(StockService::class)->sync(
             $salesReturn,
             (int) $data['warehouse_id'],

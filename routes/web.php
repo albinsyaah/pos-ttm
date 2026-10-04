@@ -266,6 +266,9 @@ Route::middleware(['auth', 'active'])->group(function () {
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['sales-spg' => 'salesSpg']);
 
+        Route::get('receivable-payments/outstanding', [ArPaymentController::class, 'outstanding'])
+            ->name('receivable-payments.outstanding');
+
         Route::resource('receivable-payments', ArPaymentController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['receivable-payments' => 'receivablePayment']);
