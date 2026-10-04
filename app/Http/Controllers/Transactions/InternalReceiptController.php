@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Exceptions\InsufficientStockException;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\InternalMutation;
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -75,7 +77,7 @@ class InternalReceiptController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $internalReceipt = InternalMutation::create([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -84,9 +86,13 @@ class InternalReceiptController extends Controller implements HasMiddleware
             ]);
 
             $internalReceipt->internalMutationDetails()->createMany($data['items']);
+
+            // Only a "completed" internal receipt moves stock. Refused (and rolled back)
+            // if a warehouse is short.
+            $this->syncStock($internalReceipt, $data);
         });
 
-        return redirect()->route('transactions.internal-receipts.index')->with('success', 'Internal receipt added successfully.');
+        return redirect()->route('transactions.internal-receipts.index')->with('success', __('Internal receipt added successfully.'));
     }
 
     public function update(Request $request, InternalMutation $internalReceipt): RedirectResponse
@@ -95,7 +101,7 @@ class InternalReceiptController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $internalReceipt) {
             $internalReceipt->update([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -105,26 +111,54 @@ class InternalReceiptController extends Controller implements HasMiddleware
 
             $internalReceipt->internalMutationDetails()->delete();
             $internalReceipt->internalMutationDetails()->createMany($data['items']);
+
+            $this->syncStock($internalReceipt, $data);
         });
 
-        return redirect()->route('transactions.internal-receipts.index')->with('success', 'Internal receipt updated successfully.');
+        return redirect()->route('transactions.internal-receipts.index')->with('success', __('Internal receipt updated successfully.'));
     }
 
     public function destroy(InternalMutation $internalReceipt): RedirectResponse
     {
-        DB::transaction(function () use ($internalReceipt) {
-            $internalReceipt->internalMutationDetails()->delete();
-            $internalReceipt->delete();
-        });
+        try {
+            DB::transaction(function () use ($internalReceipt) {
+                // Undo whatever this internal receipt did to stock (refused if that stock
+                // has already been used).
+                app(StockService::class)->sync($internalReceipt, null, [], 'in', $internalReceipt->mutation_number);
 
-        return redirect()->route('transactions.internal-receipts.index')->with('success', 'Internal receipt deleted successfully.');
+                $internalReceipt->internalMutationDetails()->delete();
+                $internalReceipt->delete();
+            });
+        } catch (InsufficientStockException $e) {
+            return back()->with('error', implode(' ', $e->shortages));
+        }
+
+        return redirect()->route('transactions.internal-receipts.index')->with('success', __('Internal receipt deleted successfully.'));
+    }
+
+    /**
+     * Stock comes into the warehouse only while the receipt is "completed".
+     * Must be called inside the caller's DB::transaction().
+     */
+    protected function syncStock(InternalMutation $internalReceipt, array $data): void
+    {
+        $counts = $data['status'] === 'completed';
+
+        app(StockService::class)->sync(
+            $internalReceipt,
+            $counts ? (int) $data['to_warehouse_id'] : null,
+            $counts ? $data['items'] : [],
+            'in',
+            $internalReceipt->mutation_number,
+            $data['mutation_date']
+        );
     }
 
     protected function validateInternalReceipt(Request $request, ?int $ignoreId = null): array
     {
         $data = $request->validate([
             'mutation_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('internal_mutations', 'mutation_number')->ignore($ignoreId),
             ],
             'mutation_date' => ['required', 'date'],

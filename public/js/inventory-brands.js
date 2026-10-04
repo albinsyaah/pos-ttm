@@ -21,7 +21,7 @@ document.getElementById('addBrandBtn')?.addEventListener('click', (e) => {
   brandForm.reset();
   brandForm.action = e.currentTarget.dataset.action;
   brandFormMethod.innerHTML = '';
-  brandModalTitle.textContent = 'Add Merk';
+  brandModalTitle.textContent = __t('Add Brand');
   openModal(brandModal);
   brandNameInput?.focus();
 });
@@ -32,7 +32,7 @@ document.querySelectorAll('.edit-brand-btn').forEach((btn) => {
     brandForm.reset();
     brandForm.action = btn.dataset.action;
     brandFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    brandModalTitle.textContent = 'Edit Merk';
+    brandModalTitle.textContent = __t('Edit Brand');
 
     brandNameInput.value = btn.dataset.name || '';
 

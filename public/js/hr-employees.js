@@ -24,7 +24,7 @@ document.getElementById('addEmployeeBtn')?.addEventListener('click', (e) => {
   employeeForm.reset();
   employeeForm.action = e.currentTarget.dataset.action;
   employeeFormMethod.innerHTML = '';
-  employeeModalTitle.textContent = 'Add Employee';
+  employeeModalTitle.textContent = __t('Add Employee');
   openModal(employeeModal);
   codeInput?.focus();
 });
@@ -35,7 +35,7 @@ document.querySelectorAll('.edit-employee-btn').forEach((btn) => {
     employeeForm.reset();
     employeeForm.action = btn.dataset.action;
     employeeFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    employeeModalTitle.textContent = 'Edit Employee';
+    employeeModalTitle.textContent = __t('Edit Employee');
 
     codeInput.value = btn.dataset.code || '';
     nameInput.value = btn.dataset.name || '';

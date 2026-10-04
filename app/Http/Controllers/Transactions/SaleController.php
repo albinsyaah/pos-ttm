@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Http\Controllers\Concerns\SyncsSaleStock;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -18,6 +19,8 @@ use Illuminate\Validation\Rule;
 
 class SaleController extends Controller implements HasMiddleware
 {
+    use SyncsSaleStock;
+
     /**
      * The 'sales' page manages regular (non point-of-sale) invoiced sales.
      * Records created here are always tagged with this source, keeping them
@@ -70,7 +73,7 @@ class SaleController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $sale = Sale::create([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
                 'total_amount' => $data['total_amount'],
                 'source' => self::SOURCE,
@@ -78,12 +81,17 @@ class SaleController extends Controller implements HasMiddleware
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
                 'warehouse_id' => $data['warehouse_id'],
+                'driver_name' => $data['driver_name'],
             ]);
 
             $sale->saleDetails()->createMany($data['items']);
+
+            // Take the items out of the chosen warehouse; refused (and rolled
+            // back) if a warehouse is short. Same product on two lines is added up.
+            $this->syncSaleStock($sale, $data['items']);
         });
 
-        return redirect()->route('transactions.sales.index')->with('success', 'Sale added successfully.');
+        return redirect()->route('transactions.sales.index')->with('success', __('Sale added successfully.'));
     }
 
     public function update(Request $request, Sale $sale): RedirectResponse
@@ -91,42 +99,57 @@ class SaleController extends Controller implements HasMiddleware
         $data = $this->validateSale($request, $sale->id);
 
         DB::transaction(function () use ($data, $sale) {
+            // A sale that was given a discount (cashier terminal) keeps it: it is worked out again
+            // from the same percentage and amount against the edited lines.
+            $pricing = app(\App\Services\SaleDiscountService::class)->recalculateFor($sale, (float) $data['total_amount']);
+
             $sale->update([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
-                'total_amount' => $data['total_amount'],
+                'total_amount' => $pricing['total_amount'],
+                'discount_percent' => $pricing['discount_percent'],
+                'discount_amount' => $pricing['discount_amount'],
+                'discount_total' => $pricing['discount_total'],
                 'sales_order_id' => $data['sales_order_id'],
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
                 'warehouse_id' => $data['warehouse_id'],
+                'driver_name' => $data['driver_name'],
             ]);
 
             $sale->saleDetails()->delete();
             $sale->saleDetails()->createMany($data['items']);
+
+            // Writes only the difference from what this sale already took out
+            // of stock; refused (and rolled back) if a warehouse is short.
+            $this->syncSaleStock($sale, $data['items']);
         });
 
-        return redirect()->route('transactions.sales.index')->with('success', 'Sale updated successfully.');
+        return redirect()->route('transactions.sales.index')->with('success', __('Sale updated successfully.'));
     }
 
     public function destroy(Sale $sale): RedirectResponse
     {
         if ($sale->salesReturns()->exists()) {
-            return back()->with('error', 'This sale already has returns recorded and cannot be deleted.');
+            return back()->with('error', __('This sale already has returns recorded and cannot be deleted.'));
         }
 
         DB::transaction(function () use ($sale) {
+            // Put the stock this sale took out back into its warehouse.
+            $this->syncSaleStock($sale);
+
             $sale->saleDetails()->delete();
             $sale->delete();
         });
 
-        return redirect()->route('transactions.sales.index')->with('success', 'Sale deleted successfully.');
+        return redirect()->route('transactions.sales.index')->with('success', __('Sale deleted successfully.'));
     }
 
     protected function validateSale(Request $request, ?int $ignoreId = null): array
     {
         $data = $request->validate([
             'invoice_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('sales', 'invoice_number')->ignore($ignoreId),
             ],
             'sale_date' => ['required', 'date'],
@@ -134,6 +157,8 @@ class SaleController extends Controller implements HasMiddleware
             'customer_id' => ['required', 'exists:customers,id'],
             'salesman_id' => ['nullable', 'exists:employees,id'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
+            // Printed on the delivery note (surat jalan).
+            'driver_name' => ['nullable', 'string', 'max:100'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.qty' => ['required', 'integer', 'min:1'],
@@ -152,6 +177,7 @@ class SaleController extends Controller implements HasMiddleware
 
         $data['sales_order_id'] = $data['sales_order_id'] ?? null;
         $data['salesman_id'] = $data['salesman_id'] ?? null;
+        $data['driver_name'] = filled($data['driver_name'] ?? null) ? trim($data['driver_name']) : null;
 
         return $data;
     }

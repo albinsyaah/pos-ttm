@@ -48,7 +48,7 @@ class SupplierController extends Controller implements HasMiddleware
 
         Supplier::create($data);
 
-        return redirect()->route('suppliers.index')->with('success', 'Supplier added successfully.');
+        return redirect()->route('suppliers.index')->with('success', __('Supplier added successfully.'));
     }
 
     public function update(Request $request, Supplier $supplier): RedirectResponse
@@ -57,25 +57,25 @@ class SupplierController extends Controller implements HasMiddleware
 
         $supplier->update($data);
 
-        return redirect()->route('suppliers.index')->with('success', 'Supplier updated successfully.');
+        return redirect()->route('suppliers.index')->with('success', __('Supplier updated successfully.'));
     }
 
     public function destroy(Supplier $supplier): RedirectResponse
     {
         if ($supplier->purchaseOrders()->exists() || $supplier->purchases()->exists()) {
-            return back()->with('error', 'This supplier still has purchase records and cannot be deleted.');
+            return back()->with('error', __('This supplier still has purchase records and cannot be deleted.'));
         }
 
         $supplier->delete();
 
-        return redirect()->route('suppliers.index')->with('success', 'Supplier deleted successfully.');
+        return redirect()->route('suppliers.index')->with('success', __('Supplier deleted successfully.'));
     }
 
     protected function validateSupplier(Request $request, ?int $ignoreId = null): array
     {
         return $request->validate([
             'code' => [
-                'required', 'string', 'max:50',
+                'nullable', 'string', 'max:50',
                 Rule::unique('suppliers', 'code')->ignore($ignoreId),
             ],
             'name' => ['required', 'string', 'max:150'],

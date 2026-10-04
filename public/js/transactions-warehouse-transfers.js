@@ -65,7 +65,7 @@ document.getElementById('addWarehouseTransferBtn')?.addEventListener('click', (e
   warehouseTransferForm.reset();
   warehouseTransferForm.action = e.currentTarget.dataset.action;
   warehouseTransferFormMethod.innerHTML = '';
-  warehouseTransferModalTitle.textContent = 'Add Warehouse Transfer';
+  warehouseTransferModalTitle.textContent = __t('Add Warehouse Transfer');
   resetItemRows();
   addItemRow();
   openModal(warehouseTransferModal);
@@ -78,7 +78,7 @@ document.querySelectorAll('.edit-warehouse-transfer-btn').forEach((btn) => {
     warehouseTransferForm.reset();
     warehouseTransferForm.action = btn.dataset.action;
     warehouseTransferFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    warehouseTransferModalTitle.textContent = 'Edit Warehouse Transfer';
+    warehouseTransferModalTitle.textContent = __t('Edit Warehouse Transfer');
 
     mutationNumberInput.value = btn.dataset.mutationNumber || '';
     mutationDateInput.value = btn.dataset.mutationDate || '';

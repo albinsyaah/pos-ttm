@@ -4,52 +4,40 @@
 @section('page-title', __('app.layout.dashboard'))
 
 @section('content')
+@php use App\Support\Money; @endphp
 
-    {{-- Stat cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-
-        <div class="stat-card card-gradient text-white p-6">
+    {{-- Sales cards: day, week and month, each in its own colour --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="stat-card card-day text-white p-6" id="cardDaySales">
             <div class="flex items-center justify-between">
-                <p class="text-xs opacity-80 tracking-wide">{{ __('app.dashboard.todays_sales') }}</p>
-                <i class="fa-solid fa-sack-dollar opacity-80"></i>
+                <p class="text-xs opacity-90 tracking-wide font-semibold">{{ __('app.dashboard.todays_sales') }}</p>
+                <i class="fa-solid fa-sun opacity-90"></i>
             </div>
-            <p class="text-3xl font-bold mt-3">Rp{{ number_format($todaySales) }}</p>
-            <p class="text-xs mt-2 opacity-90">{{ __('app.dashboard.total_sales_today') }}</p>
+            <p class="text-3xl font-bold mt-3">{{ Money::rupiah($todaySales) }}</p>
+            <p class="text-xs mt-2 opacity-90">{{ $ordersToday }} {{ __('app.dashboard.orders') }} &middot; {{ __('app.dashboard.total_sales_today') }}</p>
         </div>
 
-        <div class="stat-card p-6">
+        <div class="stat-card card-week text-white p-6" id="cardWeekSales">
             <div class="flex items-center justify-between">
-                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.orders_today') }}</p>
-                <div class="w-9 h-9 rounded-xl bg-[var(--brand-100)] text-[var(--brand-600)] flex items-center justify-center">
-                    <i class="fa-solid fa-receipt text-sm"></i>
-                </div>
+                <p class="text-xs opacity-90 tracking-wide font-semibold">{{ __('app.dashboard.weekly_sales') }}</p>
+                <i class="fa-solid fa-calendar-week opacity-90"></i>
             </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ $ordersToday }}</p>
-            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.sales_transactions_today') }}</p>
+            <p class="text-3xl font-bold mt-3">{{ Money::rupiah($weeklySales) }}</p>
+            <p class="text-xs mt-2 opacity-90">{{ $weekCount }} {{ __('app.dashboard.orders') }} &middot; {{ __('app.dashboard.total_sales_week') }}</p>
         </div>
 
-        {{-- <div class="stat-card p-6">
+        <div class="stat-card card-month text-white p-6" id="cardMonthSales">
             <div class="flex items-center justify-between">
-                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.avg_order_value') }}</p>
-                <div class="w-9 h-9 rounded-xl bg-[var(--warn-100)] text-[var(--warn-600)] flex items-center justify-center">
-                    <i class="fa-solid fa-tag text-sm"></i>
-                </div>
+                <p class="text-xs opacity-90 tracking-wide font-semibold">{{ __('app.dashboard.monthly_sales') }}</p>
+                <i class="fa-solid fa-calendar-days opacity-90"></i>
             </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($avgOrderValue) }}</p>
-            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.todays_sales_divided_orders') }}</p>
-        </div> --}}
+            <p class="text-3xl font-bold mt-3">{{ Money::rupiah($monthSales) }}</p>
+            <p class="text-xs mt-2 opacity-90">{{ $monthCount }} {{ __('app.dashboard.orders') }} &middot; {{ __('app.dashboard.total_sales_month') }}</p>
+        </div>
+    </div>
 
-        {{-- <div class="stat-card p-6">
-            <div class="flex items-center justify-between">
-                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.monthly_sales') }}</p>
-                <div class="w-9 h-9 rounded-xl bg-[var(--bad-100)] text-[var(--bad-600)] flex items-center justify-center">
-                    <i class="fa-solid fa-triangle-exclamation text-sm"></i>
-                </div>
-            </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($monthSales) }}</p>
-            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.total_sales_month') }}</p>
-        </div> --}}
-
+    {{-- Stock and money owed --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.low_stock_items') }}</p>
@@ -60,37 +48,6 @@
             <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ $lowStockCount }}</p>
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.needs_reordering') }}</p>
         </div>
-    </div>
-
-    {{-- weekly & monthly sales --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 mt-6">
-        {{-- weekly sales --}}
-        <div class="stat-card p-6">
-            <div class="flex items-center justify-between">
-                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.weekly_sales') }}</p>
-                <div class="w-9 h-9 rounded-xl bg-[var(--brand-100)] text-[var(--brand-600)] flex items-center justify-center">
-                    <i class="fa-solid fa-sack-dollar opacity-80 text-sm"></i>
-                </div>
-            </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($weeklySales) }}</p>
-            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.total_sales_week') }}</p>
-        </div>
-
-        <div class="stat-card p-6">
-            <div class="flex items-center justify-between">
-                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.monthly_sales') }}</p>
-                <div class="w-9 h-9 rounded-xl bg-[var(--brand-100)] text-[var(--brand-600)] flex items-center justify-center">
-                    <i class="fa-solid fa-sack-dollar opacity-80 text-sm"></i>
-                </div>
-            </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($monthSales) }}</p>
-            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.total_sales_month') }}</p>
-        </div>
-
-    </div>
-
-    {{-- Finance & open orders --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 mt-6">
 
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
@@ -99,7 +56,7 @@
                     <i class="fa-solid fa-hand-holding-dollar text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($receivablesOutstanding) }}</p>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ Money::rupiah($receivablesOutstanding) }}</p>
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.sales_not_yet_paid') }}</p>
         </div>
 
@@ -110,31 +67,9 @@
                     <i class="fa-solid fa-money-check-dollar text-sm"></i>
                 </div>
             </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">Rp{{ number_format($payablesOutstanding) }}</p>
+            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ Money::rupiah($payablesOutstanding) }}</p>
             <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.purchases_not_yet_paid') }}</p>
         </div>
-
-        {{-- <div class="stat-card p-6">
-            <div class="flex items-center justify-between">
-                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.pending_sales_orders') }}</p>
-                <div class="w-9 h-9 rounded-xl bg-[var(--brand-100)] text-[var(--brand-600)] flex items-center justify-center">
-                    <i class="fa-solid fa-cart-shopping text-sm"></i>
-                </div>
-            </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ $pendingSalesOrders }}</p>
-            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.awaiting_fulfillment') }}</p>
-        </div>
-
-        <div class="stat-card p-6">
-            <div class="flex items-center justify-between">
-                <p class="text-xs text-[var(--ink-400)] tracking-wide font-medium">{{ __('app.dashboard.pending_purchase_orders') }}</p>
-                <div class="w-9 h-9 rounded-xl bg-[var(--warn-100)] text-[var(--warn-600)] flex items-center justify-center">
-                    <i class="fa-solid fa-truck-ramp-box text-sm"></i>
-                </div>
-            </div>
-            <p class="text-3xl font-bold mt-3 text-[var(--ink-900)]">{{ $pendingPurchaseOrders }}</p>
-            <p class="text-xs mt-2 text-[var(--ink-400)] font-medium">{{ __('app.dashboard.awaiting_delivery') }}</p>
-        </div> --}}
     </div>
 
     {{-- Chart + top products --}}
@@ -160,8 +95,8 @@
                 @foreach($days as $day)
                     <div class="flex flex-col items-center gap-2 flex-1">
                         <div class="w-full flex items-end justify-center gap-1 h-40">
-                            <div class="bar w-3 bg-[var(--ink-200)] rounded-md" style="height: {{ max(2, $day['last'] * $scale) }}px" title="{{ __('app.dashboard.last_week_tooltip') }}: Rp{{ number_format($day['last']) }}"></div>
-                            <div class="bar w-3 bg-[var(--brand-600)] rounded-md" style="height: {{ max(2, $day['this'] * $scale) }}px" title="{{ __('app.dashboard.this_week_tooltip') }}: Rp{{ number_format($day['this']) }}"></div>
+                            <div class="bar w-3 bg-[var(--ink-200)] rounded-md" style="height: {{ max(2, $day['last'] * $scale) }}px" title="{{ __('app.dashboard.last_week_tooltip') }}: {{ Money::rupiah($day['last']) }}"></div>
+                            <div class="bar w-3 bg-[var(--brand-600)] rounded-md" style="height: {{ max(2, $day['this'] * $scale) }}px" title="{{ __('app.dashboard.this_week_tooltip') }}: {{ Money::rupiah($day['this']) }}"></div>
                         </div>
                         <span class="text-[10px] text-[var(--ink-400)]">{{ $day['label'] }}</span>
                     </div>
@@ -169,27 +104,66 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-6">
-            <h3 class="font-semibold text-lg text-[var(--ink-900)]">{{ __('app.dashboard.top_products') }}</h3>
-            <p class="text-xs text-[var(--ink-400)] mt-0.5">{{ __('app.dashboard.by_units_sold_today') }}</p>
+        <div class="bg-white rounded-3xl p-6" id="insights">
+            <div class="flex items-start justify-between gap-3 flex-wrap">
+                <div>
+                    <h3 class="font-semibold text-lg text-[var(--ink-900)]">{{ __('insight.dashboard.top_products') }}</h3>
+                    <p class="text-xs text-[var(--ink-400)] mt-0.5">{{ __('insight.dashboard.by_units_sold') }}</p>
+                </div>
+                @include('partials.range-tabs', ['range' => $range])
+            </div>
 
-            <div class="mt-5 space-y-1">
-                @forelse($topProducts as $product)
+            <div class="mt-5 space-y-1" id="topProductsList">
+                @php $badge = ['brand', 'warn', 'good', 'bad']; @endphp
+                @forelse($topProducts as $i => $row)
+                    @php $tone = $badge[$i % count($badge)]; @endphp
                     <div class="product-row flex items-center gap-3 p-2 rounded-xl">
-                        <div class="w-10 h-10 rounded-xl bg-[var(--{{ $product['bg'] }}-100)] text-[var(--{{ $product['bg'] }}-600)] flex items-center justify-center">
-                            <i class="fa-solid {{ $product['icon'] }}"></i>
-                        </div>
+                        <div class="w-8 h-8 rounded-xl bg-[var(--{{ $tone }}-100)] text-[var(--{{ $tone }}-600)] flex items-center justify-center text-xs font-bold">{{ $i + 1 }}</div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-[var(--ink-900)] truncate">{{ $product['name'] }}</p>
-                            <p class="text-xs text-[var(--ink-400)]">{{ $product['sold'] }} {{ __('app.dashboard.sold') }}</p>
+                            <p class="text-sm font-medium text-[var(--ink-900)] truncate">{{ $row['product']->name }}</p>
+                            <p class="text-xs text-[var(--ink-400)]">{{ $row['product']->formatQuantity($row['sold']) }} {{ __('app.dashboard.sold') }}</p>
                         </div>
-                        <span class="text-sm font-semibold text-[var(--ink-900)]">Rp{{ number_format($product['revenue']) }}</span>
+                        <span class="text-sm font-semibold text-[var(--ink-900)]">{{ Money::rupiah($row['revenue']) }}</span>
                     </div>
                 @empty
-                    <p class="text-sm text-[var(--ink-400)] py-6 text-center">{{ __('app.dashboard.no_sales_recorded_today') }}</p>
+                    <p class="text-sm text-[var(--ink-400)] py-6 text-center">{{ __('insight.dashboard.no_sales_in_range') }}</p>
                 @endforelse
             </div>
         </div>
+    </div>
+
+    {{-- Income per payment method (same range as the best sellers) --}}
+    <div class="bg-white rounded-3xl p-6 mt-6" id="incomeByMethod">
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+                <h3 class="font-semibold text-lg text-[var(--ink-900)]">{{ __('insight.dashboard.income_by_method') }}</h3>
+                <p class="text-xs text-[var(--ink-400)] mt-0.5">{{ __('insight.dashboard.income_by_method_hint') }}</p>
+            </div>
+            @include('partials.range-tabs', ['range' => $range])
+        </div>
+
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            @forelse($incomeByMethod as $method)
+                <div class="rounded-2xl bg-[var(--surface)] p-4">
+                    <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
+                        {{ $method['name'] }}
+                        @unless($method['is_active'])<span class="normal-case">({{ __('insight.dashboard.inactive') }})</span>@endunless
+                    </p>
+                    <p class="text-xl font-extrabold text-[var(--ink-900)] mt-1">{{ Money::rupiah($method['income']) }}</p>
+                    <p class="text-xs text-[var(--ink-400)] mt-1">
+                        {{ __('insight.dashboard.cash_sales') }} {{ Money::rupiah($method['cash_sales']) }}
+                        &middot; {{ __('insight.dashboard.receivable_payments') }} {{ Money::rupiah($method['ar_received']) }}
+                    </p>
+                </div>
+            @empty
+                <p class="text-sm text-[var(--ink-400)] py-6 text-center sm:col-span-2 xl:col-span-4">{{ __('insight.dashboard.no_income_in_range') }}</p>
+            @endforelse
+        </div>
+        @if(count($incomeByMethod))
+            <p class="text-sm font-semibold text-[var(--ink-900)] mt-4">
+                {{ __('insight.dashboard.total_income') }}: {{ Money::rupiah(collect($incomeByMethod)->sum('income')) }}
+            </p>
+        @endif
     </div>
 
     {{-- Low stock + top customers --}}
@@ -231,7 +205,7 @@
                             <p class="text-sm font-medium text-[var(--ink-900)] truncate">{{ $customer->name }}</p>
                             <p class="text-xs text-[var(--ink-400)]">{{ $customer->orders }} {{ __('app.dashboard.orders') }}</p>
                         </div>
-                        <span class="text-sm font-semibold text-[var(--ink-900)]">Rp{{ number_format($customer->total) }}</span>
+                        <span class="text-sm font-semibold text-[var(--ink-900)]">{{ Money::rupiah($customer->total) }}</span>
                     </div>
                 @empty
                     <p class="text-sm text-[var(--ink-400)] py-6 text-center">{{ __('app.dashboard.no_sales_recorded_yet') }}</p>
@@ -267,7 +241,7 @@
                         <td class="text-[var(--ink-400)]">{{ $order['items'] }} {{ __('app.dashboard.items_count') }}</td>
                         <td class="text-[var(--ink-700)]">{{ ucfirst($order['source']) }}</td>
                         <td class="text-[var(--ink-400)]">{{ $order['date'] }} &middot; {{ $order['time'] }}</td>
-                        <td class="font-semibold text-[var(--ink-900)]">Rp{{ number_format($order['total']) }}</td>
+                        <td class="font-semibold text-[var(--ink-900)]">{{ Money::rupiah($order['total']) }}</td>
                         <td class="text-right pr-5">
                             <button class="dl-btn border border-gray-200 text-[var(--ink-700)] rounded-full px-4 py-2 text-xs font-medium hover:border-[var(--brand-600)] hover:text-[var(--brand-600)] transition-colors">{{ __('app.dashboard.print') }}</button>
                         </td>
@@ -284,6 +258,14 @@
     </div>
 
 @endsection
+
+@push('styles')
+    <style>
+        .card-day { background: linear-gradient(135deg, #3b4cf6 0%, #6c4cf6 100%); box-shadow: 0 20px 40px -14px rgba(59,76,246,.45); }
+        .card-week { background: linear-gradient(135deg, #0e9f6e 0%, #12b76a 100%); box-shadow: 0 20px 40px -14px rgba(18,183,106,.45); }
+        .card-month { background: linear-gradient(135deg, #f79009 0%, #f04438 100%); box-shadow: 0 20px 40px -14px rgba(247,144,9,.45); }
+    </style>
+@endpush
 
 @push('scripts')
     <script src="{{ asset('js/dashboard.js') }}"></script>

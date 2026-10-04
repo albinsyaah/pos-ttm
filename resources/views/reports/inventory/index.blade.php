@@ -6,7 +6,7 @@
 @section('content')
 
     <form id="inventoryReportFilterForm" action="{{ route('reports.inventory') }}" method="GET"
-        class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+        class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="inventoryReportSearch">{{ __('app.reports.inventory.search_label') }}</label>
             <input id="inventoryReportSearch" name="q" type="search" value="{{ $search }}"
@@ -128,7 +128,12 @@
                         <td class="text-[var(--ink-700)]">{{ $product->brand?->name ?? '-' }}</td>
                         <td class="text-[var(--ink-700)]">{{ $product->itemType?->name ?? '-' }}</td>
                         <td class="text-[var(--ink-700)]">{{ $product->productGroup?->name ?? '-' }}</td>
-                        <td class=" font-medium text-[var(--ink-900)]">{{ number_format($stock) }}</td>
+                        <td class=" font-medium text-[var(--ink-900)]">
+                            {{ $product->formatQuantity($stock) }}
+                            @if ($product->hasPack() || $product->hasBox())
+                                <span class="block text-xs font-normal text-[var(--ink-400)]">{{ number_format($stock) }} {{ $product->unit_name }}</span>
+                            @endif
+                        </td>
                         <td class=" text-[var(--ink-700)]">Rp{{ number_format((float) $price) }}</td>
                         <td class=" font-medium text-[var(--ink-900)]">Rp{{ number_format((float) ($stock * $price)) }}</td>
                     </tr>

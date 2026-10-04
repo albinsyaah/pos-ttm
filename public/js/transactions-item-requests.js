@@ -64,7 +64,7 @@ document.getElementById('addItemRequestBtn')?.addEventListener('click', (e) => {
   itemRequestForm.reset();
   itemRequestForm.action = e.currentTarget.dataset.action;
   itemRequestFormMethod.innerHTML = '';
-  itemRequestModalTitle.textContent = 'Add Item Request';
+  itemRequestModalTitle.textContent = __t('Add Item Request');
   resetItemRows();
   addItemRow();
   openModal(itemRequestModal);
@@ -77,7 +77,7 @@ document.querySelectorAll('.edit-item-request-btn').forEach((btn) => {
     itemRequestForm.reset();
     itemRequestForm.action = btn.dataset.action;
     itemRequestFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    itemRequestModalTitle.textContent = 'Edit Item Request';
+    itemRequestModalTitle.textContent = __t('Edit Item Request');
 
     mutationNumberInput.value = btn.dataset.mutationNumber || '';
     mutationDateInput.value = btn.dataset.mutationDate || '';

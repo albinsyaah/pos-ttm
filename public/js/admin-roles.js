@@ -28,7 +28,7 @@ document.getElementById('addRoleBtn')?.addEventListener('click', (e) => {
   roleForm.reset();
   roleForm.action = e.currentTarget.dataset.action;
   roleFormMethod.innerHTML = '';
-  roleModalTitle.textContent = 'Add Role';
+  roleModalTitle.textContent = __t('Add Role');
   roleNameInput.disabled = false;
   resetPermissionCheckboxes([]);
   permissionCheckboxes.forEach((cb) => (cb.disabled = false));

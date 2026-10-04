@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
-        <form action="{{ route('finance.general-ledgers.index') }}" method="GET" class="relative">
+        <form action="{{ route('finance.general-ledgers.index') }}" method="GET" class="relative" data-live-search="auto">
             <label class="sr-only" for="ledgerSearch">{{ __('app.general_ledgers.search_ledgers') }}</label>
             <input
                 id="ledgerSearch"

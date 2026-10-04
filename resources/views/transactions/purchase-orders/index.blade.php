@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
-        <form action="{{ route('transactions.purchase-orders.index') }}" method="GET" class="relative">
+        <form action="{{ route('transactions.purchase-orders.index') }}" method="GET" class="relative" data-live-search="auto">
             <label class="sr-only" for="purchaseOrderSearch">{{ __('app.purchase_orders.search_purchase_orders') }}</label>
             <input
                 id="purchaseOrderSearch"
@@ -122,8 +122,8 @@
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label for="po_number" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.purchase_orders.po_number') }}</label>
-                        <input id="po_number" name="po_number" type="text" required maxlength="100"
-                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        <input id="po_number" name="po_number" type="text" readonly maxlength="100" placeholder="{{ __('app.auto_number') }}"
+                               class="cursor-not-allowed text-[var(--ink-400)] w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="order_date" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.purchase_orders.order_date') }}</label>
@@ -270,5 +270,6 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-triangle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    <script src="{{ asset('js/product-picker.js') }}"></script>
     <script src="{{ asset('js/transactions-purchase-orders.js') }}"></script>
 @endpush

@@ -62,7 +62,7 @@ class PurchaseOrderController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $purchaseOrder = PurchaseOrder::create([
-                'po_number' => $data['po_number'],
+                'po_number' => $data['po_number'] ?? null,
                 'order_date' => $data['order_date'],
                 'status' => $data['status'],
                 'supplier_id' => $data['supplier_id'],
@@ -71,7 +71,7 @@ class PurchaseOrderController extends Controller implements HasMiddleware
             $purchaseOrder->purchaseOrderDetails()->createMany($data['items']);
         });
 
-        return redirect()->route('transactions.purchase-orders.index')->with('success', 'Purchase order added successfully.');
+        return redirect()->route('transactions.purchase-orders.index')->with('success', __('Purchase order added successfully.'));
     }
 
     public function update(Request $request, PurchaseOrder $purchaseOrder): RedirectResponse
@@ -80,7 +80,7 @@ class PurchaseOrderController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $purchaseOrder) {
             $purchaseOrder->update([
-                'po_number' => $data['po_number'],
+                'po_number' => $data['po_number'] ?? null,
                 'order_date' => $data['order_date'],
                 'status' => $data['status'],
                 'supplier_id' => $data['supplier_id'],
@@ -90,13 +90,13 @@ class PurchaseOrderController extends Controller implements HasMiddleware
             $purchaseOrder->purchaseOrderDetails()->createMany($data['items']);
         });
 
-        return redirect()->route('transactions.purchase-orders.index')->with('success', 'Purchase order updated successfully.');
+        return redirect()->route('transactions.purchase-orders.index')->with('success', __('Purchase order updated successfully.'));
     }
 
     public function destroy(PurchaseOrder $purchaseOrder): RedirectResponse
     {
         if ($purchaseOrder->purchases()->exists()) {
-            return back()->with('error', 'This purchase order already has purchases recorded and cannot be deleted.');
+            return back()->with('error', __('This purchase order already has purchases recorded and cannot be deleted.'));
         }
 
         DB::transaction(function () use ($purchaseOrder) {
@@ -104,14 +104,14 @@ class PurchaseOrderController extends Controller implements HasMiddleware
             $purchaseOrder->delete();
         });
 
-        return redirect()->route('transactions.purchase-orders.index')->with('success', 'Purchase order deleted successfully.');
+        return redirect()->route('transactions.purchase-orders.index')->with('success', __('Purchase order deleted successfully.'));
     }
 
     protected function validatePurchaseOrder(Request $request, ?int $ignoreId = null): array
     {
         $data = $request->validate([
             'po_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('purchase_orders', 'po_number')->ignore($ignoreId),
             ],
             'order_date' => ['required', 'date'],

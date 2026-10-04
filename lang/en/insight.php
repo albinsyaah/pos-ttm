@@ -1,0 +1,121 @@
+<?php
+
+// Stage 7 texts: Inquiry, dashboard and the new reports.
+return [
+    'common' => [
+        'print' => 'Print',
+        'export_excel' => 'Export to Excel',
+        'reset_filters' => 'Reset Filters',
+        'date_to' => 'to',
+        'total' => 'Total',
+        'total_revenue' => 'Total Sales',
+        'revenue' => 'Sales',
+        'product' => 'Product',
+        'free' => 'Free',
+        'inactive' => 'inactive',
+    ],
+
+    'returns' => [
+        'sales_returns' => 'Sales Returns',
+        'gross_sales' => 'Gross sales',
+        'net_hint' => 'After sales returns',
+        'return_column' => 'Returns',
+        'returned_qty' => 'Returned',
+    ],
+
+    'terminal' => [
+        'head_title' => 'Point of Sales (Head Cashier)',
+    ],
+
+    'sidebar' => [
+        'sales_by_product' => 'Sales by Product',
+        'salesman' => 'Salesman Report',
+        'payment_methods' => 'Payment Method Report',
+    ],
+
+    'dashboard' => [
+        'range_day' => 'Day',
+        'range_week' => 'Week',
+        'range_month' => 'Month',
+        'top_products' => 'Top 10 Products',
+        'by_units_sold' => 'By units sold (free items not counted)',
+        'no_sales_in_range' => 'No sales in this period yet.',
+        'income_by_method' => 'Income by Payment Method',
+        'income_by_method_hint' => 'Cash sales plus receivable payments received in this period',
+        'cash_sales' => 'Cash sales',
+        'receivable_payments' => 'Receivables',
+        'total_income' => 'Total income',
+        'no_income_in_range' => 'No income in this period yet.',
+        'inactive' => 'inactive',
+    ],
+
+    'inquiry' => [
+        'available' => 'In stock',
+        'out_of_stock' => 'Out of stock',
+        'effective' => 'effective',
+        'price_history' => 'Price history',
+        'no_price_history' => 'No price changes recorded for this product yet.',
+        'when' => 'When',
+        'category' => 'Category',
+        'change' => 'Change',
+        'effective_date' => 'Effective from',
+        'by' => 'By',
+        'set_to' => 'Set to',
+        'removed' => 'Removed',
+    ],
+
+    'payment_methods' => [
+        'title' => 'Payment Method Report',
+        'all_methods' => 'All Methods',
+        'method' => 'Method',
+        'cash_sales_count' => 'Transactions',
+        'cash_sales' => 'Cash Sales',
+        'receivable_count' => 'Payments',
+        'receivable_payments' => 'Receivable Payments',
+        'income' => 'Income',
+        'total_income' => 'Total Income',
+        'refunds' => 'Cash Refunds',
+        'supplier_paid' => 'Supplier Payments',
+        'no_data' => 'No payment method data yet.',
+        'note' => 'Income = cash sales + receivable payments received. A credit sale only counts once the customer pays. Supplier payments are money out and are not added to income. Returns of cash sales are deducted from the method the original sale was paid with; returns of credit sales lower the receivable instead.',
+    ],
+
+    'salesman' => [
+        'title' => 'Salesman Report',
+        'search_label' => 'Search products',
+        'search_placeholder' => 'Search the products sold',
+        'all_salesmen' => 'All Salesmen',
+        'salesmen_count' => 'Salesmen',
+        'salesman' => 'Salesman',
+        'sales' => 'sales',
+        'paid_qty' => 'Sold',
+        'free_qty' => 'Free',
+        'no_data' => 'No sales by a salesman yet.',
+    ],
+
+    'by_product' => [
+        'title' => 'Sales by Product Report',
+        'search_label' => 'Search products',
+        'search_placeholder' => 'Search by product code or name',
+        'all_warehouses' => 'All Warehouses',
+        'total_qty' => 'Total Quantity Sold',
+        'price' => 'Selling Price',
+        'qty' => 'Quantity',
+        'sales_count' => 'Transactions',
+        'period' => 'Period',
+        'price_changed' => 'price changed',
+        'no_data' => 'No sales found.',
+    ],
+
+    'sales_summary' => [
+        'free_goods_loss' => 'Free Goods Loss',
+        'free_goods_loss_hint' => 'Cost of free items (last purchase price)',
+        'free_loss_column' => 'Free Goods Loss',
+        'discount_column' => 'Discount',
+        'discount_total' => 'Total Discount',
+        'free_goods_title' => 'Free Goods Breakdown',
+        'free_goods_basis' => 'Cost is the last purchase price on or before the sale date.',
+        'free_qty' => 'Free Quantity',
+        'no_purchase_price' => 'no purchase price yet',
+    ],
+];

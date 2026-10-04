@@ -62,7 +62,7 @@ class SalesOrderController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $salesOrder = SalesOrder::create([
-                'so_number' => $data['so_number'],
+                'so_number' => $data['so_number'] ?? null,
                 'order_date' => $data['order_date'],
                 'status' => $data['status'],
                 'customer_id' => $data['customer_id'],
@@ -71,7 +71,7 @@ class SalesOrderController extends Controller implements HasMiddleware
             $salesOrder->salesOrderDetails()->createMany($data['items']);
         });
 
-        return redirect()->route('transactions.sales-orders.index')->with('success', 'Sales order added successfully.');
+        return redirect()->route('transactions.sales-orders.index')->with('success', __('Sales order added successfully.'));
     }
 
     public function update(Request $request, SalesOrder $salesOrder): RedirectResponse
@@ -80,7 +80,7 @@ class SalesOrderController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $salesOrder) {
             $salesOrder->update([
-                'so_number' => $data['so_number'],
+                'so_number' => $data['so_number'] ?? null,
                 'order_date' => $data['order_date'],
                 'status' => $data['status'],
                 'customer_id' => $data['customer_id'],
@@ -90,13 +90,13 @@ class SalesOrderController extends Controller implements HasMiddleware
             $salesOrder->salesOrderDetails()->createMany($data['items']);
         });
 
-        return redirect()->route('transactions.sales-orders.index')->with('success', 'Sales order updated successfully.');
+        return redirect()->route('transactions.sales-orders.index')->with('success', __('Sales order updated successfully.'));
     }
 
     public function destroy(SalesOrder $salesOrder): RedirectResponse
     {
         if ($salesOrder->sales()->exists()) {
-            return back()->with('error', 'This sales order already has sales recorded and cannot be deleted.');
+            return back()->with('error', __('This sales order already has sales recorded and cannot be deleted.'));
         }
 
         DB::transaction(function () use ($salesOrder) {
@@ -104,14 +104,14 @@ class SalesOrderController extends Controller implements HasMiddleware
             $salesOrder->delete();
         });
 
-        return redirect()->route('transactions.sales-orders.index')->with('success', 'Sales order deleted successfully.');
+        return redirect()->route('transactions.sales-orders.index')->with('success', __('Sales order deleted successfully.'));
     }
 
     protected function validateSalesOrder(Request $request, ?int $ignoreId = null): array
     {
         $data = $request->validate([
             'so_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('sales_orders', 'so_number')->ignore($ignoreId),
             ],
             'order_date' => ['required', 'date'],

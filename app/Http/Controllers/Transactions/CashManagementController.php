@@ -58,7 +58,7 @@ class CashManagementController extends Controller implements HasMiddleware
 
         CashFlow::create($data);
 
-        return redirect()->route('transactions.cash-management.index')->with('success', 'Cash transaction added successfully.');
+        return redirect()->route('transactions.cash-management.index')->with('success', __('Cash transaction added successfully.'));
     }
 
     public function update(Request $request, CashFlow $cashManagement): RedirectResponse
@@ -67,14 +67,14 @@ class CashManagementController extends Controller implements HasMiddleware
 
         $cashManagement->update($data);
 
-        return redirect()->route('transactions.cash-management.index')->with('success', 'Cash transaction updated successfully.');
+        return redirect()->route('transactions.cash-management.index')->with('success', __('Cash transaction updated successfully.'));
     }
 
     public function destroy(CashFlow $cashManagement): RedirectResponse
     {
         $cashManagement->delete();
 
-        return redirect()->route('transactions.cash-management.index')->with('success', 'Cash transaction deleted successfully.');
+        return redirect()->route('transactions.cash-management.index')->with('success', __('Cash transaction deleted successfully.'));
     }
 
     protected function validateCashTransaction(Request $request): array

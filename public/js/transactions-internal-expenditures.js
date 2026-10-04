@@ -64,7 +64,7 @@ document.getElementById('addInternalExpenditureBtn')?.addEventListener('click', 
   internalExpenditureForm.reset();
   internalExpenditureForm.action = e.currentTarget.dataset.action;
   internalExpenditureFormMethod.innerHTML = '';
-  internalExpenditureModalTitle.textContent = 'Add Internal Expenditure';
+  internalExpenditureModalTitle.textContent = __t('Add Internal Expenditure');
   resetItemRows();
   addItemRow();
   openModal(internalExpenditureModal);
@@ -77,7 +77,7 @@ document.querySelectorAll('.edit-internal-expenditure-btn').forEach((btn) => {
     internalExpenditureForm.reset();
     internalExpenditureForm.action = btn.dataset.action;
     internalExpenditureFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    internalExpenditureModalTitle.textContent = 'Edit Internal Expenditure';
+    internalExpenditureModalTitle.textContent = __t('Edit Internal Expenditure');
 
     mutationNumberInput.value = btn.dataset.mutationNumber || '';
     mutationDateInput.value = btn.dataset.mutationDate || '';

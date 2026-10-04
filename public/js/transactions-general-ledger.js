@@ -25,7 +25,7 @@ document.getElementById('addTxLedgerBtn')?.addEventListener('click', (e) => {
   txLedgerForm.reset();
   txLedgerForm.action = e.currentTarget.dataset.action;
   txLedgerFormMethod.innerHTML = '';
-  txLedgerModalTitle.textContent = 'Add Ledger Entry';
+  txLedgerModalTitle.textContent = __t('Add Ledger Entry');
   openModal(txLedgerModal);
   txLedgerDateInput?.focus();
 });
@@ -36,7 +36,7 @@ document.querySelectorAll('.edit-tx-ledger-btn').forEach((btn) => {
     txLedgerForm.reset();
     txLedgerForm.action = btn.dataset.action;
     txLedgerFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    txLedgerModalTitle.textContent = 'Edit Ledger Entry';
+    txLedgerModalTitle.textContent = __t('Edit Ledger Entry');
 
     txLedgerDateInput.value = btn.dataset.transactionDate || '';
     txLedgerAccountSelect.value = btn.dataset.accountId || '';

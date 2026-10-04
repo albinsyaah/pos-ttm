@@ -24,7 +24,7 @@ document.getElementById('addAssetBtn')?.addEventListener('click', (e) => {
   assetForm.reset();
   assetForm.action = e.currentTarget.dataset.action;
   assetFormMethod.innerHTML = '';
-  assetModalTitle.textContent = 'Add Asset';
+  assetModalTitle.textContent = __t('Add Asset');
   openModal(assetModal);
   assetCodeInput?.focus();
 });
@@ -35,7 +35,7 @@ document.querySelectorAll('.edit-asset-btn').forEach((btn) => {
     assetForm.reset();
     assetForm.action = btn.dataset.action;
     assetFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    assetModalTitle.textContent = 'Edit Asset';
+    assetModalTitle.textContent = __t('Edit Asset');
 
     assetCodeInput.value = btn.dataset.assetCode || '';
     assetNameInput.value = btn.dataset.name || '';

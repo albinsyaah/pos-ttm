@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
-        <form action="{{ route('transactions.payable-payments.index') }}" method="GET" class="relative">
+        <form action="{{ route('transactions.payable-payments.index') }}" method="GET" class="relative" data-live-search="auto">
             <label class="sr-only" for="payablePaymentSearch">{{ __('app.payable_payments.search_payable_payments') }}</label>
             <input
                 id="payablePaymentSearch"
@@ -32,12 +32,13 @@
     </div>
 
     <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
-        <table class="w-full text-sm min-w-[760px]">
+        <table class="w-full text-sm min-w-[860px]">
             <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-semibold">{{ __('app.payable_payments.payment_number') }}</th>
                     <th class="font-semibold">{{ __('app.payable_payments.payment_date') }}</th>
                     <th class="font-semibold">{{ __('app.payable_payments.supplier') }}</th>
+                    <th class="font-semibold">{{ __('app.payable_payments.invoice') }}</th>
                     <th class="font-semibold">{{ __('app.payable_payments.payment_method') }}</th>
                     <th class="font-semibold">{{ __('app.payable_payments.amount') }}</th>
                     <th class="font-semibold text-right pr-5">{{ __('app.common.actions') }}</th>
@@ -49,7 +50,8 @@
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ $payment->payment_number }}</td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $payment->supplier?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $payment->payment_method }}</td>
+                        <td class="text-[var(--ink-700)]">{{ $payment->purchase?->invoice_number ?: '—' }}</td>
+                        <td class="text-[var(--ink-400)]">{{ $payment->paymentMethod?->name ?? '-' }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $payment->amount, 2) }}</td>
                         <td class="text-right pr-5">
                             @can('transactions.payable-payments.manage')
@@ -62,7 +64,11 @@
                                         data-payment-number="{{ $payment->payment_number }}"
                                         data-payment-date="{{ \Illuminate\Support\Carbon::parse($payment->payment_date)->format('Y-m-d') }}"
                                         data-supplier-id="{{ $payment->supplier_id }}"
-                                        data-payment-method="{{ $payment->payment_method }}"
+                                        data-purchase-id="{{ $payment->purchase_id }}"
+                                        data-purchase-number="{{ $payment->purchase?->invoice_number }}"
+                                        data-payment-id="{{ $payment->id }}"
+                                        data-payment-method-id="{{ $payment->payment_method_id }}"
+                                        data-payment-method-name="{{ $payment->paymentMethod?->name }}"
                                         data-amount="{{ $payment->amount }}"
                                     >
                                         <i class="fa-solid fa-pen text-xs"></i>
@@ -82,7 +88,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="7" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.payable_payments.no_payable_payments_found') }}
                         </td>
@@ -106,15 +112,24 @@
                 </button>
             </div>
 
-            <form id="payablePaymentForm" method="POST" action="{{ route('transactions.payable-payments.store') }}">
+            <form id="payablePaymentForm" method="POST" action="{{ route('transactions.payable-payments.store') }}"
+                  data-invoices-url="{{ route('transactions.payable-payments.invoices') }}"
+                  data-text-choose-supplier="{{ __('app.payable_payments.choose_supplier_first') }}"
+                  data-text-choose-invoice="{{ __('app.payable_payments.choose_invoice') }}"
+                  data-text-no-open="{{ __('app.payable_payments.no_open_invoices') }}"
+                  data-text-no-invoice="{{ __('app.payable_payments.no_invoice_legacy') }}"
+                  data-text-due="{{ __('app.payable_payments.due') }}"
+                  data-text-outstanding="{{ __('app.payable_payments.outstanding') }}"
+                  data-text-failed="{{ __('app.payable_payments.invoices_failed') }}"
+                  data-text-over="{{ __('app.payable_payments.over_amount') }}">
                 @csrf
                 <div id="payablePaymentFormMethod"></div>
 
                 <div class="space-y-4">
                     <div>
                         <label for="payment_number" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.payable_payments.payment_number') }}</label>
-                        <input id="payment_number" name="payment_number" type="text" required maxlength="100"
-                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        <input id="payment_number" name="payment_number" type="text" readonly maxlength="100" placeholder="{{ __('app.auto_number') }}"
+                               class="cursor-not-allowed text-[var(--ink-400)] w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="payment_date" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.payable_payments.payment_date') }}</label>
@@ -127,23 +142,47 @@
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                             <option value="">{{ __('app.common.select') }}</option>
                             @foreach($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}">{{ $supplier->code }} — {{ $supplier->name }}</option>
+                                @php($owed = $supplierTotals[$supplier->id] ?? 0)
+                                <option value="{{ $supplier->id }}">{{ $supplier->code }} — {{ $supplier->name }} — {{ $owed > 0 ? __('app.payable_payments.owes').' Rp'.number_format($owed, 2) : __('app.payable_payments.owes_none') }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
+                        <label for="purchase_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.payable_payments.invoice') }}</label>
+                        <select id="purchase_id" name="purchase_id" required disabled
+                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
+                            <option value="">{{ __('app.payable_payments.choose_supplier_first') }}</option>
+                        </select>
+                        <p id="invoiceHint" class="text-xs text-[var(--ink-400)] mt-1.5 min-h-[1rem]"></p>
+                    </div>
+                    <div>
                         <label for="payment_method" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.payable_payments.payment_method') }}</label>
-                        <select id="payment_method" name="payment_method" required
+                        <select id="payment_method" name="payment_method_id" required
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                             @foreach($paymentMethods as $method)
-                                <option value="{{ $method }}">{{ $method }}</option>
+                                <option value="{{ $method->id }}">{{ $method->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
                         <label for="amount" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.payable_payments.amount') }}</label>
-                        <input id="amount" name="amount" type="number" step="0.01" min="0" required
+                        <input id="amount" name="amount" type="number" step="0.01" min="0.01" required
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                    </div>
+
+                    <div id="balancePanel" class="hidden rounded-xl bg-[var(--surface)] p-3 text-xs text-[var(--ink-700)] space-y-1.5">
+                        <div data-bal="invoice-block" class="space-y-1.5">
+                            <div class="flex items-center justify-between"><span>{{ __('app.payable_payments.invoice_left') }}</span><strong data-bal="total"></strong></div>
+                            <div class="flex items-center justify-between"><span>{{ __('app.payable_payments.paying_now') }}</span><span data-bal="pay"></span></div>
+                            <div class="flex items-center justify-between border-t border-gray-200 pt-1.5"><span>{{ __('app.payable_payments.invoice_left_after') }}</span><strong data-bal="after"></strong></div>
+                            <p data-bal="over" class="hidden text-[var(--bad-600)]"></p>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-gray-200 pt-1.5">
+                            <span>{{ __('app.payable_payments.supplier_total') }}</span><strong data-bal="supplier-total"></strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>{{ __('app.payable_payments.supplier_total_after') }}</span><strong data-bal="supplier-after"></strong>
+                        </div>
                     </div>
                 </div>
 
@@ -209,5 +248,6 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-triangle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    <script src="{{ asset('js/payment-balance.js') }}"></script>
     <script src="{{ asset('js/transactions-payable-payments.js') }}"></script>
 @endpush

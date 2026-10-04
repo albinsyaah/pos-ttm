@@ -53,7 +53,7 @@ class ChartOfAccountController extends Controller implements HasMiddleware
 
         ChartOfAccount::create($data);
 
-        return redirect()->route('finance.chart-of-accounts.index')->with('success', 'Account added successfully.');
+        return redirect()->route('finance.chart-of-accounts.index')->with('success', __('Account added successfully.'));
     }
 
     public function update(Request $request, ChartOfAccount $account): RedirectResponse
@@ -62,18 +62,18 @@ class ChartOfAccountController extends Controller implements HasMiddleware
 
         $account->update($data);
 
-        return redirect()->route('finance.chart-of-accounts.index')->with('success', 'Account updated successfully.');
+        return redirect()->route('finance.chart-of-accounts.index')->with('success', __('Account updated successfully.'));
     }
 
     public function destroy(ChartOfAccount $account): RedirectResponse
     {
         if ($account->cashFlows()->exists() || $account->generalLedgers()->exists()) {
-            return back()->with('error', 'This account already has cash flow or ledger entries and cannot be deleted.');
+            return back()->with('error', __('This account already has cash flow or ledger entries and cannot be deleted.'));
         }
 
         $account->delete();
 
-        return redirect()->route('finance.chart-of-accounts.index')->with('success', 'Account deleted successfully.');
+        return redirect()->route('finance.chart-of-accounts.index')->with('success', __('Account deleted successfully.'));
     }
 
     protected function validateAccount(Request $request, ?int $ignoreId = null): array

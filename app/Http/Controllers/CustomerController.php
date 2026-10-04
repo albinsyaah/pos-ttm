@@ -47,7 +47,7 @@ class CustomerController extends Controller implements HasMiddleware
 
         Customer::create($data);
 
-        return redirect()->route('customers.index')->with('success', 'Customer added successfully.');
+        return redirect()->route('customers.index')->with('success', __('Customer added successfully.'));
     }
 
     public function update(Request $request, Customer $customer): RedirectResponse
@@ -56,21 +56,21 @@ class CustomerController extends Controller implements HasMiddleware
 
         $customer->update($data);
 
-        return redirect()->route('customers.index')->with('success', 'Customer updated successfully.');
+        return redirect()->route('customers.index')->with('success', __('Customer updated successfully.'));
     }
 
     public function destroy(Customer $customer): RedirectResponse
     {
         $customer->delete();
 
-        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
+        return redirect()->route('customers.index')->with('success', __('Customer deleted successfully.'));
     }
 
     protected function validateCustomer(Request $request, ?int $ignoreId = null): array
     {
         return $request->validate([
             'code' => [
-                'required', 'string', 'max:50',
+                'nullable', 'string', 'max:50',
                 Rule::unique('customers', 'code')->ignore($ignoreId),
             ],
             'name' => ['required', 'string', 'max:150'],

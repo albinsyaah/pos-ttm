@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\CashFlowController;
 use App\Http\Controllers\Finance\ChartOfAccountController;
+use App\Http\Controllers\Finance\PaymentMethodController;
 use App\Http\Controllers\Finance\GeneralLedgerController;
 use App\Http\Controllers\Hr\EmployeeController;
 use App\Http\Controllers\Hr\SalesmanController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\ProductGroupController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\Pricing\PriceHistoryController;
 use App\Http\Controllers\Pricing\PriceSetupController;
 use App\Http\Controllers\Reports\ApPaymentReportController;
 use App\Http\Controllers\Reports\ArAgingReportController;
@@ -25,7 +27,10 @@ use App\Http\Controllers\Reports\ArPaymentReportController;
 use App\Http\Controllers\Reports\DeviationReportController;
 use App\Http\Controllers\Reports\ExpenditureReportController;
 use App\Http\Controllers\Reports\InventoryReportController;
+use App\Http\Controllers\Reports\PaymentMethodReportController;
 use App\Http\Controllers\Reports\PositionReportController;
+use App\Http\Controllers\Reports\ProductSalesReportController;
+use App\Http\Controllers\Reports\SalesmanReportController;
 use App\Http\Controllers\Reports\PurchaseOrderReportController;
 use App\Http\Controllers\Reports\PurchaseReportController;
 use App\Http\Controllers\Reports\PurchaseReturnReportController;
@@ -45,7 +50,10 @@ use App\Http\Controllers\Transactions\GeneralLedgerController as TransactionsGen
 use App\Http\Controllers\Transactions\InternalExpenditureController;
 use App\Http\Controllers\Transactions\InternalReceiptController;
 use App\Http\Controllers\Transactions\ItemRequestController;
+use App\Http\Controllers\DigitalReceiptController;
+use App\Http\Controllers\Print\SalePrintController;
 use App\Http\Controllers\Transactions\PointOfSaleController;
+use App\Http\Controllers\Transactions\PointOfSaleIndukController;
 use App\Http\Controllers\Transactions\PointOfSaleNewController;
 use App\Http\Controllers\Transactions\PurchaseController;
 use App\Http\Controllers\Transactions\PurchaseOrderController;
@@ -78,6 +86,14 @@ Route::get('/language/{locale}', [LanguageController::class, 'switch'])
     ->name('language.switch');
 
 // Guest-only auth routes
+// Digital receipt opened from the barcode on a printed receipt. Public on
+// purpose (customers are not users); the unguessable token is the key, and
+// the throttle makes guessing impractical.
+Route::get('/n/{token}', [DigitalReceiptController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]{32}')
+    ->middleware('throttle:60,1')
+    ->name('receipts.show');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
@@ -137,6 +153,9 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('price-setups', PriceSetupController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['price-setups' => 'priceSetup']);
+
+        Route::get('price-histories', [PriceHistoryController::class, 'index'])
+            ->name('price-histories.index');
     });
 
     // Keuangan (Finance): chart of accounts, cash flow, general ledger.
@@ -150,6 +169,10 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('cash-flows', CashFlowController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['cash-flows' => 'cashFlow']);
+
+        Route::resource('payment-methods', PaymentMethodController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['payment-methods' => 'paymentMethod']);
 
         Route::resource('general-ledgers', GeneralLedgerController::class)
             ->only(['index', 'store', 'update', 'destroy'])
@@ -191,9 +214,17 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('purchases', PurchaseController::class)
             ->only(['index', 'store', 'update', 'destroy']);
 
+        Route::get('purchase-returns/{purchase}/lines', [PurchaseReturnController::class, 'lines'])
+            ->name('purchase-returns.lines');
+
         Route::resource('purchase-returns', PurchaseReturnController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['purchase-returns' => 'purchaseReturn']);
+
+        // Open invoices of one supplier, for the payable payment form. Declared
+        // before the resource so "invoices" is never read as a payment id.
+        Route::get('payable-payments/invoices', [ApPaymentController::class, 'invoices'])
+            ->name('payable-payments.invoices');
 
         Route::resource('payable-payments', ApPaymentController::class)
             ->only(['index', 'store', 'update', 'destroy'])
@@ -206,12 +237,26 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('sales', SaleController::class)
             ->only(['index', 'store', 'update', 'destroy']);
 
+        // Printable documents for any sale (permission per document, see SalePrintController).
+        Route::get('sales/{sale}/print/receipt-small', [SalePrintController::class, 'receiptSmall'])->name('sales.print.receipt-small');
+        Route::get('sales/{sale}/print/receipt-large', [SalePrintController::class, 'receiptLarge'])->name('sales.print.receipt-large');
+        Route::get('sales/{sale}/print/delivery-note', [SalePrintController::class, 'deliveryNote'])->name('sales.print.delivery-note');
+
         Route::get('point-of-sale-new', [PointOfSaleNewController::class, 'index'])->name('point-of-sale-new.index');
+        Route::get('point-of-sale-new/products', [PointOfSaleNewController::class, 'products'])->name('point-of-sale-new.products');
         Route::post('point-of-sale-new', [PointOfSaleNewController::class, 'store'])->name('point-of-sale-new.store');
+
+        // Head cashier's terminal: same screen, plus driver name, large receipt and delivery note.
+        Route::get('point-of-sale-induk', [PointOfSaleIndukController::class, 'index'])->name('point-of-sale-induk.index');
+        Route::get('point-of-sale-induk/products', [PointOfSaleIndukController::class, 'products'])->name('point-of-sale-induk.products');
+        Route::post('point-of-sale-induk', [PointOfSaleIndukController::class, 'store'])->name('point-of-sale-induk.store');
 
         Route::resource('point-of-sale', PointOfSaleController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['point-of-sale' => 'pointOfSale']);
+
+        Route::get('sales-returns/{sale}/lines', [SalesReturnController::class, 'lines'])
+            ->name('sales-returns.lines');
 
         Route::resource('sales-returns', SalesReturnController::class)
             ->only(['index', 'store', 'update', 'destroy'])
@@ -220,6 +265,9 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::resource('sales-spg', SalesSpgController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['sales-spg' => 'salesSpg']);
+
+        Route::get('receivable-payments/outstanding', [ArPaymentController::class, 'outstanding'])
+            ->name('receivable-payments.outstanding');
 
         Route::resource('receivable-payments', ArPaymentController::class)
             ->only(['index', 'store', 'update', 'destroy'])
@@ -295,6 +343,18 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('sales-summary', [SalesSummaryReportController::class, 'index'])
             ->middleware('permission:reports.sales-summary.view')
             ->name('sales-summary');
+
+        Route::get('sales-by-product', [ProductSalesReportController::class, 'index'])
+            ->middleware('permission:reports.sales-by-product.view')
+            ->name('sales-by-product');
+
+        Route::get('salesman', [SalesmanReportController::class, 'index'])
+            ->middleware('permission:reports.salesman.view')
+            ->name('salesman');
+
+        Route::get('payment-methods', [PaymentMethodReportController::class, 'index'])
+            ->middleware('permission:reports.payment-methods.view')
+            ->name('payment-methods');
 
         Route::get('sales-returns', [SalesReturnReportController::class, 'index'])
             ->middleware('permission:reports.sales-returns.view')

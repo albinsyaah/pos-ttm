@@ -46,7 +46,7 @@ class AssetController extends Controller implements HasMiddleware
 
         Asset::create($data);
 
-        return redirect()->route('assets.index')->with('success', 'Asset added successfully.');
+        return redirect()->route('assets.index')->with('success', __('Asset added successfully.'));
     }
 
     public function update(Request $request, Asset $asset): RedirectResponse
@@ -55,21 +55,21 @@ class AssetController extends Controller implements HasMiddleware
 
         $asset->update($data);
 
-        return redirect()->route('assets.index')->with('success', 'Asset updated successfully.');
+        return redirect()->route('assets.index')->with('success', __('Asset updated successfully.'));
     }
 
     public function destroy(Asset $asset): RedirectResponse
     {
         $asset->delete();
 
-        return redirect()->route('assets.index')->with('success', 'Asset deleted successfully.');
+        return redirect()->route('assets.index')->with('success', __('Asset deleted successfully.'));
     }
 
     protected function validateAsset(Request $request, ?int $ignoreId = null): array
     {
         return $request->validate([
             'asset_code' => [
-                'required', 'string', 'max:50',
+                'nullable', 'string', 'max:50',
                 Rule::unique('assets', 'asset_code')->ignore($ignoreId),
             ],
             'name' => ['required', 'string', 'max:150'],

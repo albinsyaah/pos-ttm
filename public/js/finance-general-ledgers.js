@@ -25,7 +25,7 @@ document.getElementById('addLedgerBtn')?.addEventListener('click', (e) => {
   ledgerForm.reset();
   ledgerForm.action = e.currentTarget.dataset.action;
   ledgerFormMethod.innerHTML = '';
-  ledgerModalTitle.textContent = 'Add Ledger Entry';
+  ledgerModalTitle.textContent = __t('Add Ledger Entry');
   openModal(ledgerModal);
   ledgerDateInput?.focus();
 });
@@ -36,7 +36,7 @@ document.querySelectorAll('.edit-ledger-btn').forEach((btn) => {
     ledgerForm.reset();
     ledgerForm.action = btn.dataset.action;
     ledgerFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    ledgerModalTitle.textContent = 'Edit Ledger Entry';
+    ledgerModalTitle.textContent = __t('Edit Ledger Entry');
 
     ledgerDateInput.value = btn.dataset.transactionDate || '';
     ledgerAccountSelect.value = btn.dataset.accountId || '';

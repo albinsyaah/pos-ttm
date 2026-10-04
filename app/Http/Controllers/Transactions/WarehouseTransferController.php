@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Exceptions\InsufficientStockException;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\InternalMutation;
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -82,7 +84,7 @@ class WarehouseTransferController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $warehouseTransfer = InternalMutation::create([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -92,9 +94,13 @@ class WarehouseTransferController extends Controller implements HasMiddleware
             ]);
 
             $warehouseTransfer->internalMutationDetails()->createMany($data['items']);
+
+            // Only a "completed" warehouse transfer moves stock. Refused (and rolled back)
+            // if a warehouse is short.
+            $this->syncStock($warehouseTransfer, $data);
         });
 
-        return redirect()->route('transactions.warehouse-transfers.index')->with('success', 'Warehouse transfer added successfully.');
+        return redirect()->route('transactions.warehouse-transfers.index')->with('success', __('Warehouse transfer added successfully.'));
     }
 
     public function update(Request $request, InternalMutation $warehouseTransfer): RedirectResponse
@@ -103,7 +109,7 @@ class WarehouseTransferController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data, $warehouseTransfer) {
             $warehouseTransfer->update([
-                'mutation_number' => $data['mutation_number'],
+                'mutation_number' => $data['mutation_number'] ?? null,
                 'type' => self::TYPE,
                 'mutation_date' => $data['mutation_date'],
                 'status' => $data['status'],
@@ -114,26 +120,55 @@ class WarehouseTransferController extends Controller implements HasMiddleware
 
             $warehouseTransfer->internalMutationDetails()->delete();
             $warehouseTransfer->internalMutationDetails()->createMany($data['items']);
+
+            $this->syncStock($warehouseTransfer, $data);
         });
 
-        return redirect()->route('transactions.warehouse-transfers.index')->with('success', 'Warehouse transfer updated successfully.');
+        return redirect()->route('transactions.warehouse-transfers.index')->with('success', __('Warehouse transfer updated successfully.'));
     }
 
     public function destroy(InternalMutation $warehouseTransfer): RedirectResponse
     {
-        DB::transaction(function () use ($warehouseTransfer) {
-            $warehouseTransfer->internalMutationDetails()->delete();
-            $warehouseTransfer->delete();
-        });
+        try {
+            DB::transaction(function () use ($warehouseTransfer) {
+                // Undo whatever this warehouse transfer did to stock (refused if that stock
+                // has already been used).
+                app(StockService::class)->syncTransfer($warehouseTransfer, null, null, [], $warehouseTransfer->mutation_number);
 
-        return redirect()->route('transactions.warehouse-transfers.index')->with('success', 'Warehouse transfer deleted successfully.');
+                $warehouseTransfer->internalMutationDetails()->delete();
+                $warehouseTransfer->delete();
+            });
+        } catch (InsufficientStockException $e) {
+            return back()->with('error', implode(' ', $e->shortages));
+        }
+
+        return redirect()->route('transactions.warehouse-transfers.index')->with('success', __('Warehouse transfer deleted successfully.'));
+    }
+
+    /**
+     * Stock moves from the source to the destination warehouse only while the
+     * transfer is "completed"; pending, approved and rejected ones do not.
+     * Must be called inside the caller's DB::transaction().
+     */
+    protected function syncStock(InternalMutation $warehouseTransfer, array $data): void
+    {
+        $counts = $data['status'] === 'completed';
+
+        app(StockService::class)->syncTransfer(
+            $warehouseTransfer,
+            $counts ? (int) $data['from_warehouse_id'] : null,
+            $counts ? (int) $data['to_warehouse_id'] : null,
+            $counts ? $data['items'] : [],
+            $warehouseTransfer->mutation_number,
+            $data['mutation_date']
+        );
     }
 
     protected function validateWarehouseTransfer(Request $request, ?int $ignoreId = null): array
     {
         $data = $request->validate([
             'mutation_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('internal_mutations', 'mutation_number')->ignore($ignoreId),
             ],
             'mutation_date' => ['required', 'date'],

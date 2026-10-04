@@ -15,6 +15,13 @@ const noItemsMessage = document.getElementById('noItemsMessage');
 
 let rowIndex = 0;
 
+// Products on the chosen invoice, limited to what may still be returned.
+// Id of the return being edited (null when adding): its own quantities count as still available.
+let editingReturnId = null;
+const returnLines = ReturnLines.create({ sourceSelect: saleIdInput, rowsBody: itemRowsBody });
+
+saleIdInput.addEventListener('change', () => returnLines.load(saleIdInput.value, editingReturnId));
+
 function openModal(modal) {
   modal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
@@ -38,8 +45,7 @@ function addItemRow(values = {}) {
   const row = wrapper.firstElementChild;
   itemRowsBody.appendChild(row);
 
-  if (values.product_id) row.querySelector('.item-product').value = values.product_id;
-  if (values.qty !== undefined) row.querySelector('.item-qty').value = values.qty;
+  returnLines.attachRow(row, values);
 
   row.querySelector('.remove-item-btn').addEventListener('click', () => {
     row.remove();
@@ -62,7 +68,9 @@ document.getElementById('addSalesReturnBtn')?.addEventListener('click', (e) => {
   salesReturnForm.reset();
   salesReturnForm.action = e.currentTarget.dataset.action;
   salesReturnFormMethod.innerHTML = '';
-  salesReturnModalTitle.textContent = 'Add Sales Return';
+  salesReturnModalTitle.textContent = __t('Add Sales Return');
+  editingReturnId = null;
+  returnLines.load('', null);
   resetItemRows();
   addItemRow();
   openModal(salesReturnModal);
@@ -71,11 +79,11 @@ document.getElementById('addSalesReturnBtn')?.addEventListener('click', (e) => {
 
 // Open "Edit Sales Return" for each row
 document.querySelectorAll('.edit-sales-return-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', async () => {
     salesReturnForm.reset();
     salesReturnForm.action = btn.dataset.action;
     salesReturnFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    salesReturnModalTitle.textContent = 'Edit Sales Return';
+    salesReturnModalTitle.textContent = __t('Edit Sales Return');
 
     returnNumberInput.value = btn.dataset.returnNumber || '';
     returnDateInput.value = btn.dataset.returnDate || '';
@@ -83,6 +91,9 @@ document.querySelectorAll('.edit-sales-return-btn').forEach((btn) => {
     totalAmountInput.value = btn.dataset.totalAmount || '';
 
     resetItemRows();
+    editingReturnId = btn.dataset.returnId || null;
+    // Load the invoice's products first; this return's own quantities still count as available.
+    await returnLines.load(saleIdInput.value, editingReturnId);
     try {
       const items = JSON.parse(btn.dataset.items || '[]');
       items.forEach((item) => addItemRow(item));

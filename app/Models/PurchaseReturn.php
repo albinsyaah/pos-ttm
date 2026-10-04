@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoNumber;
+use App\Services\NumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PurchaseReturn extends Model
 {
     use HasFactory;
+    use HasAutoNumber;
 
     protected $table = 'purchase_returns';
 
@@ -25,5 +28,11 @@ class PurchaseReturn extends Model
     public function purchaseReturnDetails()
     {
         return $this->hasMany(PurchaseReturnDetail::class, 'purchase_return_id');
+    }
+
+    /** Automatic number: see NumberingService. */
+    public function autoNumberConfig(): array
+    {
+        return ['column' => 'return_number', 'prefix' => NumberingService::TYPE_PURCHASE_RETURN, 'date' => 'return_date'];
     }
 }

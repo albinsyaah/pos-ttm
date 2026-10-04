@@ -6,7 +6,7 @@
 @section('content')
 
     <form id="transferReportFilterForm" action="{{ route('reports.transfers') }}" method="GET"
-        class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+        class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="transferReportSearch">{{ __('app.reports.transfer.search_label') }}</label>
             <input id="transferReportSearch" name="q" type="search" value="{{ $search }}"

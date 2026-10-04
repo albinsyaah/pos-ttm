@@ -10,7 +10,12 @@ use App\Models\PurchaseOrder;
 use App\Models\Sale;
 use App\Models\SaleDetail;
 use App\Models\SalesOrder;
+use App\Models\SalesReturn;
+use App\Services\PayableService;
+use App\Services\ReceivableService;
+use App\Services\SalesInsightService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -22,35 +27,57 @@ class DashboardController extends Controller
      */
     protected int $lowStockThreshold = 10;
 
-    public function index()
+    public function index(Request $request, SalesInsightService $insight, PayableService $payables, ReceivableService $receivables)
     {
         $today = Carbon::today();
 
-        $todaySales = Sale::whereDate('sale_date', $today)->sum('total_amount');
-        $monthSales = Sale::whereMonth('sale_date', $today->month)->sum('total_amount');
-        $weeklySales = Sale::whereBetween('sale_date', [$today->copy()->startOfWeek(), $today->copy()->endOfWeek()])->sum('total_amount');
-        $ordersToday = Sale::whereDate('sale_date', $today)->count();
+        // Sales cards: day, week (Monday to Sunday) and month, each as a date range
+        // (the old month figure matched the month number only, mixing in other years).
+        [$dayFrom, $dayTo] = SalesInsightService::bounds('day', $today);
+        [$weekFrom, $weekTo] = SalesInsightService::bounds('week', $today);
+        [$monthFrom, $monthTo] = SalesInsightService::bounds('month', $today);
+
+        $daySales = $insight->salesTotal($dayFrom, $dayTo);
+        $weekSales = $insight->salesTotal($weekFrom, $weekTo);
+        $monthSales = $insight->salesTotal($monthFrom, $monthTo);
+
+        $todaySales = $daySales['total'];
+        $weeklySales = $weekSales['total'];
+        $ordersToday = $daySales['count'];
         $avgOrderValue = $ordersToday > 0 ? $todaySales / $ordersToday : 0;
+
+        // One range switch (day / week / month) drives the best sellers and the income per method.
+        $range = SalesInsightService::normalizeRange($request->query('range'));
+        [$rangeFrom, $rangeTo] = SalesInsightService::bounds($range, $today);
 
         $lowStockProducts = $this->lowStockProducts();
         $lowStockCount = $lowStockProducts->count();
 
-        $receivablesOutstanding = Sale::sum('total_amount') - ArPayment::sum('amount');
-        $payablesOutstanding = Purchase::sum('total_amount') - ApPayment::sum('amount');
+        // Same figures as the per-invoice screens: receivables as in the aging report,
+        // payables as the sum of the open purchase invoices (net of returns and payments).
+        $receivablesOutstanding = $receivables->totalOutstanding();
+        $payablesOutstanding = $payables->totalOutstanding();
 
         // "Pending" = raised but not yet fulfilled by an actual sale/purchase.
         $pendingSalesOrders = SalesOrder::whereDoesntHave('sales')->count();
         $pendingPurchaseOrders = PurchaseOrder::whereDoesntHave('purchases')->count();
 
-        $days = $this->weeklySalesChart($today);
-        $topProducts = $this->topProducts($today);
+        $days = $this->weeklySalesChart($today, $insight);
+        $topProducts = $insight->topProducts($rangeFrom, $rangeTo, 10);
+        $incomeByMethod = $insight->incomeByMethod($rangeFrom, $rangeTo);
         $topCustomers = $this->topCustomers();
         $orders = $this->recentOrders();
 
         return view('dashboard', [
             'todaySales' => $todaySales,
             'weeklySales' => $weeklySales,
-            'monthSales' => $monthSales,
+            'monthSales' => $monthSales['total'],
+            'weekCount' => $weekSales['count'],
+            'monthCount' => $monthSales['count'],
+            'range' => $range,
+            'rangeFrom' => $rangeFrom,
+            'rangeTo' => $rangeTo,
+            'incomeByMethod' => $incomeByMethod,
             'ordersToday' => $ordersToday,
             'avgOrderValue' => $avgOrderValue,
             'lowStockCount' => $lowStockCount,
@@ -91,7 +118,7 @@ class DashboardController extends Controller
      * Daily sales totals for this week vs the same weekday last week,
      * feeding the bar chart on the dashboard.
      */
-    protected function weeklySalesChart(Carbon $today): array
+    protected function weeklySalesChart(Carbon $today, SalesInsightService $insight): array
     {
         $startOfThisWeek = $today->copy()->startOfWeek();
         $startOfLastWeek = $startOfThisWeek->copy()->subWeek();
@@ -106,6 +133,10 @@ class DashboardController extends Controller
             ->groupBy('day')
             ->pluck('total', 'day');
 
+        // Sales returns count on the day they were made.
+        $thisWeekReturns = $insight->returnsByDay($startOfThisWeek->toDateString(), $startOfThisWeek->copy()->endOfWeek()->toDateString());
+        $lastWeekReturns = $insight->returnsByDay($startOfLastWeek->toDateString(), $startOfLastWeek->copy()->endOfWeek()->toDateString());
+
         $days = [];
         for ($i = 0; $i < 7; $i++) {
             $thisDay = $startOfThisWeek->copy()->addDays($i);
@@ -113,8 +144,8 @@ class DashboardController extends Controller
 
             $days[] = [
                 'label' => $thisDay->format('D'),
-                'this' => (float) ($thisWeekSales[$thisDay->toDateString()] ?? 0),
-                'last' => (float) ($lastWeekSales[$lastDay->toDateString()] ?? 0),
+                'this' => (float) ($thisWeekSales[$thisDay->toDateString()] ?? 0) - (float) ($thisWeekReturns[$thisDay->toDateString()] ?? 0),
+                'last' => (float) ($lastWeekSales[$lastDay->toDateString()] ?? 0) - (float) ($lastWeekReturns[$lastDay->toDateString()] ?? 0),
             ];
         }
 
@@ -122,41 +153,19 @@ class DashboardController extends Controller
     }
 
     /**
-     * Top 5 products by units sold today.
-     */
-    protected function topProducts(Carbon $today): array
-    {
-        $colors = ['brand', 'warn', 'good', 'bad'];
-
-        return SaleDetail::query()
-            ->join('sales', 'sales.id', '=', 'sale_details.sale_id')
-            ->join('products', 'products.id', '=', 'sale_details.product_id')
-            ->whereDate('sales.sale_date', $today)
-            ->selectRaw('products.id, products.name, SUM(sale_details.qty) as sold, SUM(sale_details.qty * sale_details.price) as revenue')
-            ->groupBy('products.id', 'products.name')
-            ->orderByDesc('sold')
-            ->limit(5)
-            ->get()
-            ->map(function ($row, $i) use ($colors) {
-                return [
-                    'icon' => 'fa-box',
-                    'bg' => $colors[$i % count($colors)],
-                    'name' => $row->name,
-                    'sold' => (int) $row->sold,
-                    'revenue' => (float) $row->revenue,
-                ];
-            })
-            ->all();
-    }
-
-    /**
      * Top 5 customers by total revenue (all time).
      */
     protected function topCustomers()
     {
+        // Revenue per customer, net of the sales returns on their invoices.
+        $returned = SalesReturn::query()
+            ->selectRaw('sale_id, SUM(total_amount) as returned')
+            ->groupBy('sale_id');
+
         return Sale::query()
             ->join('customers', 'customers.id', '=', 'sales.customer_id')
-            ->selectRaw('customers.id, customers.name, customers.code, COUNT(sales.id) as orders, SUM(sales.total_amount) as total')
+            ->leftJoinSub($returned, 'r', 'r.sale_id', '=', 'sales.id')
+            ->selectRaw('customers.id, customers.name, customers.code, COUNT(sales.id) as orders, SUM(sales.total_amount) - COALESCE(SUM(r.returned), 0) as total')
             ->groupBy('customers.id', 'customers.name', 'customers.code')
             ->orderByDesc('total')
             ->limit(5)

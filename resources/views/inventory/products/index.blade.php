@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
-        <form action="{{ route('inventory.products.index') }}" method="GET" class="relative">
+        <form action="{{ route('inventory.products.index') }}" method="GET" class="relative" data-live-search="auto">
             <label class="sr-only" for="productSearch">{{ __('app.products.search_products') }}</label>
             <input
                 id="productSearch"
@@ -32,11 +32,13 @@
     </div>
 
     <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
-        <table class="w-full text-sm min-w-[820px]">
+        <table class="w-full text-sm min-w-[1100px]">
             <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-semibold">{{ __('app.common.code') }}</th>
                     <th class="font-semibold">{{ __('app.common.name') }}</th>
+                    <th class="font-semibold">{{ __('app.products.packaging') }}</th>
+                    <th class="font-semibold">{{ __('app.products.stock') }}</th>
                     <th class="font-semibold">{{ __('app.products.brand') }}</th>
                     <th class="font-semibold">{{ __('app.products.item_type') }}</th>
                     <th class="font-semibold">{{ __('app.products.product_group') }}</th>
@@ -48,6 +50,16 @@
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ $product->code }}</td>
                         <td class="text-[var(--ink-700)]">{{ $product->name }}</td>
+                        <td class="text-[var(--ink-400)]">
+                            {{ $product->unit_name }}
+                            @if($product->hasPack())
+                                · 1 {{ $product->pack_name }} = {{ $product->pack_qty }} {{ $product->unit_name }}
+                            @endif
+                            @if($product->hasBox())
+                                · 1 {{ $product->box_name }} = {{ $product->box_qty }} {{ $product->unit_name }}
+                            @endif
+                        </td>
+                        <td class="font-medium text-[var(--ink-900)]">{{ $product->formatQuantity($stockByProduct[$product->id] ?? 0) }}</td>
                         <td class="text-[var(--ink-400)]">{{ $product->brand?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $product->itemType?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $product->productGroup?->name ?: '—' }}</td>
@@ -61,6 +73,11 @@
                                         data-action="{{ route('inventory.products.update', $product) }}"
                                         data-code="{{ $product->code }}"
                                         data-name="{{ $product->name }}"
+                                        data-unit-name="{{ $product->unit_name }}"
+                                        data-pack-name="{{ $product->pack_name }}"
+                                        data-pack-qty="{{ $product->pack_qty }}"
+                                        data-box-name="{{ $product->box_name }}"
+                                        data-box-qty="{{ $product->box_qty }}"
                                         data-brand-id="{{ $product->brand_id }}"
                                         data-item-type-id="{{ $product->item_type_id }}"
                                         data-product-group-id="{{ $product->product_group_id }}"
@@ -82,7 +99,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="8" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.products.no_products_found') }}
                         </td>
@@ -98,7 +115,7 @@
 
     {{-- Add / Edit modal --}}
     <div id="productModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
-        <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-md">
+        <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-5">
                 <h3 id="productModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">{{ __('app.products.add_product') }}</h3>
                 <button type="button" class="icon-btn modal-close" aria-label="Close">
@@ -113,13 +130,46 @@
                 <div class="space-y-4">
                     <div>
                         <label for="code" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.code') }}</label>
-                        <input id="code" name="code" type="text" required maxlength="50"
-                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        <input id="code" name="code" type="text" readonly maxlength="50" placeholder="{{ __('app.auto_number') }}"
+                               class="cursor-not-allowed text-[var(--ink-400)] w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.name') }}</label>
                         <input id="name" name="name" type="text" required maxlength="150"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                    </div>
+                    <div class="rounded-2xl border border-gray-100 p-4 space-y-4">
+                        <div>
+                            <p class="text-xs font-semibold text-[var(--ink-900)]">{{ __('app.products.packaging') }}</p>
+                            <p class="text-xs text-[var(--ink-400)] mt-0.5">{{ __('app.products.packaging_hint') }}</p>
+                        </div>
+                        <div>
+                            <label for="unit_name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.unit_name') }}</label>
+                            <input id="unit_name" name="unit_name" type="text" required maxlength="30" value="pcs"
+                                   class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="pack_name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.pack_name') }}</label>
+                                <input id="pack_name" name="pack_name" type="text" maxlength="30" placeholder="pack"
+                                       class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                            </div>
+                            <div>
+                                <label for="pack_qty" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.pack_qty') }}</label>
+                                <input id="pack_qty" name="pack_qty" type="number" min="2" step="1" inputmode="numeric"
+                                       class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                            </div>
+                            <div>
+                                <label for="box_name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.box_name') }}</label>
+                                <input id="box_name" name="box_name" type="text" maxlength="30" placeholder="box"
+                                       class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                            </div>
+                            <div>
+                                <label for="box_qty" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.box_qty') }}</label>
+                                <input id="box_qty" name="box_qty" type="number" min="2" step="1" inputmode="numeric"
+                                       class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label for="brand_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.brand') }}</label>

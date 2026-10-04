@@ -1,81 +1,138 @@
 @extends('layouts.app')
 
-@section('title', __('app.point_of_sale_new.title'))
-@section('page-title', __('app.point_of_sale_new.title'))
+@php $isHead = ($terminalMode ?? 'cashier') === 'head'; @endphp
+@section('title', $isHead ? __('insight.terminal.head_title') : __('app.point_of_sale_new.title'))
+@section('page-title', $isHead ? __('insight.terminal.head_title') : __('app.point_of_sale_new.title'))
+
+@push('styles')
+<style>
+    /* Checkout terminal. Scoped "pos-" classes so the look does not depend on a Tailwind rebuild. */
+    .pos-field { width: 100%; border-radius: .75rem; background: var(--surface); padding: .65rem 1rem; font-size: .875rem; border: 1px solid transparent; outline: none; transition: border-color .15s, background-color .15s; }
+    .pos-field:focus { border-color: var(--brand-600); background: #fff; }
+    .pos-label { display: block; font-size: .75rem; font-weight: 500; color: var(--ink-700); margin-bottom: .375rem; }
+
+    .pos-search-wrap { position: relative; }
+    .pos-search { width: 100%; border-radius: 1rem; background: var(--surface); padding: .95rem 1rem .95rem 2.9rem; font-size: 1rem; border: 2px solid transparent; outline: none; transition: border-color .15s, background-color .15s; }
+    .pos-search:focus { border-color: var(--brand-600); background: #fff; }
+    .pos-search:disabled { opacity: .6; cursor: not-allowed; }
+    .pos-search-icon { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--ink-400); pointer-events: none; }
+
+    .pos-results { margin-top: .5rem; border: 1px solid var(--ink-200); border-radius: 1rem; background: #fff; max-height: 20rem; overflow-y: auto; }
+    .pos-status { padding: .9rem 1rem; font-size: .8rem; color: var(--ink-400); }
+    .pos-result { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 1rem; padding: .7rem 1rem; text-align: left; background: #fff; border: 0; border-bottom: 1px solid var(--surface); cursor: pointer; }
+    .pos-result:last-child { border-bottom: 0; }
+    .pos-result:hover, .pos-result.is-active { background: var(--brand-100); }
+    .pos-result.is-out { opacity: .55; }
+    .pos-result-name { font-size: .875rem; font-weight: 600; color: var(--ink-900); }
+    .pos-result-sub { font-size: .7rem; color: var(--ink-400); margin-top: .1rem; }
+    .pos-result-side { text-align: right; flex-shrink: 0; font-size: .75rem; }
+    .pos-stock-ok { color: var(--good-600); font-weight: 600; }
+    .pos-stock-low { color: var(--warn-600); font-weight: 600; }
+    .pos-stock-out { color: var(--bad-600); font-weight: 600; }
+
+    .pos-cart-wrap { border: 1px solid var(--ink-200); border-radius: 1rem; overflow-x: auto; }
+    .pos-row.pos-row-bad { background: var(--bad-100); }
+    .pos-name { font-size: .8rem; font-weight: 600; color: var(--ink-900); }
+    .pos-sub { font-size: .7rem; color: var(--ink-400); margin-top: .1rem; }
+    .pos-error { color: var(--bad-600); font-size: .7rem; margin-top: .25rem; }
+    .pos-link { margin-top: .35rem; font-size: .7rem; font-weight: 600; color: var(--brand-600); background: none; border: 0; padding: 0; cursor: pointer; }
+    .pos-link:hover { color: var(--brand-700); }
+    /* display below would beat Tailwind's .hidden, so the badge was visible on every line */
+    .pos-badge-free.hidden { display: none; }
+    .pos-badge-free { display: inline-block; margin-left: .4rem; padding: .05rem .5rem; border-radius: 999px; background: var(--good-100); color: var(--good-600); font-size: .65rem; font-weight: 700; vertical-align: middle; }
+    .pos-flash { animation: pos-flash .7s ease; }
+    @keyframes pos-flash { from { background: var(--brand-100); } to { background: transparent; } }
+
+    .pos-stepper { display: flex; align-items: center; gap: .25rem; }
+    .pos-stepper button { width: 1.75rem; height: 1.75rem; border-radius: .5rem; background: var(--surface); border: 0; color: var(--ink-700); font-weight: 700; cursor: pointer; flex-shrink: 0; }
+    .pos-stepper button:hover { background: var(--brand-100); color: var(--brand-700); }
+    .pos-stepper input { width: 3.5rem; text-align: center; }
+
+    .pos-seg { display: grid; grid-template-columns: 1fr 1fr; gap: .25rem; padding: .25rem; background: var(--surface); border-radius: .875rem; }
+    .pos-seg label { cursor: pointer; }
+    .pos-seg input { position: absolute; opacity: 0; pointer-events: none; }
+    .pos-seg span { display: block; text-align: center; padding: .55rem .5rem; border-radius: .7rem; font-size: .8rem; font-weight: 600; color: var(--ink-700); transition: background-color .15s, color .15s; }
+    .pos-seg input:checked + span { background: var(--brand-600); color: #fff; }
+    .pos-seg input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .pos-note { font-size: .7rem; color: var(--ink-400); margin-top: .35rem; }
+
+    .pos-field-sm { padding: .45rem .5rem; font-size: .75rem; border-radius: .5rem; }
+    .pos-label-inline { margin-bottom: 0; }
+    .pos-stack > * + * { margin-top: 1rem; }
+    .pos-summary { border-top: 1px solid var(--surface); margin-top: 1.5rem; padding-top: 1.25rem; }
+    /* A display below would beat Tailwind's .hidden, so hide these explicitly. */
+    .pos-sum-row { display: flex; align-items: baseline; justify-content: space-between; font-size: .8rem; color: var(--ink-700); }
+    .pos-sum-row.hidden { display: none; }
+    .pos-sum-row strong { font-weight: 600; color: var(--ink-900); }
+    .pos-discount-row-hint { color: var(--good-600); }
+    .pos-field.is-invalid { border-color: var(--bad-600); }
+    .pos-total-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.25rem; }
+    .pos-total { font-size: 1.875rem; font-weight: 600; color: var(--ink-900); line-height: 1.1; }
+    .pos-submit { width: 100%; display: flex; align-items: center; justify-content: center; gap: .5rem; background: var(--brand-600); color: #fff; font-size: .875rem; font-weight: 600; border: 0; border-radius: 999px; padding: .85rem 1.25rem; cursor: pointer; transition: background-color .15s; }
+    .pos-submit:hover { background: var(--brand-700); }
+    .pos-submit:disabled { opacity: .6; cursor: not-allowed; }
+</style>
+@endpush
 
 @section('content')
 
     <p class="text-sm text-[var(--ink-400)] -mt-2 mb-6">{{ __('app.point_of_sale_new.subtitle') }}</p>
 
-    <form id="posNewForm" method="POST" action="{{ route('transactions.point-of-sale-new.store') }}" class="grid lg:grid-cols-3 gap-6 items-start">
+    {{-- After a sale: offer the receipt of that sale (only to users allowed to print it). --}}
+    @if(session('printed_sale_id'))
+        @php $printedSaleId = (int) session('printed_sale_id'); @endphp
+        @canany($isHead ? ['print.receipt-small', 'print.receipt-large', 'print.delivery-note'] : ['print.receipt-small'])
+            <div class="flex flex-wrap items-center gap-3 bg-white rounded-2xl px-5 py-3 mb-6 text-sm">
+                <span class="font-semibold text-[var(--ink-900)]">{{ __('app.print.print_this_sale') }}</span>
+                @can('print.receipt-small')
+                    <a href="{{ route('transactions.sales.print.receipt-small', $printedSaleId) }}?auto=1" target="_blank" rel="noopener" class="underline text-[var(--brand-600)]">{{ __('app.print.small_receipt') }}</a>
+                @endcan
+                @if($isHead) @can('print.receipt-large')
+                    <a href="{{ route('transactions.sales.print.receipt-large', $printedSaleId) }}" target="_blank" rel="noopener" class="underline text-[var(--brand-600)]">{{ __('app.print.large_receipt') }}</a>
+                @endcan @endif
+                @if($isHead) @can('print.delivery-note')
+                    <a href="{{ route('transactions.sales.print.delivery-note', $printedSaleId) }}" target="_blank" rel="noopener" class="underline text-[var(--brand-600)]">{{ __('app.print.delivery_note') }}</a>
+                @endcan @endif
+            </div>
+        @endcanany
+    @endif
+
+    <form id="posNewForm" method="POST" action="{{ route($routePrefix.'.store') }}" class="grid lg:grid-cols-3 gap-6 items-start">
         @csrf
 
+        {{-- Left: product search and the cart. Stock is read from all warehouses together. --}}
         <div class="lg:col-span-2 bg-white rounded-3xl p-6">
-            <div class="grid sm:grid-cols-2 gap-4">
-                <div>
-                    <label for="invoice_number" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.point_of_sale_new.invoice_number') }}</label>
-                    <input id="invoice_number" name="invoice_number" type="text" required maxlength="100" value="{{ old('invoice_number') }}"
-                           class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
-                </div>
-                <div>
-                    <label for="sale_date" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.point_of_sale_new.sale_date') }}</label>
-                    <input id="sale_date" name="sale_date" type="date" required value="{{ old('sale_date', now()->format('Y-m-d')) }}"
-                           class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
-                </div>
-                <div>
-                    <label for="customer_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.point_of_sale_new.customer_optional') }}</label>
-                    <select id="customer_id" name="customer_id"
-                           class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
-                        <option value="">{{ __('app.common.none') }}</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>{{ $customer->code }} — {{ $customer->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="salesman_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.point_of_sale_new.salesman_optional') }}</label>
-                    <select id="salesman_id" name="salesman_id"
-                           class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
-                        <option value="">{{ __('app.common.none') }}</option>
-                        @foreach($salesmen as $salesman)
-                            <option value="{{ $salesman->id }}" @selected(old('salesman_id') == $salesman->id)>{{ $salesman->code }} — {{ $salesman->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="warehouse_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.point_of_sale_new.warehouse') }}</label>
-                    <select id="warehouse_id" name="warehouse_id" required
-                           class="w-full sm:w-1/2 rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
-                        <option value="">{{ __('app.common.select') }}</option>
-                        @foreach($warehouses as $warehouse)
-                            <option value="{{ $warehouse->id }}" @selected(old('warehouse_id') == $warehouse->id)>{{ $warehouse->code }} — {{ $warehouse->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+            <div class="pos-search-wrap">
+                <i class="fa-solid fa-magnifying-glass pos-search-icon"></i>
+                <input id="productSearch" type="search" autocomplete="off" spellcheck="false"
+                       class="pos-search"
+                       placeholder="{{ __('app.point_of_sale_new.search_placeholder') }}"
+                       aria-label="{{ __('app.point_of_sale_new.search_label') }}"
+                       aria-controls="searchResults" />
             </div>
+            <div id="searchResults" class="pos-results hidden" role="listbox" aria-label="{{ __('app.point_of_sale_new.search_label') }}"></div>
+            <p class="mt-1.5 text-[11px] text-[var(--ink-400)]">{{ __('app.point_of_sale_new.stock_all_warehouses') }}</p>
 
             <div class="mt-6">
                 <div class="flex items-center justify-between mb-2">
-                    <label class="block text-xs font-medium text-[var(--ink-700)]">{{ __('app.point_of_sale_new.cart') }}</label>
-                    <button type="button" id="addItemRowBtn" class="text-xs font-semibold text-[var(--brand-600)] hover:text-[var(--brand-700)]">
-                        <i class="fa-solid fa-plus"></i> {{ __('app.point_of_sale_new.add_item') }}
-                    </button>
+                    <label class="pos-label pos-label-inline">{{ __('app.point_of_sale_new.cart') }}</label>
+                    <span id="cartCount" class="text-xs text-[var(--ink-400)]"></span>
                 </div>
 
-                <div class="rounded-2xl border border-gray-100 overflow-hidden">
+                <div class="pos-cart-wrap">
                     <table class="w-full text-xs">
                         <thead class="bg-[var(--surface)] text-[var(--ink-400)] uppercase tracking-wide">
                             <tr class="text-left">
                                 <th class="p-3 font-semibold">{{ __('app.point_of_sale_new.product') }}</th>
-                                <th class="p-3 font-semibold w-24">{{ __('app.point_of_sale_new.qty') }}</th>
-                                <th class="p-3 font-semibold w-32">{{ __('app.point_of_sale_new.price') }}</th>
+                                <th class="p-3 font-semibold w-40">{{ __('app.point_of_sale_new.qty') }}</th>
+                                <th class="p-3 font-semibold w-36">{{ __('app.point_of_sale_new.price') }}</th>
                                 <th class="p-3 font-semibold w-32">{{ __('app.point_of_sale_new.line_total') }}</th>
                                 <th class="p-3 w-10"></th>
                             </tr>
                         </thead>
                         <tbody id="itemRows"></tbody>
                     </table>
-                    <p id="noItemsMessage" class="text-center text-xs text-[var(--ink-400)] py-8">{{ __('app.point_of_sale_new.no_items_added') }}</p>
+                    <p id="noItemsMessage" class="text-center text-xs text-[var(--ink-400)] py-10">{{ __('app.point_of_sale_new.no_items_added') }}</p>
                 </div>
             </div>
 
@@ -90,23 +147,27 @@
 
         {{-- Row template for a cart item --}}
         <template id="itemRowTemplate">
-            <tr class="item-row border-t border-gray-100">
-                <td class="p-2">
-                    <select name="items[__INDEX__][product_id]" required class="item-product w-full rounded-lg bg-[var(--surface)] py-2 px-2.5 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
-                        <option value="">{{ __('app.common.select') }}</option>
-                        @foreach($products as $product)
-                            <option value="{{ $product->id }}">{{ $product->code }} — {{ $product->name }}</option>
-                        @endforeach
-                    </select>
+            <tr class="item-row pos-row border-t border-gray-100">
+                <td class="p-3 align-top">
+                    <input type="hidden" name="items[__INDEX__][product_id]" class="item-product" />
+                    <div class="pos-name"><span class="item-name"></span><span class="item-free-badge pos-badge-free hidden">{{ __('app.point_of_sale_new.free') }}</span></div>
+                    <div class="pos-sub"><span class="item-code"></span> · <span class="item-stock"></span></div>
+                    <div class="item-error pos-error hidden"></div>
+                    <button type="button" class="add-free-btn pos-link hidden"><i class="fa-solid fa-gift"></i> {{ __('app.point_of_sale_new.add_free') }}</button>
                 </td>
-                <td class="p-2">
-                    <input type="number" name="items[__INDEX__][qty]" min="1" step="1" required class="item-qty w-full rounded-lg bg-[var(--surface)] py-2 px-2.5 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                <td class="p-2 align-top">
+                    <div class="pos-stepper">
+                        <button type="button" class="qty-minus" aria-label="{{ __('app.point_of_sale_new.qty_decrease') }}">−</button>
+                        <input type="number" name="items[__INDEX__][qty]" min="1" step="1" required class="item-qty pos-field pos-field-sm" />
+                        <button type="button" class="qty-plus" aria-label="{{ __('app.point_of_sale_new.qty_increase') }}">+</button>
+                    </div>
                 </td>
-                <td class="p-2">
-                    <input type="number" name="items[__INDEX__][price]" min="0" step="0.01" required class="item-price w-full rounded-lg bg-[var(--surface)] py-2 px-2.5 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                <td class="p-2 align-top">
+                    <input type="number" name="items[__INDEX__][price]" min="0" step="0.01" required class="item-price pos-field pos-field-sm" />
+                    <span class="item-price-hint block text-[10px] mt-1 text-[var(--ink-400)]"></span>
                 </td>
-                <td class="p-2 item-line-total text-[var(--ink-700)] font-medium">0.00</td>
-                <td class="p-2 text-right">
+                <td class="p-3 align-top item-line-total text-[var(--ink-700)] font-medium">0.00</td>
+                <td class="p-2 align-top text-right">
                     <button type="button" class="remove-item-btn icon-btn" aria-label="{{ __('app.point_of_sale_new.remove') }}">
                         <i class="fa-solid fa-trash text-xs"></i>
                     </button>
@@ -114,26 +175,130 @@
             </tr>
         </template>
 
-        {{-- Summary / checkout panel --}}
+        {{-- Right: transaction details, payment and total --}}
         <div class="bg-white rounded-3xl p-6 lg:sticky lg:top-6">
-            <h3 class="font-semibold text-lg text-[var(--ink-900)] mb-4">{{ __('app.point_of_sale_new.total') }}</h3>
-            <div class="flex items-center justify-between text-2xl font-semibold text-[var(--ink-900)] mb-6">
-                <span class="text-sm font-medium text-[var(--ink-400)]">{{ __('app.point_of_sale_new.total') }}</span>
-                <span id="grandTotal">0.00</span>
+            <div class="pos-stack">
+                <div>
+                    <label for="invoice_number" class="pos-label">{{ __('app.point_of_sale_new.invoice_number') }}</label>
+                    <input id="invoice_number" name="invoice_number" type="text" readonly maxlength="100" placeholder="{{ __('app.auto_number') }}" value="" class="cursor-not-allowed text-[var(--ink-400)] pos-field" />
+                </div>
+                <div>
+                    <label for="sale_date" class="pos-label">{{ __('app.point_of_sale_new.sale_date') }}</label>
+                    <input id="sale_date" name="sale_date" type="date" required value="{{ old('sale_date', now()->format('Y-m-d')) }}" class="pos-field" />
+                </div>
+                <div>
+                    <label for="salesman_id" class="pos-label">{{ __('app.point_of_sale_new.salesman_optional') }}</label>
+                    <select id="salesman_id" name="salesman_id" class="pos-field">
+                        <option value="">{{ __('app.common.none') }}</option>
+                        @foreach($salesmen as $salesman)
+                            <option value="{{ $salesman->id }}" @selected(old('salesman_id') == $salesman->id)>{{ $salesman->code }} — {{ $salesman->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                @if($isHead)
+                <div>
+                    <label for="driver_name" class="pos-label">{{ __('app.print.driver_optional') }}</label>
+                    <input id="driver_name" name="driver_name" type="text" maxlength="100" autocomplete="off" value="{{ old('driver_name') }}" class="pos-field" />
+                </div>
+                @endif
+
+                <div>
+                    <span class="pos-label">{{ __('app.point_of_sale_new.payment') }}</span>
+                    <div class="pos-seg" role="radiogroup" aria-label="{{ __('app.point_of_sale_new.payment') }}">
+                        <label>
+                            <input type="radio" name="payment_type" value="cash" @checked(old('payment_type', 'cash') !== 'credit') />
+                            <span><i class="fa-solid fa-money-bill-wave"></i> {{ __('app.point_of_sale_new.payment_cash') }}</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="payment_type" value="credit" @checked(old('payment_type') === 'credit') />
+                            <span><i class="fa-solid fa-file-invoice-dollar"></i> {{ __('app.point_of_sale_new.payment_credit') }}</span>
+                        </label>
+                    </div>
+                    <p id="creditNote" class="pos-note hidden">{{ __('app.point_of_sale_new.credit_note') }}</p>
+                </div>
+
+                <div id="methodField">
+                    <label for="payment_method_id" class="pos-label">{{ __('app.point_of_sale_new.payment_method') }}</label>
+                    <select id="payment_method_id" name="payment_method_id" class="pos-field">
+                        @foreach($paymentMethods as $method)
+                            <option value="{{ $method->id }}" @selected($selectedMethodId === $method->id)>{{ $method->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label for="customer_id" id="customerLabel" class="pos-label"
+                           data-cash="{{ __('app.point_of_sale_new.customer_optional') }}"
+                           data-credit="{{ __('app.point_of_sale_new.customer_credit_required') }}">{{ __('app.point_of_sale_new.customer_optional') }}</label>
+                    <select id="customer_id" name="customer_id" class="pos-field">
+                        <option value="">{{ __('app.common.none') }}</option>
+                        @foreach($customers as $customer)
+                            <option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>{{ $customer->code }} — {{ $customer->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-            <button type="submit" class="w-full flex items-center justify-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-3 transition-colors">
-                <i class="fa-solid fa-cash-register"></i> {{ __('app.point_of_sale_new.complete_transaction') }}
-            </button>
-            <a href="{{ route('transactions.point-of-sale.index') }}" class="mt-3 block text-center text-xs font-medium text-[var(--ink-400)] hover:text-[var(--ink-700)]">
-                {{ __('app.sidebar.point_of_sales') }}
-            </a>
+
+            <div class="pos-summary">
+                <div class="pos-sum-row">
+                    <span>{{ __('app.point_of_sale_new.subtotal') }}</span>
+                    <strong id="subtotalValue">0.00</strong>
+                </div>
+
+                {{-- Discount on the whole sale: a percentage, a fixed amount, or both (both come off the subtotal). --}}
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <div>
+                        <label for="discount_percent" class="pos-label">{{ __('app.point_of_sale_new.discount_percent') }}</label>
+                        <input id="discount_percent" name="discount_percent" type="number" min="0" max="100" step="0.01" inputmode="decimal"
+                               placeholder="0" value="{{ $oldDiscountPercent }}" class="pos-field" />
+                    </div>
+                    <div>
+                        <label for="discount_amount" class="pos-label">{{ __('app.point_of_sale_new.discount_amount') }}</label>
+                        <input id="discount_amount" name="discount_amount" type="number" min="0" step="0.01" inputmode="decimal"
+                               placeholder="0" value="{{ $oldDiscountAmount }}" class="pos-field" />
+                    </div>
+                </div>
+                <p class="pos-note">{{ __('app.point_of_sale_new.discount_note') }}</p>
+                <p id="discountError" class="pos-error hidden" role="alert"></p>
+
+                <div id="discountRow" class="pos-sum-row hidden mt-3">
+                    <span>{{ __('app.point_of_sale_new.discount_given') }}</span>
+                    <strong id="discountValue" class="pos-discount-row-hint">-0.00</strong>
+                </div>
+
+                <div class="pos-total-row mt-4">
+                    <span class="text-sm font-medium text-[var(--ink-400)]">{{ __('app.point_of_sale_new.total') }}</span>
+                    <span id="grandTotal" class="pos-total">0.00</span>
+                </div>
+                <button id="submitBtn" type="submit" class="pos-submit">
+                    <i class="fa-solid fa-cash-register"></i> <span id="submitLabel">{{ __('app.point_of_sale_new.complete_transaction') }}</span>
+                </button>
+                <a href="{{ route('transactions.point-of-sale.index') }}" class="mt-3 block text-center text-xs font-medium text-[var(--ink-400)] hover:text-[var(--ink-700)]">
+                    {{ __('app.sidebar.point_of_sales') }}
+                </a>
+            </div>
         </div>
     </form>
 
 @endsection
 
 @push('scripts')
+@php
+    // Built in plain PHP: @json() cannot compile a multi-line array that contains __().
+    $labels = collect([
+        'search_placeholder', 'searching', 'no_results', 'search_failed', 'stock',
+        'out_of_stock', 'stock_short', 'duplicate_paid_row', 'duplicate_free_row',
+        'cart_empty_toast', 'fix_cart', 'processing', 'complete_transaction', 'reference_price',
+        'price_changed', 'no_reference_price', 'lines', 'free',
+        'discount_too_large_row', 'discount_percent_max',
+    ])->mapWithKeys(fn ($key) => [$key => __('app.point_of_sale_new.'.$key)])->all();
+@endphp
     <script>
+        window.POS_SEARCH_URL = @json(route($routePrefix.'.products'));
+        window.POS_LABELS = @json($labels);
+        // Rows of a refused submission (e.g. not enough stock), so the cart is not lost.
+        window.POS_CART_SEED = @json($cartSeed);
         @if(session('success'))
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('success'))));
         @endif

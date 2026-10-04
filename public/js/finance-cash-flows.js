@@ -25,7 +25,7 @@ document.getElementById('addCashFlowBtn')?.addEventListener('click', (e) => {
   cashFlowForm.reset();
   cashFlowForm.action = e.currentTarget.dataset.action;
   cashFlowFormMethod.innerHTML = '';
-  cashFlowModalTitle.textContent = 'Add Cash Flow';
+  cashFlowModalTitle.textContent = __t('Add Cash Flow');
   openModal(cashFlowModal);
   cashFlowDateInput?.focus();
 });
@@ -36,7 +36,7 @@ document.querySelectorAll('.edit-cash-flow-btn').forEach((btn) => {
     cashFlowForm.reset();
     cashFlowForm.action = btn.dataset.action;
     cashFlowFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    cashFlowModalTitle.textContent = 'Edit Cash Flow';
+    cashFlowModalTitle.textContent = __t('Edit Cash Flow');
 
     cashFlowDateInput.value = btn.dataset.transactionDate || '';
     cashFlowTypeSelect.value = btn.dataset.type || '';

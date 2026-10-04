@@ -64,7 +64,7 @@ document.getElementById('addDeviationBtn')?.addEventListener('click', (e) => {
   deviationForm.reset();
   deviationForm.action = e.currentTarget.dataset.action;
   deviationFormMethod.innerHTML = '';
-  deviationModalTitle.textContent = 'Add Deviation';
+  deviationModalTitle.textContent = __t('Add Deviation');
   resetItemRows();
   addItemRow();
   openModal(deviationModal);
@@ -77,7 +77,7 @@ document.querySelectorAll('.edit-deviation-btn').forEach((btn) => {
     deviationForm.reset();
     deviationForm.action = btn.dataset.action;
     deviationFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    deviationModalTitle.textContent = 'Edit Deviation';
+    deviationModalTitle.textContent = __t('Edit Deviation');
 
     mutationNumberInput.value = btn.dataset.mutationNumber || '';
     mutationDateInput.value = btn.dataset.mutationDate || '';

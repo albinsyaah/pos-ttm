@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Warehouse extends Model
 {
     use HasFactory;
+    use HasAutoNumber;
 
     protected $table = 'warehouses';
 
@@ -36,5 +38,11 @@ class Warehouse extends Model
     public function inventoryLedgers()
     {
         return $this->hasMany(InventoryLedger::class, 'warehouse_id');
+    }
+
+    /** Automatic code: see NumberingService. */
+    public function autoNumberConfig(): array
+    {
+        return ['column' => 'code', 'series' => 'warehouse', 'width' => 3];
     }
 }

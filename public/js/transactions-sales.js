@@ -10,6 +10,7 @@ const salesOrderIdInput = document.getElementById('sales_order_id');
 const saleCustomerIdInput = document.getElementById('customer_id');
 const salesmanIdInput = document.getElementById('salesman_id');
 const saleWarehouseIdInput = document.getElementById('warehouse_id');
+const driverNameInput = document.getElementById('driver_name');
 
 const itemRowsBody = document.getElementById('itemRows');
 const itemRowTemplate = document.getElementById('itemRowTemplate');
@@ -86,7 +87,7 @@ document.getElementById('addSaleBtn')?.addEventListener('click', (e) => {
   saleForm.reset();
   saleForm.action = e.currentTarget.dataset.action;
   saleFormMethod.innerHTML = '';
-  saleModalTitle.textContent = 'Add Sale';
+  saleModalTitle.textContent = __t('Add Sale');
   resetItemRows();
   addItemRow();
   openModal(saleModal);
@@ -99,7 +100,7 @@ document.querySelectorAll('.edit-sale-btn').forEach((btn) => {
     saleForm.reset();
     saleForm.action = btn.dataset.action;
     saleFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    saleModalTitle.textContent = 'Edit Sale';
+    saleModalTitle.textContent = __t('Edit Sale');
 
     invoiceNumberInput.value = btn.dataset.invoiceNumber || '';
     saleDateInput.value = btn.dataset.saleDate || '';
@@ -107,6 +108,7 @@ document.querySelectorAll('.edit-sale-btn').forEach((btn) => {
     saleCustomerIdInput.value = btn.dataset.customerId || '';
     salesmanIdInput.value = btn.dataset.salesmanId || '';
     saleWarehouseIdInput.value = btn.dataset.warehouseId || '';
+    driverNameInput.value = btn.dataset.driverName || '';
 
     resetItemRows();
     try {

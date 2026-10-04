@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
-        <form action="{{ route('finance.chart-of-accounts.index') }}" method="GET" class="relative">
+        <form action="{{ route('finance.chart-of-accounts.index') }}" method="GET" class="relative" data-live-search="auto">
             <label class="sr-only" for="accountSearch">{{ __('app.chart_of_accounts.search_accounts') }}</label>
             <input
                 id="accountSearch"

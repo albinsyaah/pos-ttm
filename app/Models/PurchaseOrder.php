@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAutoNumber;
+use App\Services\NumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PurchaseOrder extends Model
 {
     use HasFactory;
+    use HasAutoNumber;
 
     protected $table = 'purchase_orders';
 
@@ -29,5 +32,11 @@ class PurchaseOrder extends Model
     public function purchases()
     {
         return $this->hasMany(Purchase::class, 'purchase_order_id');
+    }
+
+    /** Automatic number: see NumberingService. */
+    public function autoNumberConfig(): array
+    {
+        return ['column' => 'po_number', 'prefix' => NumberingService::TYPE_PURCHASE_ORDER, 'date' => 'order_date'];
     }
 }

@@ -44,7 +44,7 @@ class ProductGroupController extends Controller implements HasMiddleware
 
         ProductGroup::create($data);
 
-        return redirect()->route('inventory.product-groups.index')->with('success', 'Product group added successfully.');
+        return redirect()->route('inventory.product-groups.index')->with('success', __('Product group added successfully.'));
     }
 
     public function update(Request $request, ProductGroup $productGroup): RedirectResponse
@@ -53,18 +53,18 @@ class ProductGroupController extends Controller implements HasMiddleware
 
         $productGroup->update($data);
 
-        return redirect()->route('inventory.product-groups.index')->with('success', 'Product group updated successfully.');
+        return redirect()->route('inventory.product-groups.index')->with('success', __('Product group updated successfully.'));
     }
 
     public function destroy(ProductGroup $productGroup): RedirectResponse
     {
         if ($productGroup->products()->exists()) {
-            return back()->with('error', 'This product group is still used by one or more products.');
+            return back()->with('error', __('This product group is still used by one or more products.'));
         }
 
         $productGroup->delete();
 
-        return redirect()->route('inventory.product-groups.index')->with('success', 'Product group deleted successfully.');
+        return redirect()->route('inventory.product-groups.index')->with('success', __('Product group deleted successfully.'));
     }
 
     protected function validateProductGroup(Request $request): array

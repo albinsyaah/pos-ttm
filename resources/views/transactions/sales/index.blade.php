@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
-        <form action="{{ route('transactions.sales.index') }}" method="GET" class="relative">
+        <form action="{{ route('transactions.sales.index') }}" method="GET" class="relative" data-live-search="auto">
             <label class="sr-only" for="saleSearch">{{ __('app.sales.search_sales') }}</label>
             <input
                 id="saleSearch"
@@ -50,10 +50,11 @@
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ $sale->invoice_number }}</td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($sale->sale_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $sale->customer?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: __('app.common.all_warehouses') }}</td>
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $sale->total_amount, 2) }}</td>
                         <td class="text-right pr-5">
+                            @include('partials.print-links', ['sale' => $sale])
                             @can('transactions.sales.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -67,6 +68,7 @@
                                         data-customer-id="{{ $sale->customer_id }}"
                                         data-salesman-id="{{ $sale->salesman_id }}"
                                         data-warehouse-id="{{ $sale->warehouse_id }}"
+                                        data-driver-name="{{ $sale->driver_name }}"
                                         data-items="{{ $sale->saleDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty, 'price' => $d->price])->toJson() }}"
                                     >
                                         <i class="fa-solid fa-pen text-xs"></i>
@@ -117,8 +119,8 @@
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label for="invoice_number" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.sales.invoice_number') }}</label>
-                        <input id="invoice_number" name="invoice_number" type="text" required maxlength="100"
-                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        <input id="invoice_number" name="invoice_number" type="text" readonly maxlength="100" placeholder="{{ __('app.auto_number') }}"
+                               class="cursor-not-allowed text-[var(--ink-400)] w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="sale_date" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.sales.sale_date') }}</label>
@@ -154,6 +156,11 @@
                                 <option value="{{ $salesman->id }}">{{ $salesman->code }} — {{ $salesman->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div>
+                        <label for="driver_name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.print.driver_optional') }}</label>
+                        <input id="driver_name" name="driver_name" type="text" maxlength="100" autocomplete="off"
+                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="warehouse_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.sales.warehouse') }}</label>

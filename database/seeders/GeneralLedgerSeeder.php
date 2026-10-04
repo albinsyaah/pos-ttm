@@ -44,7 +44,7 @@ class GeneralLedgerSeeder extends Seeder
 
         // AP payments: debit Accounts Payable, credit Cash/Bank.
         ApPayment::orderBy('id')->get()->each(function (ApPayment $payment) use ($accountsPayable, $cash, $bank) {
-            $paidFrom = $payment->payment_method === 'Tunai' ? $cash : $bank;
+            $paidFrom = $payment->paymentMethod?->is_cash ? $cash : $bank;
 
             GeneralLedger::create([
                 'transaction_date' => $payment->payment_date,
@@ -100,7 +100,7 @@ class GeneralLedgerSeeder extends Seeder
 
         // AR payments: debit Cash/Bank, credit Receivable.
         ArPayment::orderBy('id')->get()->each(function (ArPayment $payment) use ($receivable, $cash, $bank) {
-            $receivedInto = $payment->payment_method === 'Tunai' ? $cash : $bank;
+            $receivedInto = $payment->paymentMethod?->is_cash ? $cash : $bank;
 
             GeneralLedger::create([
                 'transaction_date' => $payment->payment_date,

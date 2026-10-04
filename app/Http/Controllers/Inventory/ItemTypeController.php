@@ -44,7 +44,7 @@ class ItemTypeController extends Controller implements HasMiddleware
 
         ItemType::create($data);
 
-        return redirect()->route('inventory.item-types.index')->with('success', 'Item type added successfully.');
+        return redirect()->route('inventory.item-types.index')->with('success', __('Item type added successfully.'));
     }
 
     public function update(Request $request, ItemType $itemType): RedirectResponse
@@ -53,18 +53,18 @@ class ItemTypeController extends Controller implements HasMiddleware
 
         $itemType->update($data);
 
-        return redirect()->route('inventory.item-types.index')->with('success', 'Item type updated successfully.');
+        return redirect()->route('inventory.item-types.index')->with('success', __('Item type updated successfully.'));
     }
 
     public function destroy(ItemType $itemType): RedirectResponse
     {
         if ($itemType->products()->exists()) {
-            return back()->with('error', 'This item type is still used by one or more products.');
+            return back()->with('error', __('This item type is still used by one or more products.'));
         }
 
         $itemType->delete();
 
-        return redirect()->route('inventory.item-types.index')->with('success', 'Item type deleted successfully.');
+        return redirect()->route('inventory.item-types.index')->with('success', __('Item type deleted successfully.'));
     }
 
     protected function validateItemType(Request $request): array

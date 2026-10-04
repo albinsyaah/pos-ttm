@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Http\Controllers\Concerns\SyncsSaleStock;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -17,6 +18,8 @@ use Illuminate\Validation\Rule;
 
 class PointOfSaleController extends Controller implements HasMiddleware
 {
+    use SyncsSaleStock;
+
     /**
      * The Point of Sale pages manage over-the-counter sales, tagged with
      * this source. They share the 'sales' table with the regular Sales
@@ -68,20 +71,25 @@ class PointOfSaleController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $sale = Sale::create([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
                 'total_amount' => $data['total_amount'],
                 'source' => self::SOURCE,
                 'sales_order_id' => null,
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
+                'driver_name' => $data['driver_name'],
                 'warehouse_id' => $data['warehouse_id'],
             ]);
 
             $sale->saleDetails()->createMany($data['items']);
+
+            // Take the items out of the chosen warehouse; refused (and rolled
+            // back) if a warehouse is short. Same product on two lines is added up.
+            $this->syncSaleStock($sale, $data['items']);
         });
 
-        return redirect()->route('transactions.point-of-sale.index')->with('success', 'Point of sale transaction added successfully.');
+        return redirect()->route('transactions.point-of-sale.index')->with('success', __('Point of sale transaction added successfully.'));
     }
 
     public function update(Request $request, Sale $pointOfSale): RedirectResponse
@@ -89,46 +97,62 @@ class PointOfSaleController extends Controller implements HasMiddleware
         $data = $this->validatePointOfSale($request, $pointOfSale->id);
 
         DB::transaction(function () use ($data, $pointOfSale) {
+            // A sale that was given a discount (cashier terminal) keeps it: it is worked out again
+            // from the same percentage and amount against the edited lines.
+            $pricing = app(\App\Services\SaleDiscountService::class)->recalculateFor($pointOfSale, (float) $data['total_amount']);
+
             $pointOfSale->update([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
-                'total_amount' => $data['total_amount'],
+                'total_amount' => $pricing['total_amount'],
+                'discount_percent' => $pricing['discount_percent'],
+                'discount_amount' => $pricing['discount_amount'],
+                'discount_total' => $pricing['discount_total'],
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
+                'driver_name' => $data['driver_name'],
                 'warehouse_id' => $data['warehouse_id'],
             ]);
 
             $pointOfSale->saleDetails()->delete();
             $pointOfSale->saleDetails()->createMany($data['items']);
+
+            // Writes only the difference from what this sale already took out
+            // of stock; refused (and rolled back) if a warehouse is short.
+            $this->syncSaleStock($pointOfSale, $data['items']);
         });
 
-        return redirect()->route('transactions.point-of-sale.index')->with('success', 'Point of sale transaction updated successfully.');
+        return redirect()->route('transactions.point-of-sale.index')->with('success', __('Point of sale transaction updated successfully.'));
     }
 
     public function destroy(Sale $pointOfSale): RedirectResponse
     {
         if ($pointOfSale->salesReturns()->exists()) {
-            return back()->with('error', 'This transaction already has returns recorded and cannot be deleted.');
+            return back()->with('error', __('This transaction already has returns recorded and cannot be deleted.'));
         }
 
         DB::transaction(function () use ($pointOfSale) {
+            // Put the stock this sale took out back into its warehouse.
+            $this->syncSaleStock($pointOfSale);
+
             $pointOfSale->saleDetails()->delete();
             $pointOfSale->delete();
         });
 
-        return redirect()->route('transactions.point-of-sale.index')->with('success', 'Point of sale transaction deleted successfully.');
+        return redirect()->route('transactions.point-of-sale.index')->with('success', __('Point of sale transaction deleted successfully.'));
     }
 
     protected function validatePointOfSale(Request $request, ?int $ignoreId = null): array
     {
         $data = $request->validate([
             'invoice_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('sales', 'invoice_number')->ignore($ignoreId),
             ],
             'sale_date' => ['required', 'date'],
             'customer_id' => ['nullable', 'exists:customers,id'],
             'salesman_id' => ['nullable', 'exists:employees,id'],
+            'driver_name' => ['nullable', 'string', 'max:100'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
@@ -146,6 +170,7 @@ class PointOfSaleController extends Controller implements HasMiddleware
 
         $data['customer_id'] = $data['customer_id'] ?? null;
         $data['salesman_id'] = $data['salesman_id'] ?? null;
+        $data['driver_name'] = filled($data['driver_name'] ?? null) ? trim($data['driver_name']) : null;
 
         return $data;
     }

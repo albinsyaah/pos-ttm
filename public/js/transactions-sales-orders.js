@@ -97,7 +97,7 @@ document.querySelectorAll('.edit-sales-order-btn').forEach((btn) => {
     salesOrderForm.reset();
     salesOrderForm.action = btn.dataset.action;
     salesOrderFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    salesOrderModalTitle.textContent = 'Edit Sales Order';
+    salesOrderModalTitle.textContent = __t('Edit Sales Order');
 
     soNumberInput.value = btn.dataset.soNumber || '';
     orderDateInput.value = btn.dataset.orderDate || '';

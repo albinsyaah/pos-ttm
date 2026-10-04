@@ -6,7 +6,7 @@
 @section('content')
 
     <div class="flex items-center justify-between flex-wrap gap-4">
-        <form action="{{ route('transactions.purchase-returns.index') }}" method="GET" class="relative">
+        <form action="{{ route('transactions.purchase-returns.index') }}" method="GET" class="relative" data-live-search="auto">
             <label class="sr-only" for="purchaseReturnSearch">{{ __('app.purchase_returns.search_purchase_returns') }}</label>
             <input
                 id="purchaseReturnSearch"
@@ -65,6 +65,7 @@
                                         data-return-number="{{ $purchaseReturn->return_number }}"
                                         data-return-date="{{ \Illuminate\Support\Carbon::parse($purchaseReturn->return_date)->format('Y-m-d') }}"
                                         data-purchase-id="{{ $purchaseReturn->purchase_id }}"
+                                        data-return-id="{{ $purchaseReturn->id }}"
                                         data-total-amount="{{ $purchaseReturn->total_amount }}"
                                         data-items="{{ $purchaseReturn->purchaseReturnDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty, 'reason' => $d->reason])->toJson() }}"
                                     >
@@ -116,8 +117,8 @@
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label for="return_number" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.purchase_returns.return_number') }}</label>
-                        <input id="return_number" name="return_number" type="text" required maxlength="100"
-                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        <input id="return_number" name="return_number" type="text" readonly maxlength="100" placeholder="{{ __('app.auto_number') }}"
+                               class="cursor-not-allowed text-[var(--ink-400)] w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
                     </div>
                     <div>
                         <label for="return_date" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.purchase_returns.return_date') }}</label>
@@ -126,7 +127,7 @@
                     </div>
                     <div>
                         <label for="purchase_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.purchase_returns.purchase') }}</label>
-                        <select id="purchase_id" name="purchase_id" required
+                        <select id="purchase_id" name="purchase_id" required data-lines-url="{{ route('transactions.purchase-returns.lines', ['purchase' => '__ID__']) }}"
                                class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                             <option value="">{{ __('app.common.select') }}</option>
                             @foreach($purchases as $purchase)
@@ -187,13 +188,11 @@
             <td class="p-2">
                 <select name="items[__INDEX__][product_id]" required class="item-product w-full rounded-lg bg-[var(--surface)] py-2 px-2.5 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
                     <option value="">{{ __('app.common.select') }}</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->code }} — {{ $product->name }}</option>
-                    @endforeach
                 </select>
             </td>
             <td class="p-2">
                 <input type="number" name="items[__INDEX__][qty]" min="1" step="1" required class="item-qty w-full rounded-lg bg-[var(--surface)] py-2 px-2.5 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                <div class="item-hint hidden mt-1 text-[10px] text-[var(--ink-500)]"></div>
             </td>
             <td class="p-2">
                 <input type="text" name="items[__INDEX__][reason]" maxlength="255" class="item-reason w-full rounded-lg bg-[var(--surface)] py-2 px-2.5 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
@@ -252,5 +251,7 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-triangle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    <script src="{{ asset('js/product-picker.js') }}"></script>
+    <script src="{{ asset('js/return-lines.js') }}"></script>
     <script src="{{ asset('js/transactions-purchase-returns.js') }}"></script>
 @endpush

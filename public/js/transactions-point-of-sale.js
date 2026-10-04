@@ -8,6 +8,7 @@ const invoiceNumberInput = document.getElementById('invoice_number');
 const saleDateInput = document.getElementById('sale_date');
 const posCustomerIdInput = document.getElementById('customer_id');
 const salesmanIdInput = document.getElementById('salesman_id');
+const driverNameInput = document.getElementById('driver_name');
 const posWarehouseIdInput = document.getElementById('warehouse_id');
 
 const itemRowsBody = document.getElementById('itemRows');
@@ -85,7 +86,7 @@ document.getElementById('addPointOfSaleBtn')?.addEventListener('click', (e) => {
   posForm.reset();
   posForm.action = e.currentTarget.dataset.action;
   posFormMethod.innerHTML = '';
-  posModalTitle.textContent = 'Add Transaction';
+  posModalTitle.textContent = __t('Add Transaction');
   resetItemRows();
   addItemRow();
   openModal(posModal);
@@ -98,12 +99,13 @@ document.querySelectorAll('.edit-pos-btn').forEach((btn) => {
     posForm.reset();
     posForm.action = btn.dataset.action;
     posFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    posModalTitle.textContent = 'Edit Transaction';
+    posModalTitle.textContent = __t('Edit Transaction');
 
     invoiceNumberInput.value = btn.dataset.invoiceNumber || '';
     saleDateInput.value = btn.dataset.saleDate || '';
     posCustomerIdInput.value = btn.dataset.customerId || '';
     salesmanIdInput.value = btn.dataset.salesmanId || '';
+    driverNameInput.value = btn.dataset.driverName || '';
     posWarehouseIdInput.value = btn.dataset.warehouseId || '';
 
     resetItemRows();

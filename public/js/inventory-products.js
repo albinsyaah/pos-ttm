@@ -6,6 +6,11 @@ const productModalTitle = document.getElementById('productModalTitle');
 
 const productCodeInput = document.getElementById('code');
 const productNameInput = document.getElementById('name');
+const productUnitInput = document.getElementById('unit_name');
+const productPackNameInput = document.getElementById('pack_name');
+const productPackQtyInput = document.getElementById('pack_qty');
+const productBoxNameInput = document.getElementById('box_name');
+const productBoxQtyInput = document.getElementById('box_qty');
 const productBrandSelect = document.getElementById('brand_id');
 const productItemTypeSelect = document.getElementById('item_type_id');
 const productGroupSelect = document.getElementById('product_group_id');
@@ -23,9 +28,10 @@ function closeModal(modal) {
 // Open "Add Barang"
 document.getElementById('addProductBtn')?.addEventListener('click', (e) => {
   productForm.reset();
+  productUnitInput.value = 'pcs';
   productForm.action = e.currentTarget.dataset.action;
   productFormMethod.innerHTML = '';
-  productModalTitle.textContent = 'Add Barang';
+  productModalTitle.textContent = __t('Add Product');
   openModal(productModal);
   productCodeInput?.focus();
 });
@@ -36,10 +42,15 @@ document.querySelectorAll('.edit-product-btn').forEach((btn) => {
     productForm.reset();
     productForm.action = btn.dataset.action;
     productFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    productModalTitle.textContent = 'Edit Barang';
+    productModalTitle.textContent = __t('Edit Product');
 
     productCodeInput.value = btn.dataset.code || '';
     productNameInput.value = btn.dataset.name || '';
+    productUnitInput.value = btn.dataset.unitName || 'pcs';
+    productPackNameInput.value = btn.dataset.packName || '';
+    productPackQtyInput.value = btn.dataset.packQty || '';
+    productBoxNameInput.value = btn.dataset.boxName || '';
+    productBoxQtyInput.value = btn.dataset.boxQty || '';
     productBrandSelect.value = btn.dataset.brandId || '';
     productItemTypeSelect.value = btn.dataset.itemTypeId || '';
     productGroupSelect.value = btn.dataset.productGroupId || '';

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Http\Controllers\Concerns\SyncsSaleStock;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -17,6 +18,8 @@ use Illuminate\Validation\Rule;
 
 class SalesSpgController extends Controller implements HasMiddleware
 {
+    use SyncsSaleStock;
+
     /**
      * Sales SPG (sales promotion girl / booth sales) transactions. They
      * share the 'sales' table with the regular Sales and Point of Sale
@@ -70,7 +73,7 @@ class SalesSpgController extends Controller implements HasMiddleware
 
         DB::transaction(function () use ($data) {
             $sale = Sale::create([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
                 'total_amount' => $data['total_amount'],
                 'source' => self::SOURCE,
@@ -81,9 +84,13 @@ class SalesSpgController extends Controller implements HasMiddleware
             ]);
 
             $sale->saleDetails()->createMany($data['items']);
+
+            // Take the items out of the chosen warehouse; refused (and rolled
+            // back) if a warehouse is short. Same product on two lines is added up.
+            $this->syncSaleStock($sale, $data['items']);
         });
 
-        return redirect()->route('transactions.sales-spg.index')->with('success', 'Sales SPG transaction added successfully.');
+        return redirect()->route('transactions.sales-spg.index')->with('success', __('Sales SPG transaction added successfully.'));
     }
 
     public function update(Request $request, Sale $salesSpg): RedirectResponse
@@ -91,10 +98,17 @@ class SalesSpgController extends Controller implements HasMiddleware
         $data = $this->validateSalesSpg($request, $salesSpg->id);
 
         DB::transaction(function () use ($data, $salesSpg) {
+            // A sale that was given a discount (cashier terminal) keeps it: it is worked out again
+            // from the same percentage and amount against the edited lines.
+            $pricing = app(\App\Services\SaleDiscountService::class)->recalculateFor($salesSpg, (float) $data['total_amount']);
+
             $salesSpg->update([
-                'invoice_number' => $data['invoice_number'],
+                'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
-                'total_amount' => $data['total_amount'],
+                'total_amount' => $pricing['total_amount'],
+                'discount_percent' => $pricing['discount_percent'],
+                'discount_amount' => $pricing['discount_amount'],
+                'discount_total' => $pricing['discount_total'],
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
                 'warehouse_id' => $data['warehouse_id'],
@@ -102,30 +116,37 @@ class SalesSpgController extends Controller implements HasMiddleware
 
             $salesSpg->saleDetails()->delete();
             $salesSpg->saleDetails()->createMany($data['items']);
+
+            // Writes only the difference from what this sale already took out
+            // of stock; refused (and rolled back) if a warehouse is short.
+            $this->syncSaleStock($salesSpg, $data['items']);
         });
 
-        return redirect()->route('transactions.sales-spg.index')->with('success', 'Sales SPG transaction updated successfully.');
+        return redirect()->route('transactions.sales-spg.index')->with('success', __('Sales SPG transaction updated successfully.'));
     }
 
     public function destroy(Sale $salesSpg): RedirectResponse
     {
         if ($salesSpg->salesReturns()->exists()) {
-            return back()->with('error', 'This transaction already has returns recorded and cannot be deleted.');
+            return back()->with('error', __('This transaction already has returns recorded and cannot be deleted.'));
         }
 
         DB::transaction(function () use ($salesSpg) {
+            // Put the stock this sale took out back into its warehouse.
+            $this->syncSaleStock($salesSpg);
+
             $salesSpg->saleDetails()->delete();
             $salesSpg->delete();
         });
 
-        return redirect()->route('transactions.sales-spg.index')->with('success', 'Sales SPG transaction deleted successfully.');
+        return redirect()->route('transactions.sales-spg.index')->with('success', __('Sales SPG transaction deleted successfully.'));
     }
 
     protected function validateSalesSpg(Request $request, ?int $ignoreId = null): array
     {
         $data = $request->validate([
             'invoice_number' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('sales', 'invoice_number')->ignore($ignoreId),
             ],
             'sale_date' => ['required', 'date'],

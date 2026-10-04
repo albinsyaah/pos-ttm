@@ -6,7 +6,7 @@
 @section('content')
 
     <form id="positionReportFilterForm" action="{{ route('reports.position') }}" method="GET"
-        class="report-filter-form flex items-center justify-between flex-wrap gap-4">
+        class="report-filter-form flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="positionReportSearch">{{ __('app.reports.position.search_label') }}</label>
             <input id="positionReportSearch" name="q" type="search" value="{{ $search }}"
@@ -106,7 +106,14 @@
                         <td class="font-medium text-[var(--ink-900)]">{{ $position->product_name }}</td>
                         <td class="text-[var(--ink-700)]">{{ $position->warehouse_name }}</td>
                         <td class="text-right font-medium text-[var(--ink-900)]">
-                            {{ number_format($position->balance) }}</td>
+                            @php
+                                $packaging = new \App\Models\Product($position->only(['unit_name', 'pack_name', 'pack_qty', 'box_name', 'box_qty']));
+                            @endphp
+                            {{ $packaging->formatQuantity((int) $position->balance) }}
+                            @if ($packaging->hasPack() || $packaging->hasBox())
+                                <span class="block text-xs font-normal text-[var(--ink-400)]">{{ number_format($position->balance) }} {{ $packaging->unit_name }}</span>
+                            @endif
+                        </td>
                         <td>
                             @if ($position->balance < $lowStockThreshold)
                                 <span

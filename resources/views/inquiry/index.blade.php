@@ -4,8 +4,9 @@
 @section('page-title', __('app.inquiry.title'))
 
 @section('content')
+@php use App\Support\Money; @endphp
 
-    <form id="inquiryFilterForm" action="{{ route('inquiry.index') }}" method="GET" class="flex items-center justify-between flex-wrap gap-4">
+    <form id="inquiryFilterForm" action="{{ route('inquiry.index') }}" method="GET" class="flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
             <label class="sr-only" for="inquirySearch">{{ __('app.inquiry.search_products') }}</label>
             <input
@@ -91,11 +92,16 @@
                         <td class="px-5 py-4 text-[var(--ink-400)]">{{ $product->itemType?->name ?: '—' }}</td>
                         <td class="px-5 py-4">
                             @if($stock)
-                                <span class="font-semibold text-[var(--ink-900)]">{{ number_format($stock['total']) }}</span>
+                                <span class="font-semibold text-[var(--ink-900)]">{{ $product->formatQuantity($stock['total']) }}</span>
+                                @if($stock['total'] > 0)
+                                    <span class="chip bg-[var(--good-100)] text-[var(--good-600)] ml-1" data-availability="available">{{ __('insight.inquiry.available') }}</span>
+                                @else
+                                    <span class="chip bg-[var(--bad-100)] text-[var(--bad-600)] ml-1" data-availability="out">{{ __('insight.inquiry.out_of_stock') }}</span>
+                                @endif
                                 <div class="mt-1.5 flex flex-wrap gap-1.5">
                                     @foreach($stock['warehouses'] as $row)
                                         <span class="inline-flex items-center rounded-full bg-[var(--surface)] px-2.5 py-1 text-xs text-[var(--ink-400)] whitespace-nowrap">
-                                            {{ $row['name'] }}: {{ number_format($row['balance']) }}
+                                            {{ $row['name'] }}: {{ $product->formatQuantity($row['balance']) }}
                                         </span>
                                     @endforeach
                                 </div>
@@ -107,11 +113,55 @@
                             @forelse($prices as $price)
                                 <div class="text-[var(--ink-700)] whitespace-nowrap">
                                     <span class="text-[var(--ink-400)] text-xs">{{ $price->price_category }}:</span>
-                                    {{ number_format((float) $price->amount, 2) }}
+                                    <span class="font-semibold">{{ Money::rupiah($price->amount) }}</span>
+                                    <span class="text-[var(--ink-400)] text-[11px]">({{ __('insight.inquiry.effective') }} {{ \Illuminate\Support\Carbon::parse($price->effective_date)->format('d M Y') }})</span>
                                 </div>
                             @empty
                                 <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_price_data') }}</span>
                             @endforelse
+                            <button type="button" data-history-toggle="{{ $product->id }}" aria-expanded="false"
+                                    class="mt-2 text-xs font-semibold text-[var(--brand-600)] hover:underline">
+                                {{ __('insight.inquiry.price_history') }}
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="hidden bg-[var(--surface)]" data-history-row="{{ $product->id }}">
+                        <td colspan="6" class="px-5 py-4">
+                            @php $history = $historyByProduct[$product->id] ?? collect(); @endphp
+                            @if($history->isEmpty())
+                                <p class="text-xs text-[var(--ink-400)]">{{ __('insight.inquiry.no_price_history') }}</p>
+                            @else
+                                <table class="w-full text-xs">
+                                    <thead class="text-[var(--ink-400)] uppercase tracking-wide">
+                                        <tr class="text-left">
+                                            <th class="py-1 pr-3 font-semibold">{{ __('insight.inquiry.when') }}</th>
+                                            <th class="py-1 pr-3 font-semibold">{{ __('insight.inquiry.category') }}</th>
+                                            <th class="py-1 pr-3 font-semibold">{{ __('insight.inquiry.change') }}</th>
+                                            <th class="py-1 pr-3 font-semibold">{{ __('insight.inquiry.effective_date') }}</th>
+                                            <th class="py-1 font-semibold">{{ __('insight.inquiry.by') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($history as $log)
+                                            <tr class="border-t border-white">
+                                                <td class="py-1.5 pr-3 whitespace-nowrap">{{ $log->created_at?->format('d M Y H:i') }}</td>
+                                                <td class="py-1.5 pr-3">{{ $log->price_category }}</td>
+                                                <td class="py-1.5 pr-3 whitespace-nowrap">
+                                                    @if($log->action === \App\Models\PriceHistory::CREATED)
+                                                        {{ __('insight.inquiry.set_to') }} <strong>{{ Money::rupiah($log->new_amount) }}</strong>
+                                                    @elseif($log->action === \App\Models\PriceHistory::DELETED)
+                                                        {{ __('insight.inquiry.removed') }} ({{ Money::rupiah($log->old_amount) }})
+                                                    @else
+                                                        {{ Money::rupiah($log->old_amount) }} &rarr; <strong>{{ Money::rupiah($log->new_amount) }}</strong>
+                                                    @endif
+                                                </td>
+                                                <td class="py-1.5 pr-3 whitespace-nowrap">{{ ($log->new_effective_date ?? $log->old_effective_date)?->format('d M Y') ?: '—' }}</td>
+                                                <td class="py-1.5">{{ $log->user?->username ?: '—' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
                         </td>
                     </tr>
                 @empty

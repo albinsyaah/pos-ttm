@@ -21,7 +21,7 @@ document.getElementById('addProductGroupBtn')?.addEventListener('click', (e) => 
   productGroupForm.reset();
   productGroupForm.action = e.currentTarget.dataset.action;
   productGroupFormMethod.innerHTML = '';
-  productGroupModalTitle.textContent = 'Add Grup Produk';
+  productGroupModalTitle.textContent = __t('Add Product Group');
   openModal(productGroupModal);
   productGroupNameInput?.focus();
 });
@@ -32,7 +32,7 @@ document.querySelectorAll('.edit-product-group-btn').forEach((btn) => {
     productGroupForm.reset();
     productGroupForm.action = btn.dataset.action;
     productGroupFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    productGroupModalTitle.textContent = 'Edit Grup Produk';
+    productGroupModalTitle.textContent = __t('Edit Product Group');
 
     productGroupNameInput.value = btn.dataset.name || '';
 

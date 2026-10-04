@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             PriceSetupSeeder::class,
             AssetSeeder::class,
             ChartOfAccountSeeder::class,
+            PaymentMethodSeeder::class,
 
             // Purchasing cycle (Procure to Pay).
             PurchaseOrderSeeder::class,

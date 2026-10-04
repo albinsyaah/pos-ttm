@@ -23,7 +23,7 @@ document.getElementById('addAccountBtn')?.addEventListener('click', (e) => {
   accountForm.reset();
   accountForm.action = e.currentTarget.dataset.action;
   accountFormMethod.innerHTML = '';
-  accountModalTitle.textContent = 'Add Account';
+  accountModalTitle.textContent = __t('Add Account');
   openModal(accountModal);
   accountCodeInput?.focus();
 });
@@ -34,7 +34,7 @@ document.querySelectorAll('.edit-account-btn').forEach((btn) => {
     accountForm.reset();
     accountForm.action = btn.dataset.action;
     accountFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    accountModalTitle.textContent = 'Edit Account';
+    accountModalTitle.textContent = __t('Edit Account');
 
     accountCodeInput.value = btn.dataset.accountCode || '';
     accountNameInput.value = btn.dataset.accountName || '';

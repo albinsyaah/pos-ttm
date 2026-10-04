@@ -25,7 +25,7 @@ document.getElementById('addSupplierBtn')?.addEventListener('click', (e) => {
   supplierForm.reset();
   supplierForm.action = e.currentTarget.dataset.action;
   supplierFormMethod.innerHTML = '';
-  supplierModalTitle.textContent = 'Add Supplier';
+  supplierModalTitle.textContent = __t('Add Supplier');
   openModal(supplierModal);
   codeInput?.focus();
 });
@@ -36,7 +36,7 @@ document.querySelectorAll('.edit-supplier-btn').forEach((btn) => {
     supplierForm.reset();
     supplierForm.action = btn.dataset.action;
     supplierFormMethod.innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    supplierModalTitle.textContent = 'Edit Supplier';
+    supplierModalTitle.textContent = __t('Edit Supplier');
 
     codeInput.value = btn.dataset.code || '';
     nameInput.value = btn.dataset.name || '';
