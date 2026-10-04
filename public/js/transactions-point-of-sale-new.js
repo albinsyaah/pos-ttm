@@ -7,6 +7,8 @@
  *  - A product may be in the cart once at a price and once as a free item (Rp0).
  *    The server enforces the same rule; this file only makes it visible early.
  *  - Credit sales are for registered customers only.
+ *  - A discount on the whole sale: a percentage, a fixed amount, or both. Both come off the
+ *    subtotal (percent x subtotal + amount). The server works it out again; this is a preview.
  */
 (() => {
   'use strict';
@@ -22,6 +24,12 @@
   const rowTemplate = document.getElementById('itemRowTemplate');
   const emptyMessage = document.getElementById('noItemsMessage');
   const grandTotalEl = document.getElementById('grandTotal');
+  const subtotalEl = document.getElementById('subtotalValue');
+  const discountPercentInput = document.getElementById('discount_percent');
+  const discountAmountInput = document.getElementById('discount_amount');
+  const discountRow = document.getElementById('discountRow');
+  const discountValueEl = document.getElementById('discountValue');
+  const discountErrorEl = document.getElementById('discountError');
   const cartCountEl = document.getElementById('cartCount');
   const searchInput = document.getElementById('productSearch');
   const resultsEl = document.getElementById('searchResults');
@@ -35,6 +43,7 @@
   const submitLabel = document.getElementById('submitLabel');
 
   let rowIndex = 0;
+  let discountError = ''; // message while the typed discount is not acceptable
 
   // ---- Helpers --------------------------------------------------------------
 
@@ -52,6 +61,39 @@
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+  }
+
+  const round2 = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
+
+  /** A discount box as a number; empty or invalid counts as 0. */
+  function numberOf(input) {
+    const value = parseFloat(input.value);
+    return Number.isFinite(value) && value > 0 ? value : 0;
+  }
+
+  /**
+   * Discount in rupiah for a subtotal: subtotal x percent / 100 + fixed amount.
+   * Also sets discountError when the typed figures cannot be accepted.
+   */
+  function computeDiscount(subtotal, hasLines) {
+    const percent = numberOf(discountPercentInput);
+    const amount = numberOf(discountAmountInput);
+    const discount = round2(subtotal * percent / 100 + amount);
+
+    let message = '';
+    if (percent > 100) {
+      message = t('discount_percent_max');
+    } else if (hasLines && discount > subtotal + 0.004) {
+      message = t('discount_too_large_row', { discount: formatNumber(discount), subtotal: formatNumber(subtotal) });
+    }
+
+    discountError = message;
+    discountPercentInput.classList.toggle('is-invalid', percent > 100);
+    discountAmountInput.classList.toggle('is-invalid', message !== '' && percent <= 100);
+    discountErrorEl.textContent = message;
+    discountErrorEl.classList.toggle('hidden', message === '');
+
+    return message === '' ? discount : 0;
   }
 
   function toast(message) {
@@ -295,7 +337,12 @@
       });
     });
 
-    grandTotalEl.textContent = formatNumber(total);
+    const subtotal = round2(total);
+    const discount = computeDiscount(subtotal, rows.length > 0);
+    subtotalEl.textContent = formatNumber(subtotal);
+    discountRow.classList.toggle('hidden', discount <= 0);
+    discountValueEl.textContent = '-' + formatNumber(discount);
+    grandTotalEl.textContent = formatNumber(Math.max(0, round2(subtotal - discount)));
     emptyMessage.classList.toggle('hidden', rows.length > 0);
     cartCountEl.textContent = rows.length > 0 ? t('lines', { count: rows.length }) : '';
 
@@ -484,6 +531,8 @@
     }
   }
 
+  [discountPercentInput, discountAmountInput].forEach((input) => input.addEventListener('input', refreshCart));
+
   form.querySelectorAll('input[name="payment_type"]').forEach((radio) => radio.addEventListener('change', syncPayment));
 
   // ---- Submit ------------------------------------------------------------------------
@@ -495,7 +544,15 @@
       return;
     }
 
-    if (refreshCart() > 0) {
+    const cartProblems = refreshCart();
+    if (discountError !== '') {
+      event.preventDefault();
+      toast(discountError);
+      (numberOf(discountPercentInput) > 100 ? discountPercentInput : discountAmountInput).focus();
+      return;
+    }
+
+    if (cartProblems > 0) {
       event.preventDefault();
       toast(t('fix_cart'));
       const bad = rowsBody.querySelector('.pos-row-bad');

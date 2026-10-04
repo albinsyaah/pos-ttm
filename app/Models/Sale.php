@@ -23,6 +23,9 @@ class Sale extends Model
         'invoice_number',
         'sale_date',
         'total_amount',
+        'discount_percent',
+        'discount_amount',
+        'discount_total',
         'source',
         'payment_type',
         'payment_method_id',
@@ -55,6 +58,36 @@ class Sale extends Model
     {
         return $query->where('payment_type', self::PAYMENT_CREDIT)
             ->whereNotNull('customer_id');
+    }
+
+    /** True when the sale was given a discount. */
+    public function hasDiscount(): bool
+    {
+        return (float) $this->discount_total > 0;
+    }
+
+    /** The lines added up, before the discount (total_amount is what is left after it). */
+    public function subtotalBeforeDiscount(): float
+    {
+        return round((float) $this->total_amount + (float) $this->discount_total, 2);
+    }
+
+    /**
+     * Short description of how the discount was entered, for receipts:
+     * "10%", "Rp 10.000" or "10% + Rp 10.000". Empty when there is none.
+     */
+    public function discountDescription(): string
+    {
+        $parts = [];
+
+        if ((float) $this->discount_percent > 0) {
+            $parts[] = rtrim(rtrim(number_format((float) $this->discount_percent, 2, ',', '.'), '0'), ',').'%';
+        }
+        if ((float) $this->discount_amount > 0) {
+            $parts[] = \App\Support\Money::rupiah($this->discount_amount);
+        }
+
+        return implode(' + ', $parts);
     }
 
     /** Link the receipt barcode points to (public, no sign-in needed). */

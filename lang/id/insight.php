@@ -111,6 +111,8 @@ return [
         'free_goods_loss' => 'Kerugian Barang Gratis',
         'free_goods_loss_hint' => 'Modal barang gratis (harga beli terakhir)',
         'free_loss_column' => 'Kerugian Gratis',
+        'discount_column' => 'Diskon',
+        'discount_total' => 'Total Diskon',
         'free_goods_title' => 'Rincian Barang Gratis',
         'free_goods_basis' => 'Modal dihitung dari harga beli terakhir sebelum atau pada tanggal penjualan.',
         'free_qty' => 'Jumlah Gratis',

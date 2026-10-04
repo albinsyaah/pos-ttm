@@ -69,6 +69,8 @@ class SalesSummaryReportController extends Controller
         $grossAmount = (float) (clone $query)->sum('total_amount');
         $returned = $insight->returnsForSales($query);
         $totalAmount = $grossAmount - $returned['total'];
+        // Discounts given on the cashier terminals (already left out of total_amount).
+        $discountTotal = (float) (clone $query)->sum('discount_total');
 
         // Per-channel breakdown (count + amount for each of sales/pos/spg
         // within the current filters), computed as one grouped aggregate
@@ -108,6 +110,7 @@ class SalesSummaryReportController extends Controller
             'freeLoss' => $freeLoss,
             'grossAmount' => $grossAmount,
             'returnsTotal' => $returned['total'],
+            'discountTotal' => $discountTotal,
         ]);
     }
 }

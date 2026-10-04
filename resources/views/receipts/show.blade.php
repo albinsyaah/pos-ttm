@@ -69,6 +69,10 @@
         @endforeach
     </div>
 
+    @if($sale->hasDiscount())
+        <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:14px;"><span>{{ __('app.print.subtotal') }}</span><span>{{ Money::rupiah($sale->subtotalBeforeDiscount()) }}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:14px;"><span>{{ __('app.print.discount') }}@if((float) $sale->discount_percent > 0) ({{ $sale->discountDescription() }})@endif</span><span>-{{ Money::rupiah($sale->discount_total) }}</span></div>
+    @endif
     <div class="total"><span>{{ __('app.print.total') }}</span><span>{{ Money::rupiah($sale->total_amount) }}</span></div>
 
     @if(filled($store['receipt_footer']))<div class="foot">{{ $store['receipt_footer'] }}</div>@endif

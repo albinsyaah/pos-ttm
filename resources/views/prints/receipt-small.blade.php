@@ -36,6 +36,10 @@
         </div>
     @endforeach
     <hr>
+    @if($sale->hasDiscount())
+        <div class="row"><span>{{ __('app.print.subtotal') }}</span><span>{{ Money::rupiah($sale->subtotalBeforeDiscount()) }}</span></div>
+        <div class="row"><span>{{ __('app.print.discount') }}@if((float) $sale->discount_percent > 0) ({{ $sale->discountDescription() }})@endif</span><span>-{{ Money::rupiah($sale->discount_total) }}</span></div>
+    @endif
     <div class="row"><strong>{{ __('app.print.total') }}</strong><strong>{{ Money::rupiah($sale->total_amount) }}</strong></div>
     <div class="row">
         <span>{{ __('app.print.payment') }}</span>

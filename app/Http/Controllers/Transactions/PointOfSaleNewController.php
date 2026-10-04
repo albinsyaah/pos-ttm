@@ -10,6 +10,7 @@ use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Services\PriceService;
+use App\Services\SaleDiscountService;
 use App\Services\StockService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -76,6 +77,8 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             'paymentMethods' => $paymentMethods,
             // Preselect what the cashier chose before a refused submission, else Tunai.
             'selectedMethodId' => (int) (old('payment_method_id') ?: ($paymentMethods->firstWhere('is_cash', true)?->id ?? 0)),
+            'oldDiscountPercent' => old('discount_percent'),
+            'oldDiscountAmount' => old('discount_amount'),
             'cartSeed' => $this->cartSeed((array) old('items', []), $prices, $stock),
         ]);
     }
@@ -139,6 +142,9 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             'salesman_id' => ['nullable', 'exists:employees,id'],
             // Printed on the delivery note (surat jalan).
             'driver_name' => ['nullable', 'string', 'max:100'],
+            // Discount on the whole sale: a percentage, a fixed rupiah amount, or both together.
+            'discount_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'discount_amount' => ['nullable', 'numeric', 'min:0', 'max:9999999999999.99'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.qty' => ['required', 'integer', 'min:1'],
@@ -155,7 +161,15 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
 
         $this->assertNoDuplicateProducts($items);
 
-        $totalAmount = collect($items)->sum(fn ($item) => $item['qty'] * $item['price']);
+        $subtotal = (float) collect($items)->sum(fn ($item) => $item['qty'] * $item['price']);
+
+        // The server works the discount out itself; the figures on the page are only a preview.
+        // total_amount is what the customer owes, i.e. after the discount.
+        $pricing = app(SaleDiscountService::class)->calculate(
+            $subtotal,
+            (float) ($data['discount_percent'] ?? 0),
+            (float) ($data['discount_amount'] ?? 0),
+        );
         $paymentType = $data['payment_type'] ?? Sale::PAYMENT_CASH;
 
         // Only a sale paid right away has a method; a credit sale (piutang) is
@@ -165,11 +179,14 @@ class PointOfSaleNewController extends Controller implements HasMiddleware
             ? ($data['payment_method_id'] ?? PaymentMethod::defaultCash()?->id)
             : null;
 
-        $sale = DB::transaction(function () use ($data, $items, $totalAmount, $paymentType, $paymentMethodId) {
+        $sale = DB::transaction(function () use ($data, $items, $pricing, $paymentType, $paymentMethodId) {
             $sale = Sale::create([
                 'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
-                'total_amount' => $totalAmount,
+                'total_amount' => $pricing['total_amount'],
+                'discount_percent' => $pricing['discount_percent'],
+                'discount_amount' => $pricing['discount_amount'],
+                'discount_total' => $pricing['discount_total'],
                 'source' => self::SOURCE,
                 'payment_type' => $paymentType,
                 'payment_method_id' => $paymentMethodId,

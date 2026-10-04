@@ -990,6 +990,14 @@ return [
         'credit_note' => 'A credit sale is recorded as a receivable of the customer.',
         'customer_credit_required' => 'Registered customer (required for credit)',
         'credit_requires_customer' => 'A credit sale is only for a registered customer. Choose a customer.',
+        'subtotal' => 'Subtotal',
+        'discount_percent' => 'Discount (%)',
+        'discount_amount' => 'Discount (Rp)',
+        'discount_note' => 'Fill in either one or both. The percentage and the amount are both taken off the subtotal.',
+        'discount_given' => 'Discount given',
+        'discount_percent_max' => 'A percentage discount cannot be more than 100.',
+        'discount_too_large' => 'The discount of Rp :discount is more than the subtotal of Rp :subtotal.',
+        'discount_too_large_row' => 'The discount of :discount is more than the subtotal of :subtotal.',
     ],
 
     // Transactions - Sales Returns
@@ -1286,6 +1294,7 @@ return [
         'sign_admin' => 'Admin',
         'sign_warehouse_head' => 'Warehouse head',
         'sign_receiver' => 'Receiver',
+        'discount' => 'Discount',
     ],
 
 ];

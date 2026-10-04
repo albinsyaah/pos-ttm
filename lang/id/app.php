@@ -989,6 +989,14 @@ return [
         'credit_note' => 'Penjualan kredit dicatat sebagai piutang pelanggan.',
         'customer_credit_required' => 'Pelanggan terdaftar (wajib untuk kredit)',
         'credit_requires_customer' => 'Penjualan kredit hanya untuk pelanggan terdaftar. Pilih pelanggan.',
+        'subtotal' => 'Subtotal',
+        'discount_percent' => 'Diskon (%)',
+        'discount_amount' => 'Diskon (Rp)',
+        'discount_note' => 'Boleh diisi salah satu atau keduanya. Persen dan Rp sama-sama dipotong dari subtotal.',
+        'discount_given' => 'Potongan diskon',
+        'discount_percent_max' => 'Diskon persen tidak boleh lebih dari 100.',
+        'discount_too_large' => 'Diskon Rp :discount melebihi subtotal Rp :subtotal.',
+        'discount_too_large_row' => 'Diskon :discount melebihi subtotal :subtotal.',
     ],
 
     // Transactions - Sales Returns (Retur Penjualan)
@@ -1285,6 +1293,7 @@ return [
         'sign_admin' => 'Admin',
         'sign_warehouse_head' => 'Kepala Gudang',
         'sign_receiver' => 'Penerima',
+        'discount' => 'Diskon',
     ],
 
 ];

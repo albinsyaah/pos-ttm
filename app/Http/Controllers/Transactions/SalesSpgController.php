@@ -98,10 +98,17 @@ class SalesSpgController extends Controller implements HasMiddleware
         $data = $this->validateSalesSpg($request, $salesSpg->id);
 
         DB::transaction(function () use ($data, $salesSpg) {
+            // A sale that was given a discount (cashier terminal) keeps it: it is worked out again
+            // from the same percentage and amount against the edited lines.
+            $pricing = app(\App\Services\SaleDiscountService::class)->recalculateFor($salesSpg, (float) $data['total_amount']);
+
             $salesSpg->update([
                 'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
-                'total_amount' => $data['total_amount'],
+                'total_amount' => $pricing['total_amount'],
+                'discount_percent' => $pricing['discount_percent'],
+                'discount_amount' => $pricing['discount_amount'],
+                'discount_total' => $pricing['discount_total'],
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],
                 'warehouse_id' => $data['warehouse_id'],

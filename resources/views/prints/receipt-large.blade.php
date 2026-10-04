@@ -81,6 +81,16 @@
             @endforeach
         </tbody>
         <tfoot>
+            @if($sale->hasDiscount())
+                <tr>
+                    <td colspan="4" class="right">{{ __('app.print.subtotal') }}</td>
+                    <td class="right">{{ Money::rupiah($sale->subtotalBeforeDiscount()) }}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="right">{{ __('app.print.discount') }}@if((float) $sale->discount_percent > 0) ({{ $sale->discountDescription() }})@endif</td>
+                    <td class="right">-{{ Money::rupiah($sale->discount_total) }}</td>
+                </tr>
+            @endif
             <tr>
                 <td colspan="4" class="right total">{{ __('app.print.total') }}</td>
                 <td class="right total">{{ Money::rupiah($sale->total_amount) }}</td>

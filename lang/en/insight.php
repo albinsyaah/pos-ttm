@@ -111,6 +111,8 @@ return [
         'free_goods_loss' => 'Free Goods Loss',
         'free_goods_loss_hint' => 'Cost of free items (last purchase price)',
         'free_loss_column' => 'Free Goods Loss',
+        'discount_column' => 'Discount',
+        'discount_total' => 'Total Discount',
         'free_goods_title' => 'Free Goods Breakdown',
         'free_goods_basis' => 'Cost is the last purchase price on or before the sale date.',
         'free_qty' => 'Free Quantity',

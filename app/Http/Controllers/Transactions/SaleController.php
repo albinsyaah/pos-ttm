@@ -99,10 +99,17 @@ class SaleController extends Controller implements HasMiddleware
         $data = $this->validateSale($request, $sale->id);
 
         DB::transaction(function () use ($data, $sale) {
+            // A sale that was given a discount (cashier terminal) keeps it: it is worked out again
+            // from the same percentage and amount against the edited lines.
+            $pricing = app(\App\Services\SaleDiscountService::class)->recalculateFor($sale, (float) $data['total_amount']);
+
             $sale->update([
                 'invoice_number' => $data['invoice_number'] ?? null,
                 'sale_date' => $data['sale_date'],
-                'total_amount' => $data['total_amount'],
+                'total_amount' => $pricing['total_amount'],
+                'discount_percent' => $pricing['discount_percent'],
+                'discount_amount' => $pricing['discount_amount'],
+                'discount_total' => $pricing['discount_total'],
                 'sales_order_id' => $data['sales_order_id'],
                 'customer_id' => $data['customer_id'],
                 'salesman_id' => $data['salesman_id'],

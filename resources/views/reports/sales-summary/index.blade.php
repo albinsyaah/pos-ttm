@@ -79,6 +79,9 @@
             <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1" id="netSalesAmount">{{ Money::rupiah($totalAmount) }}
             </p>
             <p class="text-xs text-[var(--ink-400)] mt-1">{{ __('insight.returns.net_hint') }}</p>
+            @if($discountTotal > 0)
+                <p class="text-xs text-[var(--ink-400)] mt-1" id="discountTotalHint">{{ __('insight.sales_summary.discount_total') }}: {{ Money::rupiah($discountTotal) }}</p>
+            @endif
         </div>
         <div class="bg-white rounded-3xl p-5" id="salesReturnsCard">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
@@ -145,6 +148,7 @@
                     <th class="font-semibold">{{ __('app.reports.sales_summary.channel') }}</th>
                     <th class="font-semibold">{{ __('app.sales.items') }}</th>
                     <th class="font-semibold">{{ __('app.sales.total') }}</th>
+                    <th class="font-semibold">{{ __('insight.sales_summary.discount_column') }}</th>
                     <th class="font-semibold">{{ __('insight.returns.return_column') }}</th>
                     <th class="font-semibold">{{ __('insight.sales_summary.free_loss_column') }}</th>
                 </tr>
@@ -165,6 +169,9 @@
                         </td>
                         <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
                         <td class="text-[var(--ink-700)]">{{ Money::rupiah($sale->total_amount) }}</td>
+                        <td class="{{ $sale->hasDiscount() ? 'text-[var(--ink-700)]' : 'text-[var(--ink-400)]' }}">
+                            {{ $sale->hasDiscount() ? Money::rupiah($sale->discount_total) : '—' }}
+                        </td>
                         <td class="{{ (float) $sale->returned_total > 0 ? 'text-[var(--bad-600)] font-semibold' : 'text-[var(--ink-400)]' }}">
                             {{ (float) $sale->returned_total > 0 ? Money::rupiah($sale->returned_total) : '—' }}
                         </td>
@@ -174,7 +181,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="10" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.reports.sales_summary.no_data') }}
                         </td>

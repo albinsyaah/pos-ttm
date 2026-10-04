@@ -60,6 +60,12 @@
     .pos-label-inline { margin-bottom: 0; }
     .pos-stack > * + * { margin-top: 1rem; }
     .pos-summary { border-top: 1px solid var(--surface); margin-top: 1.5rem; padding-top: 1.25rem; }
+    /* A display below would beat Tailwind's .hidden, so hide these explicitly. */
+    .pos-sum-row { display: flex; align-items: baseline; justify-content: space-between; font-size: .8rem; color: var(--ink-700); }
+    .pos-sum-row.hidden { display: none; }
+    .pos-sum-row strong { font-weight: 600; color: var(--ink-900); }
+    .pos-discount-row-hint { color: var(--good-600); }
+    .pos-field.is-invalid { border-color: var(--bad-600); }
     .pos-total-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.25rem; }
     .pos-total { font-size: 1.875rem; font-weight: 600; color: var(--ink-900); line-height: 1.1; }
     .pos-submit { width: 100%; display: flex; align-items: center; justify-content: center; gap: .5rem; background: var(--brand-600); color: #fff; font-size: .875rem; font-weight: 600; border: 0; border-radius: 999px; padding: .85rem 1.25rem; cursor: pointer; transition: background-color .15s; }
@@ -235,7 +241,33 @@
             </div>
 
             <div class="pos-summary">
-                <div class="pos-total-row">
+                <div class="pos-sum-row">
+                    <span>{{ __('app.point_of_sale_new.subtotal') }}</span>
+                    <strong id="subtotalValue">0.00</strong>
+                </div>
+
+                {{-- Discount on the whole sale: a percentage, a fixed amount, or both (both come off the subtotal). --}}
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <div>
+                        <label for="discount_percent" class="pos-label">{{ __('app.point_of_sale_new.discount_percent') }}</label>
+                        <input id="discount_percent" name="discount_percent" type="number" min="0" max="100" step="0.01" inputmode="decimal"
+                               placeholder="0" value="{{ $oldDiscountPercent }}" class="pos-field" />
+                    </div>
+                    <div>
+                        <label for="discount_amount" class="pos-label">{{ __('app.point_of_sale_new.discount_amount') }}</label>
+                        <input id="discount_amount" name="discount_amount" type="number" min="0" step="0.01" inputmode="decimal"
+                               placeholder="0" value="{{ $oldDiscountAmount }}" class="pos-field" />
+                    </div>
+                </div>
+                <p class="pos-note">{{ __('app.point_of_sale_new.discount_note') }}</p>
+                <p id="discountError" class="pos-error hidden" role="alert"></p>
+
+                <div id="discountRow" class="pos-sum-row hidden mt-3">
+                    <span>{{ __('app.point_of_sale_new.discount_given') }}</span>
+                    <strong id="discountValue" class="pos-discount-row-hint">-0.00</strong>
+                </div>
+
+                <div class="pos-total-row mt-4">
                     <span class="text-sm font-medium text-[var(--ink-400)]">{{ __('app.point_of_sale_new.total') }}</span>
                     <span id="grandTotal" class="pos-total">0.00</span>
                 </div>
@@ -259,6 +291,7 @@
         'out_of_stock', 'stock_short', 'duplicate_paid_row', 'duplicate_free_row',
         'cart_empty_toast', 'fix_cart', 'processing', 'complete_transaction', 'reference_price',
         'price_changed', 'no_reference_price', 'lines', 'free',
+        'discount_too_large_row', 'discount_percent_max',
     ])->mapWithKeys(fn ($key) => [$key => __('app.point_of_sale_new.'.$key)])->all();
 @endphp
     <script>
