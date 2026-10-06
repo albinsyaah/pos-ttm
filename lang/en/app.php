@@ -98,7 +98,7 @@ return [
         'account_receivable' => 'Account Receivable',
         'sales_order' => 'Sales Order',
         'sales' => 'Sales',
-        'point_of_sales_new' => 'Point of Sales New',
+        'point_of_sales_new' => 'Cashier',
         'point_of_sales' => 'Point of Sales',
         'sales_return' => 'Sales Return',
         'sales_spg' => 'Sales SPG',
@@ -939,7 +939,7 @@ return [
 
     // Transactions - Point of Sale New (checkout terminal)
     'point_of_sale_new' => [
-        'title' => 'Point of Sales New',
+        'title' => 'Cashier',
         'subtitle' => 'Ring up a new over-the-counter sale.',
         'invoice_number' => 'Invoice Number',
         'sale_date' => 'Date',

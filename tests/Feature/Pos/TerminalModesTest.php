@@ -89,7 +89,7 @@ it('has the driver field and posts to its own route on the head cashier terminal
 
     $this->get(route('transactions.point-of-sale-induk.index'))
         ->assertOk()
-        ->assertSee('Point of Sales Induk')
+        ->assertSee('Kasir Induk')
         ->assertSee('name="driver_name"', false)
         ->assertSee(route('transactions.point-of-sale-induk.store'), false)
         // The search URL is printed through @json, which escapes the slashes.

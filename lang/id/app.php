@@ -98,7 +98,7 @@ return [
         'account_receivable' => 'Penjualan',
         'sales_order' => 'Sales Order',
         'sales' => 'Penjualan',
-        'point_of_sales_new' => 'Point of Sales Baru',
+        'point_of_sales_new' => 'Kasir',
         'point_of_sales' => 'Point of Sales',
         'sales_return' => 'Retur Penjualan',
         'sales_spg' => 'Sales SPG',
@@ -938,7 +938,7 @@ return [
 
     // Transactions - Point of Sale New (kasir)
     'point_of_sale_new' => [
-        'title' => 'Point of Sales New',
+        'title' => 'Kasir',
         'subtitle' => 'Buat transaksi penjualan langsung baru.',
         'invoice_number' => 'Nomor Invoice',
         'sale_date' => 'Tanggal',
