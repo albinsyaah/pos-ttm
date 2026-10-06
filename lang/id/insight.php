@@ -24,7 +24,7 @@ return [
     ],
 
     'terminal' => [
-        'head_title' => 'Point of Sales Induk',
+        'head_title' => 'Kasir Induk',
     ],
 
     'sidebar' => [

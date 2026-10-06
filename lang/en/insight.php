@@ -24,7 +24,7 @@ return [
     ],
 
     'terminal' => [
-        'head_title' => 'Point of Sales (Head Cashier)',
+        'head_title' => 'Head Cashier',
     ],
 
     'sidebar' => [
