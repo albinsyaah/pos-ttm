@@ -139,7 +139,7 @@ return [
 
     // Login page
     'auth' => [
-        'sign_in_to_account' => 'Masuk ke akun PointDash Anda',
+        'sign_in_to_account' => 'Masuk ke akun POS Anda',
         'username' => 'Nama pengguna',
         'password' => 'Kata sandi',
         'enter_username' => 'Masukkan nama pengguna Anda',

@@ -139,7 +139,7 @@ return [
 
     // Login page
     'auth' => [
-        'sign_in_to_account' => 'Sign in to your PointDash account',
+        'sign_in_to_account' => 'Sign in to your POS account',
         'username' => 'Username',
         'password' => 'Password',
         'enter_username' => 'Enter your username',
