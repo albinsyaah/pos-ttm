@@ -9,6 +9,11 @@
     /* Checkout terminal. Scoped "pos-" classes so the look does not depend on a Tailwind rebuild. */
     .pos-field { width: 100%; border-radius: .75rem; background: var(--surface); padding: .65rem 1rem; font-size: .875rem; border: 1px solid transparent; outline: none; transition: border-color .15s, background-color .15s; }
     .pos-field:focus { border-color: var(--brand-600); background: #fff; }
+    .pos-print-choice { width: 100%; border-radius: .75rem; padding: .75rem 1rem; font-size: .875rem; font-weight: 600; text-align: left; background: var(--surface); color: var(--ink-900); border: 2px solid transparent; cursor: pointer; transition: border-color .15s, background-color .15s; }
+    .pos-print-choice:hover, .pos-print-choice:focus { border-color: var(--brand-600); background: #fff; outline: none; }
+    .pos-print-primary { background: var(--brand-600); color: #fff; text-align: center; }
+    .pos-print-primary:hover, .pos-print-primary:focus { background: var(--brand-600); filter: brightness(.95); }
+    .pos-print-none { text-align: center; font-weight: 500; color: var(--ink-700); }
     .pos-label { display: block; font-size: .75rem; font-weight: 500; color: var(--ink-700); margin-bottom: .375rem; }
 
     .pos-search-wrap { position: relative; }
@@ -78,23 +83,41 @@
 
     <p class="text-sm text-[var(--ink-400)] -mt-2 mb-6">{{ __('app.point_of_sale_new.subtitle') }}</p>
 
-    {{-- After a sale: offer the receipt of that sale (only to users allowed to print it). --}}
+    {{-- After a sale: ask which document to print (only documents this user may print and this terminal offers). --}}
     @if(session('printed_sale_id'))
-        @php $printedSaleId = (int) session('printed_sale_id'); @endphp
-        @canany($isHead ? ['print.receipt-small', 'print.receipt-large', 'print.delivery-note'] : ['print.receipt-small'])
-            <div class="flex flex-wrap items-center gap-3 bg-white rounded-2xl px-5 py-3 mb-6 text-sm">
-                <span class="font-semibold text-[var(--ink-900)]">{{ __('app.print.print_this_sale') }}</span>
-                @can('print.receipt-small')
-                    <a href="{{ route('transactions.sales.print.receipt-small', $printedSaleId) }}?auto=1" target="_blank" rel="noopener" class="underline text-[var(--brand-600)]">{{ __('app.print.small_receipt') }}</a>
-                @endcan
-                @if($isHead) @can('print.receipt-large')
-                    <a href="{{ route('transactions.sales.print.receipt-large', $printedSaleId) }}" target="_blank" rel="noopener" class="underline text-[var(--brand-600)]">{{ __('app.print.large_receipt') }}</a>
-                @endcan @endif
-                @if($isHead) @can('print.delivery-note')
-                    <a href="{{ route('transactions.sales.print.delivery-note', $printedSaleId) }}" target="_blank" rel="noopener" class="underline text-[var(--brand-600)]">{{ __('app.print.delivery_note') }}</a>
-                @endcan @endif
+        @php
+            $printedSaleId = (int) session('printed_sale_id');
+            $printedSale = \App\Models\Sale::find($printedSaleId);
+            $canSmall = auth()->user()->can('print.receipt-small');
+            $canLarge = $isHead && auth()->user()->can('print.receipt-large');
+            $canNote = $isHead && auth()->user()->can('print.delivery-note');
+        @endphp
+        @if($printedSale && ($canSmall || $canLarge || $canNote))
+            <div id="printDialog" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="printDialogTitle"
+                 @if($canSmall) data-small="{{ route('transactions.sales.print.receipt-small', $printedSaleId) }}?auto=1" @endif
+                 @if($canLarge) data-large="{{ route('transactions.sales.print.receipt-large', $printedSaleId) }}" @endif
+                 @if($canNote) data-note="{{ route('transactions.sales.print.delivery-note', $printedSaleId) }}" @endif>
+                <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-sm">
+                    <h3 id="printDialogTitle" class="text-lg font-semibold text-[var(--ink-900)]">{{ __('app.print.dialog_title') }}</h3>
+                    <p class="text-sm text-[var(--ink-400)] mt-1">{{ $printedSale->invoice_number }}</p>
+                    <p class="text-sm text-[var(--ink-700)] mt-4">{{ $isHead ? __('app.print.dialog_question_head') : __('app.print.dialog_question_small') }}</p>
+
+                    <div class="flex flex-col gap-2 mt-4">
+                        @if(! $isHead)
+                            <button type="button" data-print="small" class="pos-print-choice pos-print-primary">{{ __('app.print.dialog_yes') }}</button>
+                        @else
+                            @if($canLarge)<button type="button" data-print="large" class="pos-print-choice">{{ __('app.print.only_large') }}</button>@endif
+                            @if($canSmall)<button type="button" data-print="small" class="pos-print-choice">{{ __('app.print.only_small') }}</button>@endif
+                            @if($canNote)<button type="button" data-print="note" class="pos-print-choice">{{ __('app.print.only_note') }}</button>@endif
+                            @if($canLarge && $canNote)<button type="button" data-print="large+note" class="pos-print-choice">{{ __('app.print.large_and_note') }}</button>@endif
+                        @endif
+                        <button type="button" data-print="none" class="pos-print-choice pos-print-none">{{ __('app.print.dialog_no') }}</button>
+                    </div>
+
+                    <p id="printBlocked" class="pos-note hidden mt-3" data-text="{{ __('app.print.dialog_blocked') }}"></p>
+                </div>
             </div>
-        @endcanany
+        @endif
     @endif
 
     <form id="posNewForm" method="POST" action="{{ route($routePrefix.'.store') }}" class="grid lg:grid-cols-3 gap-6 items-start">
@@ -188,7 +211,9 @@
                 </div>
                 <div>
                     <label for="salesman_id" class="pos-label">{{ __('app.point_of_sale_new.salesman_optional') }}</label>
-                    <select id="salesman_id" name="salesman_id" class="pos-field">
+                    <select id="salesman_id" name="salesman_id" class="pos-field"
+                            data-picker-placeholder="{{ __('app.point_of_sale_new.search_salesman') }}"
+                            data-picker-empty="{{ __('app.point_of_sale_new.no_salesman_found') }}">
                         <option value="">{{ __('app.common.none') }}</option>
                         @foreach($salesmen as $salesman)
                             <option value="{{ $salesman->id }}" @selected(old('salesman_id') == $salesman->id)>{{ $salesman->code }} — {{ $salesman->name }}</option>
@@ -231,7 +256,9 @@
                     <label for="customer_id" id="customerLabel" class="pos-label"
                            data-cash="{{ __('app.point_of_sale_new.customer_optional') }}"
                            data-credit="{{ __('app.point_of_sale_new.customer_credit_required') }}">{{ __('app.point_of_sale_new.customer_optional') }}</label>
-                    <select id="customer_id" name="customer_id" class="pos-field">
+                    <select id="customer_id" name="customer_id" class="pos-field"
+                            data-picker-placeholder="{{ __('app.point_of_sale_new.search_customer') }}"
+                            data-picker-empty="{{ __('app.point_of_sale_new.no_customer_found') }}">
                         <option value="">{{ __('app.common.none') }}</option>
                         @foreach($customers as $customer)
                             <option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>{{ $customer->code }} — {{ $customer->name }}</option>
@@ -306,5 +333,9 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-triangle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    @if(isset($printedSale) && $printedSale && ($canSmall || $canLarge || $canNote))
+        <script src="{{ asset('js/pos-print-dialog.js') }}"></script>
+    @endif
+    <script src="{{ asset('js/product-picker.js') }}"></script>
     <script src="{{ asset('js/transactions-point-of-sale-new.js') }}"></script>
 @endpush

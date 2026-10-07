@@ -42,6 +42,13 @@
   const submitBtn = document.getElementById('submitBtn');
   const submitLabel = document.getElementById('submitLabel');
 
+  const salesmanSelect = document.getElementById('salesman_id');
+
+  // Customer and salesman lists can be long: turn them into boxes you can type in.
+  if (window.ProductPicker) {
+    [customerSelect, salesmanSelect].forEach((select) => select && window.ProductPicker.enhance(select));
+  }
+
   let rowIndex = 0;
   let discountError = ''; // message while the typed discount is not acceptable
 
