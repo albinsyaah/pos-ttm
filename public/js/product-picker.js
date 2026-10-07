@@ -2,6 +2,12 @@
  * Product picker: turns a plain <select class="item-product"> into a box you
  * can type in to find a product by code or name.
  *
+ * It also works for other lists (customer, salesman): the select can carry
+ *   data-picker-placeholder="..."  text shown in the empty box
+ *   data-picker-empty="..."        text shown when nothing matches
+ * Without them the product texts are used. An option with an empty value
+ * ("None") is not listed; clearing the box selects it.
+ *
  * The <select> stays in the form as the real field (it is only hidden behind
  * the box), so what gets posted does not change. Call
  *   ProductPicker.enhance(select)   once, after the row's value is set
@@ -39,6 +45,14 @@
     input.setAttribute('aria-expanded', 'false');
     wrapper.insertBefore(input, select);
 
+    // A label pointing at the select (or a failed "required" check on it) should land in the box.
+    select.addEventListener('focus', () => input.focus());
+    if (select.id) {
+      document.querySelectorAll('label[for="' + select.id + '"]').forEach((label) => {
+        label.addEventListener('click', (e) => { e.preventDefault(); input.focus(); });
+      });
+    }
+
     const list = document.createElement('div');
     list.className = 'product-picker-list';
     list.setAttribute('role', 'listbox');
@@ -62,7 +76,9 @@
       input.disabled = select.disabled;
       // A first option marked data-status carries a message ("Select the invoice first"); otherwise invite a search.
       const first = select.options[0];
-      input.placeholder = first && first.dataset.status ? first.textContent.trim() : text('Search product by code or name');
+      input.placeholder = first && first.dataset.status
+        ? first.textContent.trim()
+        : (select.dataset.pickerPlaceholder || text('Search product by code or name'));
     }
 
     function filter(query) {
@@ -99,7 +115,7 @@
       if (shown.length === 0) {
         const empty = document.createElement('div');
         empty.style.cssText = 'padding:.5rem .75rem;color:#9ca3af;';
-        empty.textContent = text('No product found');
+        empty.textContent = select.dataset.pickerEmpty || text('No product found');
         list.appendChild(empty);
         active = -1;
         return;
