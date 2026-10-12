@@ -40,10 +40,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   transition: color .15s ease, background-color .15s ease;
   border-radius: 12px;
 }
-.sidebar-item:hover{ color:var(--brand-600); background:var(--brand-100); }
+/* .sidebar-item:hover{ color:var(--brand-600); background:var(--brand-100); } */
+.sidebar-item:hover{ color:var(--ink-200); background:var(--ink-700); }
 .sidebar-item.active{
-  color:var(--brand-700);
-  background:var(--brand-100);
+  color:var(--ink-200);
+  background:var(--brand-700);
   font-weight:600;
 }
 
@@ -103,8 +104,29 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   color:var(--ink-700);
   transition: background-color .15s ease, transform .1s ease;
 }
+.icon-btn-edit{
+  width:2.75rem; height:2.75rem;
+  border-radius:999px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--warn-600);
+  color:var(--surface);
+  /* border:3px solid var(--warn-600); */
+  transition: background-color .15s ease, transform .1s ease;
+}
+.icon-btn-del{
+  width:2.75rem; height:2.75rem;
+  border-radius:999px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--bad-600);
+  color:var(--surface);
+  transition: background-color .15s ease, transform .1s ease;
+}
 .icon-btn:hover{ background:var(--brand-100); color:var(--brand-600); }
+.icon-btn-edit:hover{ background:var(--warn-100); color:var(--warn-600); }
+.icon-btn-del:hover{ background:var(--bad-100); color:var(--bad-600); }
 .icon-btn:active{ transform: scale(0.95); }
+.icon-btn-edit:active{ transform: scale(0.95); }
+.icon-btn-del:active{ transform: scale(0.95); }
 
 .bar{
   transition: transform .2s ease, background-color .2s ease;

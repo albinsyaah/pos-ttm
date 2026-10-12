@@ -100,11 +100,11 @@
             </div>
         @else
             <table class="w-full text-sm min-w-[820px]">
-                <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+                <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                     <tr class="text-left border-b border-gray-100">
-                        <th class="p-5 font-semibold">{{ __('app.reports.receivable_card.date') }}</th>
-                        <th class="font-semibold">{{ __('app.reports.receivable_card.document_number') }}</th>
-                        <th class="font-semibold">{{ __('app.reports.receivable_card.type') }}</th>
+                        <th class="p-5 font-bold">{{ __('app.reports.receivable_card.date') }}</th>
+                        <th class="font-bold">{{ __('app.reports.receivable_card.document_number') }}</th>
+                        <th class="font-bold">{{ __('app.reports.receivable_card.type') }}</th>
                         <th class="font-semibold ">{{ __('app.reports.receivable_card.debit') }}</th>
                         <th class="font-semibold ">{{ __('app.reports.receivable_card.credit') }}</th>
                         <th class="font-semibold ">{{ __('app.reports.receivable_card.balance') }}</th>

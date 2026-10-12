@@ -16,12 +16,12 @@
                 value="{{ $search }}"
                 placeholder="{{ __('app.inquiry.search_placeholder') }}"
                 autocomplete="off"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-[var(--ink-400)] focus:border-[var(--brand-600)] focus:bg-white transition-colors"
             />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </div>
 
-        <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex items-center gap-3 flex-wrap ">
             @if($search || $brandId || $itemTypeId || $warehouseId)
                 <a href="{{ route('inquiry.index') }}" class="text-xs font-semibold text-[var(--ink-400)] hover:text-[var(--ink-900)] transition-colors">
                     <i class="fa-solid fa-xmark"></i> Reset Filters
@@ -69,7 +69,7 @@
                 <col style="width: 28%">
                 <col style="width: 18%">
             </colgroup>
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="px-5 py-4 font-semibold whitespace-nowrap">{{ __('app.common.code') }}</th>
                     <th class="px-5 py-4 font-semibold">{{ __('app.common.name') }}</th>

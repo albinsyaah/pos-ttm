@@ -34,12 +34,12 @@
 
     <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[560px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.roles.role') }}</th>
-                    <th class="font-semibold">{{ __('app.roles.permissions') }}</th>
-                    <th class="font-semibold">{{ __('app.roles.users') }}</th>
-                    <th class="font-semibold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.roles.role') }}</th>
+                    <th class="font-bold">{{ __('app.roles.permissions') }}</th>
+                    <th class="font-bold">{{ __('app.roles.users') }}</th>
+                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,24 +57,24 @@
                             <div class="inline-flex items-center gap-2">
                                 <button
                                     type="button"
-                                    class="edit-role-btn icon-btn"
+                                    class="edit-role-btn icon-btn-edit"
                                     aria-label="Edit {{ $role->name }}"
                                     data-action="{{ route('admin.roles.update', $role) }}"
                                     data-name="{{ $role->name }}"
                                     data-permissions="{{ $role->permissions->pluck('name')->implode(',') }}"
                                     data-protected="{{ $role->name === 'Super Admin' ? '1' : '0' }}"
                                 >
-                                    <i class="fa-solid fa-pen text-xs"></i>
+                                    <i class="fa-solid fa-pen text-[15px]"></i>
                                 </button>
                                 @if($role->name !== 'Super Admin')
                                     <button
                                         type="button"
-                                        class="delete-role-btn icon-btn"
+                                        class="delete-role-btn icon-btn-del"
                                         aria-label="Delete {{ $role->name }}"
                                         data-action="{{ route('admin.roles.destroy', $role) }}"
                                         data-name="{{ $role->name }}"
                                     >
-                                        <i class="fa-solid fa-trash text-xs"></i>
+                                        <i class="fa-solid fa-trash text-[15px]"></i>
                                     </button>
                                 @endif
                             </div>

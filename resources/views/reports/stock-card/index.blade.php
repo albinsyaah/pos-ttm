@@ -109,12 +109,12 @@
             </div>
         @else
             <table class="w-full text-sm min-w-[880px]">
-                <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+                <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                     <tr class="text-left border-b border-gray-100">
-                        <th class="p-5 font-semibold">{{ __('app.reports.stock_card.date') }}</th>
-                        <th class="font-semibold">{{ __('app.reports.stock_card.reference_number') }}</th>
-                        <th class="font-semibold">{{ __('app.reports.stock_card.warehouse') }}</th>
-                        <th class="font-semibold">{{ __('app.reports.stock_card.type') }}</th>
+                        <th class="p-5 font-bold">{{ __('app.reports.stock_card.date') }}</th>
+                        <th class="font-bold">{{ __('app.reports.stock_card.reference_number') }}</th>
+                        <th class="font-bold">{{ __('app.reports.stock_card.warehouse') }}</th>
+                        <th class="font-bold">{{ __('app.reports.stock_card.type') }}</th>
                         <th class="font-semibold ">{{ __('app.reports.stock_card.in') }}</th>
                         <th class="font-semibold ">{{ __('app.reports.stock_card.out') }}</th>
                         <th class="font-semibold ">{{ __('app.reports.stock_card.balance') }}</th>

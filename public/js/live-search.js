@@ -3,7 +3,7 @@
 // form apply as soon as they change. Pages marked data-live-search="custom" run their own script
 // and are left alone, so nothing fires twice.
 (function () {
-  const DELAY = 300;
+  const DELAY = 1000;
   const FOCUS_KEY = 'liveSearchFocus';
 
   function remember(form, input) {

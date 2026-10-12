@@ -11,7 +11,7 @@
             <label class="sr-only" for="arReportSearch">{{ __('app.reports.receivable_payment.search_label') }}</label>
             <input id="arReportSearch" name="q" type="search" value="{{ $search }}"
                 placeholder="{{ __('app.reports.receivable_payment.search_placeholder') }}" autocomplete="off"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-[var(--ink-400)] focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
             <i
                 class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </div>
@@ -96,13 +96,13 @@
         </div>
 
         <table class="w-full text-sm min-w-[760px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.receivable_payments.payment_number') }}</th>
-                    <th class="font-semibold">{{ __('app.receivable_payments.payment_date') }}</th>
-                    <th class="font-semibold">{{ __('app.receivable_payments.customer') }}</th>
-                    <th class="font-semibold">{{ __('app.receivable_payments.payment_method') }}</th>
-                    <th class="font-semibold">{{ __('app.receivable_payments.amount') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.receivable_payments.payment_number') }}</th>
+                    <th class="font-bold">{{ __('app.receivable_payments.payment_date') }}</th>
+                    <th class="font-bold">{{ __('app.receivable_payments.customer') }}</th>
+                    <th class="font-bold">{{ __('app.receivable_payments.payment_method') }}</th>
+                    <th class="font-bold">{{ __('app.receivable_payments.amount') }}</th>
                 </tr>
             </thead>
             <tbody>

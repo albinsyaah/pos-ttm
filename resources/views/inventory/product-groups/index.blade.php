@@ -14,7 +14,7 @@
                 type="search"
                 value="{{ $search }}"
                 placeholder="{{ __('app.product_groups.search_placeholder') }}"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-[var(--ink-400)] focus:border-[var(--brand-600)] focus:bg-white transition-colors"
             />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
@@ -33,11 +33,11 @@
 
     <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[480px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.common.name') }}</th>
-                    <th class="font-semibold">{{ __('app.product_groups.products_count') }}</th>
-                    <th class="font-semibold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.common.name') }}</th>
+                    <th class="font-bold">{{ __('app.product_groups.products_count') }}</th>
+                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,21 +50,21 @@
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"
-                                        class="edit-product-group-btn icon-btn"
+                                        class="edit-product-group-btn icon-btn-edit"
                                         aria-label="Edit {{ $productGroup->name }}"
                                         data-action="{{ route('inventory.product-groups.update', $productGroup) }}"
                                         data-name="{{ $productGroup->name }}"
                                     >
-                                        <i class="fa-solid fa-pen text-xs"></i>
+                                        <i class="fa-solid fa-pen text-[15px]"></i>
                                     </button>
                                     <button
                                         type="button"
-                                        class="delete-product-group-btn icon-btn"
+                                        class="delete-product-group-btn icon-btn-del"
                                         aria-label="Delete {{ $productGroup->name }}"
                                         data-action="{{ route('inventory.product-groups.destroy', $productGroup) }}"
                                         data-name="{{ $productGroup->name }}"
                                     >
-                                        <i class="fa-solid fa-trash text-xs"></i>
+                                        <i class="fa-solid fa-trash text-[15px]"></i>
                                     </button>
                                 </div>
                             @endcan
