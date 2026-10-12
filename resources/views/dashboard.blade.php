@@ -142,7 +142,7 @@
             @include('partials.range-tabs', ['range' => $range])
         </div>
 
-        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             @forelse($incomeByMethod as $method)
                 <div class="rounded-2xl bg-[var(--surface)] p-4">
                     <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
