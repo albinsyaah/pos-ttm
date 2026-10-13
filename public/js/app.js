@@ -23,11 +23,60 @@ function showToast(message, icon = 'fa-circle-check', color = 'var(--good-600)')
 }
 
 // Mobile sidebar toggle (used by navbar hamburger button)
-document.getElementById('menuBtn')?.addEventListener('click', () => {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar) return;
-  sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
-});
+// Sidebar: overlay on mobile, collapsible on desktop
+(() => {
+  const sidebar  = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  const menuBtn  = document.getElementById('menuBtn');
+  if (!sidebar || !backdrop || !menuBtn) return;
+
+  const desktop = window.matchMedia('(min-width: 1024px)');
+
+  // --- mobile (overlay) ---
+  const openMobile = () => {
+    sidebar.classList.add('sidebar-open');
+    backdrop.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  };
+  const closeMobile = () => {
+    sidebar.classList.remove('sidebar-open');
+    backdrop.classList.add('hidden');
+    document.body.style.overflow = '';
+  };
+
+  // --- desktop (collapse) ---
+  const setCollapsed = (collapsed) => {
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+    try { localStorage.setItem('sidebarCollapsed', collapsed ? '1' : '0'); } catch (e) {}
+  };
+  try {
+    if (localStorage.getItem('sidebarCollapsed') === '1') {
+      document.body.classList.add('sidebar-collapsed');
+    }
+  } catch (e) {}
+
+  menuBtn.addEventListener('click', () => {
+    if (desktop.matches) {
+      setCollapsed(!document.body.classList.contains('sidebar-collapsed'));
+    } else {
+      sidebar.classList.contains('sidebar-open') ? closeMobile() : openMobile();
+    }
+  });
+
+  backdrop.addEventListener('click', closeMobile);
+  document.getElementById('sidebarClose')?.addEventListener('click', () => {
+    desktop.matches ? setCollapsed(true) : closeMobile();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobile(); });
+
+  // Close the overlay after tapping a real link (mobile only)
+  sidebar.querySelectorAll('a[href]').forEach(a =>
+    a.addEventListener('click', () => { if (!desktop.matches) closeMobile(); })
+  );
+
+  // Crossing the breakpoint: reset overlay state
+  desktop.addEventListener('change', closeMobile);
+})();
 
 // Profile / user menu dropdown (navbar)
 const userMenuBtn = document.getElementById('userMenuBtn');

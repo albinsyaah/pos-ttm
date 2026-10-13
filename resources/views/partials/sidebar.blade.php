@@ -9,7 +9,7 @@
   @can/@canany check automatically (see AppServiceProvider).
 --}}
 <aside id="sidebar" class="w-[280px] bg-[var(--ink-900)] border-r border-gray-100 shrink-0 flex flex-col h-screen sticky top-0">
-
+    
     <div class="flex items-center gap-3 px-6 py-6 shrink-0">
         {{-- <div class="w-10 h-10 rounded-xl bg-[var(--brand-600)] text-white flex items-center justify-center text-lg">
             <i class="fa-solid fa-cash-register"></i>
