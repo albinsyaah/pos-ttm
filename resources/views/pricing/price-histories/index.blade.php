@@ -14,7 +14,7 @@
                 type="search"
                 value="{{ $search }}"
                 placeholder="{{ __('app.price_histories.search_placeholder') }}"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
             />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
@@ -22,14 +22,14 @@
 
     <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[900px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.price_histories.when') }}</th>
-                    <th class="font-semibold">{{ __('app.price_histories.who') }}</th>
-                    <th class="font-semibold">{{ __('app.price_setups.product') }}</th>
-                    <th class="font-semibold">{{ __('app.price_setups.price_category') }}</th>
-                    <th class="font-semibold">{{ __('app.price_histories.action') }}</th>
-                    <th class="font-semibold">{{ __('app.price_histories.from') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.price_histories.when') }}</th>
+                    <th class="font-bold">{{ __('app.price_histories.who') }}</th>
+                    <th class="font-bold">{{ __('app.price_setups.product') }}</th>
+                    <th class="font-bold">{{ __('app.price_setups.price_category') }}</th>
+                    <th class="font-bold">{{ __('app.price_histories.action') }}</th>
+                    <th class="font-bold">{{ __('app.price_histories.from') }}</th>
                     <th class="font-semibold pr-5">{{ __('app.price_histories.to') }}</th>
                 </tr>
             </thead>
@@ -41,7 +41,7 @@
                         <td class="font-medium text-[var(--ink-900)]">
                             {{ $h->product?->name ?: '—' }}
                             @if($h->product?->code)
-                                <span class="block text-xs text-[var(--ink-400)] font-normal">{{ $h->product->code }}</span>
+                                <span class="code-badge mt-1">{{ $h->product->code }}</span>
                             @endif
                         </td>
                         <td class="text-[var(--ink-700)]">{{ $h->price_category }}</td>

@@ -11,7 +11,7 @@
             <label class="sr-only" for="arAgingReportSearch">{{ __('app.reports.receivable_aging.search_label') }}</label>
             <input id="arAgingReportSearch" name="q" type="search" value="{{ $search }}"
                 placeholder="{{ __('app.reports.receivable_aging.search_placeholder') }}" autocomplete="off"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
             <i
                 class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </div>
@@ -102,9 +102,9 @@
         </div>
 
         <table class="w-full text-sm min-w-[880px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.reports.receivable_aging.customer') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.reports.receivable_aging.customer') }}</th>
                     <th class="font-semibold ">{{ __('app.reports.receivable_aging.bucket_current') }}</th>
                     <th class="font-semibold ">{{ __('app.reports.receivable_aging.bucket_31_60') }}</th>
                     <th class="font-semibold ">{{ __('app.reports.receivable_aging.bucket_61_90') }}</th>
@@ -118,7 +118,7 @@
                         <td class="p-5 font-medium text-[var(--ink-900)]">
                             {{ $row['customer']->name }}
                             @if ($row['customer']->code)
-                                <span class="text-[var(--ink-400)] font-normal">({{ $row['customer']->code }})</span>
+                                <span class="code-badge ml-1">{{ $row['customer']->code }}</span>
                             @endif
                         </td>
                         <td class=" text-[var(--ink-700)]">

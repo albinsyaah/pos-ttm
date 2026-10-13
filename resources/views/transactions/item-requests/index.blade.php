@@ -14,7 +14,7 @@
                 type="search"
                 value="{{ $search }}"
                 placeholder="{{ __('app.item_requests.search_placeholder') }}"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
             />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
@@ -33,21 +33,21 @@
 
     <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[820px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.item_requests.mutation_number') }}</th>
-                    <th class="font-semibold">{{ __('app.item_requests.mutation_date') }}</th>
-                    <th class="font-semibold">{{ __('app.item_requests.to_warehouse') }}</th>
-                    <th class="font-semibold">{{ __('app.item_requests.requested_by') }}</th>
-                    <th class="font-semibold">{{ __('app.item_requests.status') }}</th>
-                    <th class="font-semibold">{{ __('app.item_requests.items') }}</th>
-                    <th class="font-semibold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.item_requests.mutation_number') }}</th>
+                    <th class="font-bold">{{ __('app.item_requests.mutation_date') }}</th>
+                    <th class="font-bold">{{ __('app.item_requests.to_warehouse') }}</th>
+                    <th class="font-bold">{{ __('app.item_requests.requested_by') }}</th>
+                    <th class="font-bold">{{ __('app.item_requests.status') }}</th>
+                    <th class="font-bold">{{ __('app.item_requests.items') }}</th>
+                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($itemRequests as $itemRequest)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $itemRequest->mutation_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $itemRequest->mutation_number }}</span></td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($itemRequest->mutation_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $itemRequest->toWarehouse?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $itemRequest->requestedBy?->name ?: '—' }}</td>
@@ -62,7 +62,7 @@
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"
-                                        class="edit-item-request-btn icon-btn"
+                                        class="edit-item-request-btn icon-btn-edit"
                                         aria-label="Edit {{ $itemRequest->mutation_number }}"
                                         data-action="{{ route('transactions.item-requests.update', $itemRequest) }}"
                                         data-mutation-number="{{ $itemRequest->mutation_number }}"
@@ -72,16 +72,16 @@
                                         data-status="{{ $itemRequest->status }}"
                                         data-items="{{ $itemRequest->internalMutationDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty, 'notes' => $d->notes])->toJson() }}"
                                     >
-                                        <i class="fa-solid fa-pen text-xs"></i>
+                                        <i class="fa-solid fa-pen text-[15px]"></i>
                                     </button>
                                     <button
                                         type="button"
-                                        class="delete-item-request-btn icon-btn"
+                                        class="delete-item-request-btn icon-btn-del"
                                         aria-label="Delete {{ $itemRequest->mutation_number }}"
                                         data-action="{{ route('transactions.item-requests.destroy', $itemRequest) }}"
                                         data-name="{{ $itemRequest->mutation_number }}"
                                     >
-                                        <i class="fa-solid fa-trash text-xs"></i>
+                                        <i class="fa-solid fa-trash text-[15px]"></i>
                                     </button>
                                 </div>
                             @endcan
@@ -218,7 +218,7 @@
             </td>
             <td class="p-2 text-right">
                 <button type="button" class="remove-item-btn icon-btn" aria-label="{{ __('app.item_requests.remove') }}">
-                    <i class="fa-solid fa-trash text-xs"></i>
+                    <i class="fa-solid fa-trash text-[15px]"></i>
                 </button>
             </td>
         </tr>

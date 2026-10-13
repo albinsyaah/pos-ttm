@@ -12,7 +12,7 @@
             <label class="sr-only" for="insightSearch">{{ __('insight.salesman.search_label') }}</label>
             <input id="insightSearch" name="q" type="search" value="{{ $search }}"
                 placeholder="{{ __('insight.salesman.search_placeholder') }}" autocomplete="off"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </div>
 
@@ -62,14 +62,14 @@
         </div>
 
         <table class="w-full text-sm min-w-[760px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('insight.salesman.salesman') }}</th>
-                    <th class="font-semibold">{{ __('insight.common.product') }}</th>
+                    <th class="p-5 font-bold">{{ __('insight.salesman.salesman') }}</th>
+                    <th class="font-bold">{{ __('insight.common.product') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.salesman.paid_qty') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.salesman.free_qty') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.returns.returned_qty') }}</th>
-                    <th class="font-semibold text-right pr-5">{{ __('insight.common.revenue') }}</th>
+                    <th class="font-bold text-right pr-5">{{ __('insight.common.revenue') }}</th>
                 </tr>
             </thead>
             <tbody>

@@ -8,20 +8,20 @@
   the user can see at least one page inside it. Super Admin bypasses every
   @can/@canany check automatically (see AppServiceProvider).
 --}}
-<aside id="sidebar" class="w-[280px] bg-white border-r border-gray-100 shrink-0 flex flex-col h-screen sticky top-0">
-
+<aside id="sidebar" class="w-[280px] bg-[var(--ink-900)] border-r border-gray-100 shrink-0 flex flex-col h-screen sticky top-0">
+    
     <div class="flex items-center gap-3 px-6 py-6 shrink-0">
         {{-- <div class="w-10 h-10 rounded-xl bg-[var(--brand-600)] text-white flex items-center justify-center text-lg">
             <i class="fa-solid fa-cash-register"></i>
         </div> --}}
-        <h1 class="text-xl font-extrabold tracking-tight text-[var(--brand-600)]">TunasTaniMakmur</h1>
+        <h1 class="text-xl font-extrabold tracking-tight text-[var(--ink-400)]">TunasTaniMakmur</h1>
     </div>
 
     <label class="relative block px-4 mb-2 shrink-0">
         <span class="sr-only">{{ __('app.sidebar.search_menu') }}</span>
         <input id="navSearch" type="search" placeholder="{{ __('app.sidebar.search_menu') }}"
-            class="w-full rounded-xl bg-[var(--surface)] py-2 pl-9 pr-3 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
-        <i class="fa-solid fa-magnifying-glass absolute left-7 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-xs"></i>
+            class="w-full rounded-xl bg-[var(--ink-400)] py-2 pl-9 pr-3 text-xs outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+        <i class="fa-solid fa-magnifying-glass absolute left-7 top-1/2 -translate-y-1/2 text-[var(--ink-700)] text-xs"></i>
     </label>
 
     <nav id="mainNav" class="flex-1 overflow-y-auto px-3 pb-4 text-[var(--ink-400)] text-sm" aria-label="Main navigation">

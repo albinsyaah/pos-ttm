@@ -23,6 +23,7 @@
 
 <body>
 
+    <div id="sidebarBackdrop" class="hidden"></div>
     <div class="flex min-h-screen">
 
         @include('partials.sidebar')

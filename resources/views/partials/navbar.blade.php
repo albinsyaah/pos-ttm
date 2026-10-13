@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between gap-4 flex-wrap">
 
         <div class="flex items-center gap-3">
-            <button id="menuBtn" class="lg:hidden icon-btn" aria-label="Toggle menu">
+            <button id="menuBtn" class="icon-btn" aria-label="Toggle menu">
                 <i class="fa-solid fa-bars"></i>
             </button>
             <div>
@@ -29,7 +29,7 @@
             </button> --}}
 
             {{-- Language switcher --}}
-            <div class="relative">
+            <div class="hidden sm:block relative">
                 <button id="langMenuBtn" type="button" class="icon-btn flex items-center gap-1.5 !w-auto px-3" aria-haspopup="true" aria-expanded="false" aria-label="{{ __('app.language') }}">
                     <i class="fa-solid fa-globe"></i>
                     <span class="text-xs font-semibold uppercase hidden sm:inline">{{ app()->getLocale() }}</span>
@@ -86,25 +86,40 @@
                 </div>
             @endcan
 
+
             <img
                 src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_1280.png"
                 alt="{{ auth()->user()?->displayName() ?? 'User' }} profile photo"
                 class="w-11 h-11 rounded-full object-cover ring-2 ring-[var(--ink-200)]"
             />
-
             <div class="relative">
                 <button id="userMenuBtn" type="button" class="flex items-center gap-2" aria-haspopup="true" aria-expanded="false">
                     <span class="hidden md:block text-left">
                         <span class="block text-sm font-semibold text-[var(--ink-900)] leading-tight">{{ auth()->user()?->displayName() ?? 'User' }}</span>
                         <span class="block text-xs text-[var(--ink-400)] leading-tight">{{ auth()->user()?->roles->pluck('name')->join(', ') ?: __('app.layout.no_role') }}</span>
                     </span>
-                    <i class="fa-solid fa-chevron-down text-xs text-[var(--ink-400)]"></i>
+                    <i class="fa-solid fa-chevron-down text-sm text-[var(--ink-400)]"></i>
                 </button>
 
                 <div id="userMenu" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-2xl shadow-lg border border-gray-100 py-2 z-20">
                     <div class="px-4 py-2 md:hidden border-b border-gray-50 mb-1">
                         <p class="text-sm font-semibold text-[var(--ink-900)]">{{ auth()->user()?->displayName() ?? 'User' }}</p>
                         <p class="text-xs text-[var(--ink-400)]">{{ auth()->user()?->roles->pluck('name')->join(', ') ?: __('app.layout.no_role') }}</p>
+                    </div>
+                    <div class="sm:hidden border-b border-gray-50 mb-1 pb-1">
+                        <p class="px-4 pt-1 pb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-400)]">
+                            <i class="fa-solid fa-globe mr-1"></i> {{ __('app.language') }}
+                        </p>
+                        <a href="{{ route('language.switch', 'en') }}"
+                        class="flex items-center justify-between px-4 py-2 text-sm hover:bg-[var(--surface)] {{ app()->getLocale() === 'en' ? 'text-[var(--brand-600)] font-semibold' : 'text-[var(--ink-700)]' }}">
+                            {{ __('app.lang_en') }}
+                            @if(app()->getLocale() === 'en')<i class="fa-solid fa-check text-xs"></i>@endif
+                        </a>
+                        <a href="{{ route('language.switch', 'id') }}"
+                        class="flex items-center justify-between px-4 py-2 text-sm hover:bg-[var(--surface)] {{ app()->getLocale() === 'id' ? 'text-[var(--brand-600)] font-semibold' : 'text-[var(--ink-700)]' }}">
+                            {{ __('app.lang_id') }}
+                            @if(app()->getLocale() === 'id')<i class="fa-solid fa-check text-xs"></i>@endif
+                        </a>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

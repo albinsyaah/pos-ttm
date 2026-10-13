@@ -11,7 +11,7 @@
             <label class="sr-only" for="deviationReportSearch">{{ __('app.reports.deviation.search_label') }}</label>
             <input id="deviationReportSearch" name="q" type="search" value="{{ $search }}"
                 placeholder="{{ __('app.reports.deviation.search_placeholder') }}" autocomplete="off"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
             <i
                 class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </div>
@@ -95,13 +95,13 @@
         </div>
 
         <table class="w-full text-sm min-w-[820px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.reports.deviation.mutation_number') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.deviation.mutation_date') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.deviation.warehouse') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.deviation.status') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.deviation.items') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.reports.deviation.mutation_number') }}</th>
+                    <th class="font-bold">{{ __('app.reports.deviation.mutation_date') }}</th>
+                    <th class="font-bold">{{ __('app.reports.deviation.warehouse') }}</th>
+                    <th class="font-bold">{{ __('app.reports.deviation.status') }}</th>
+                    <th class="font-bold">{{ __('app.reports.deviation.items') }}</th>
                     <th class="font-semibold text-right">{{ __('app.reports.deviation.qty') }}</th>
                 </tr>
             </thead>
@@ -111,7 +111,7 @@
                         $lineQty = $deviation->internalMutationDetails->sum('qty');
                     @endphp
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $deviation->mutation_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $deviation->mutation_number }}</span></td>
                         <td class="text-[var(--ink-400)]">
                             {{ \Illuminate\Support\Carbon::parse($deviation->mutation_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $deviation->fromWarehouse?->name ?: '—' }}</td>

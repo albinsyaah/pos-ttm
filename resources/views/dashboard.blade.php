@@ -142,7 +142,7 @@
             @include('partials.range-tabs', ['range' => $range])
         </div>
 
-        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             @forelse($incomeByMethod as $method)
                 <div class="rounded-2xl bg-[var(--surface)] p-4">
                     <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
@@ -221,15 +221,15 @@
 
     <div class="bg-white rounded-3xl mt-5 overflow-x-auto">
         <table class="w-full text-sm min-w-[720px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.dashboard.invoice') }}</th>
-                    <th class="font-semibold">{{ __('app.dashboard.customer') }}</th>
-                    <th class="font-semibold">{{ __('app.dashboard.items') }}</th>
-                    <th class="font-semibold">{{ __('app.dashboard.source') }}</th>
-                    <th class="font-semibold">{{ __('app.dashboard.date') }}</th>
-                    <th class="font-semibold">{{ __('app.dashboard.total') }}</th>
-                    <th class="font-semibold text-right pr-5">{{ __('app.dashboard.receipt') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.dashboard.invoice') }}</th>
+                    <th class="font-bold">{{ __('app.dashboard.customer') }}</th>
+                    <th class="font-bold">{{ __('app.dashboard.items') }}</th>
+                    <th class="font-bold">{{ __('app.dashboard.source') }}</th>
+                    <th class="font-bold">{{ __('app.dashboard.date') }}</th>
+                    <th class="font-bold">{{ __('app.dashboard.total') }}</th>
+                    {{-- <th class="font-bold text-right pr-5">{{ __('app.dashboard.receipt') }}</th> --}}
                 </tr>
             </thead>
 
@@ -242,9 +242,9 @@
                         <td class="text-[var(--ink-700)]">{{ ucfirst($order['source']) }}</td>
                         <td class="text-[var(--ink-400)]">{{ $order['date'] }} &middot; {{ $order['time'] }}</td>
                         <td class="font-semibold text-[var(--ink-900)]">{{ Money::rupiah($order['total']) }}</td>
-                        <td class="text-right pr-5">
+                        {{-- <td class="text-right pr-5">
                             <button class="dl-btn border border-gray-200 text-[var(--ink-700)] rounded-full px-4 py-2 text-xs font-medium hover:border-[var(--brand-600)] hover:text-[var(--brand-600)] transition-colors">{{ __('app.dashboard.print') }}</button>
-                        </td>
+                        </td> --}}
                     </tr>
                 @empty
                 @endforelse

@@ -11,7 +11,7 @@
             <label class="sr-only" for="saleReportSearch">{{ __('app.reports.sale.search_label') }}</label>
             <input id="saleReportSearch" name="q" type="search" value="{{ $search }}"
                 placeholder="{{ __('app.reports.sale.search_placeholder') }}" autocomplete="off"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
             <i
                 class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </div>
@@ -102,21 +102,21 @@
         </div>
 
         <table class="w-full text-sm min-w-[920px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.sales.invoice_number') }}</th>
-                    <th class="font-semibold">{{ __('app.sales.sale_date') }}</th>
-                    <th class="font-semibold">{{ __('app.sales.customer') }}</th>
-                    <th class="font-semibold">{{ __('app.sales.warehouse') }}</th>
-                    <th class="font-semibold">{{ __('app.sales.items') }}</th>
-                    <th class="font-semibold">{{ __('app.sales.total') }}</th>
-                    <th class="font-semibold">{{ __('insight.returns.return_column') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.sales.invoice_number') }}</th>
+                    <th class="font-bold">{{ __('app.sales.sale_date') }}</th>
+                    <th class="font-bold">{{ __('app.sales.customer') }}</th>
+                    <th class="font-bold">{{ __('app.sales.warehouse') }}</th>
+                    <th class="font-bold">{{ __('app.sales.items') }}</th>
+                    <th class="font-bold">{{ __('app.sales.total') }}</th>
+                    <th class="font-bold">{{ __('insight.returns.return_column') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($sales as $sale)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $sale->invoice_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $sale->invoice_number }}</span></td>
                         <td class="text-[var(--ink-400)]">
                             {{ \Illuminate\Support\Carbon::parse($sale->sale_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $sale->customer?->name ?: '—' }}</td>

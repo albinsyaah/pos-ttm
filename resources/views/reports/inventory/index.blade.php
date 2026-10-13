@@ -11,7 +11,7 @@
             <label class="sr-only" for="inventoryReportSearch">{{ __('app.reports.inventory.search_label') }}</label>
             <input id="inventoryReportSearch" name="q" type="search" value="{{ $search }}"
                 placeholder="{{ __('app.reports.inventory.search_placeholder') }}" autocomplete="off"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
             <i
                 class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </div>
@@ -104,13 +104,13 @@
         </div>
 
         <table class="w-full text-sm min-w-[900px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.reports.inventory.product_code') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.inventory.product_name') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.inventory.brand') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.inventory.item_type') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.inventory.product_group') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.reports.inventory.product_code') }}</th>
+                    <th class="font-bold">{{ __('app.reports.inventory.product_name') }}</th>
+                    <th class="font-bold">{{ __('app.reports.inventory.brand') }}</th>
+                    <th class="font-bold">{{ __('app.reports.inventory.item_type') }}</th>
+                    <th class="font-bold">{{ __('app.reports.inventory.product_group') }}</th>
                     <th class="font-semibold ">{{ __('app.reports.inventory.total_stock') }}</th>
                     <th class="font-semibold ">{{ __('app.reports.inventory.unit_price') }}</th>
                     <th class="font-semibold ">{{ __('app.reports.inventory.stock_value') }}</th>
@@ -123,7 +123,7 @@
                         $price = $priceByProduct[$product->id] ?? 0;
                     @endphp
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 text-[var(--ink-400)]">{{ $product->code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $product->code }}</span></td>
                         <td class="font-medium text-[var(--ink-900)]">{{ $product->name }}</td>
                         <td class="text-[var(--ink-700)]">{{ $product->brand?->name ?? '-' }}</td>
                         <td class="text-[var(--ink-700)]">{{ $product->itemType?->name ?? '-' }}</td>

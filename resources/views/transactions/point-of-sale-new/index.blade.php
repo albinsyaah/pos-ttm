@@ -192,7 +192,7 @@
                 <td class="p-3 align-top item-line-total text-[var(--ink-700)] font-medium">0.00</td>
                 <td class="p-2 align-top text-right">
                     <button type="button" class="remove-item-btn icon-btn" aria-label="{{ __('app.point_of_sale_new.remove') }}">
-                        <i class="fa-solid fa-trash text-xs"></i>
+                        <i class="fa-solid fa-trash text-[15px]"></i>
                     </button>
                 </td>
             </tr>

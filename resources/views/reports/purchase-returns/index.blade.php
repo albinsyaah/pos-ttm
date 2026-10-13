@@ -15,7 +15,7 @@
                 value="{{ $search }}"
                 placeholder="{{ __('app.reports.purchase_return.search_placeholder') }}"
                 autocomplete="off"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
             />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </div>
@@ -83,19 +83,19 @@
         </div>
 
         <table class="w-full text-sm min-w-[820px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.purchase_returns.return_number') }}</th>
-                    <th class="font-semibold">{{ __('app.purchase_returns.return_date') }}</th>
-                    <th class="font-semibold">{{ __('app.purchase_returns.purchase') }}</th>
-                    <th class="font-semibold">{{ __('app.purchase_returns.items') }}</th>
-                    <th class="font-semibold">{{ __('app.purchase_returns.total') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.purchase_returns.return_number') }}</th>
+                    <th class="font-bold">{{ __('app.purchase_returns.return_date') }}</th>
+                    <th class="font-bold">{{ __('app.purchase_returns.purchase') }}</th>
+                    <th class="font-bold">{{ __('app.purchase_returns.items') }}</th>
+                    <th class="font-bold">{{ __('app.purchase_returns.total') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($purchaseReturns as $purchaseReturn)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $purchaseReturn->return_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $purchaseReturn->return_number }}</span></td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($purchaseReturn->return_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">
                             {{ $purchaseReturn->purchase?->invoice_number ?: '—' }}

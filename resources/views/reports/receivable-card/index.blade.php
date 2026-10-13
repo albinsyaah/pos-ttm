@@ -100,11 +100,11 @@
             </div>
         @else
             <table class="w-full text-sm min-w-[820px]">
-                <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+                <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                     <tr class="text-left border-b border-gray-100">
-                        <th class="p-5 font-semibold">{{ __('app.reports.receivable_card.date') }}</th>
-                        <th class="font-semibold">{{ __('app.reports.receivable_card.document_number') }}</th>
-                        <th class="font-semibold">{{ __('app.reports.receivable_card.type') }}</th>
+                        <th class="p-5 font-bold">{{ __('app.reports.receivable_card.date') }}</th>
+                        <th class="font-bold">{{ __('app.reports.receivable_card.document_number') }}</th>
+                        <th class="font-bold">{{ __('app.reports.receivable_card.type') }}</th>
                         <th class="font-semibold ">{{ __('app.reports.receivable_card.debit') }}</th>
                         <th class="font-semibold ">{{ __('app.reports.receivable_card.credit') }}</th>
                         <th class="font-semibold ">{{ __('app.reports.receivable_card.balance') }}</th>
@@ -121,7 +121,7 @@
                         <tr class="table-row border-b border-gray-50">
                             <td class="p-5 text-[var(--ink-400)]">
                                 {{ \Illuminate\Support\Carbon::parse($row['date'])->format('d M Y') }}</td>
-                            <td class="font-medium text-[var(--ink-900)]">{{ $row['document_number'] }}</td>
+                            <td><span class="code-badge">{{ $row['document_number'] }}</span></td>
                             <td class="text-[var(--ink-700)]">{{ $row['type'] }}</td>
                             <td class=" text-[var(--ink-700)]">
                                 {{ $row['debit'] > 0 ? 'Rp' . number_format($row['debit']) : '—' }}</td>

@@ -14,7 +14,7 @@
                 type="search"
                 value="{{ $search }}"
                 placeholder="{{ __('app.assets.search_placeholder') }}"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
             />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
@@ -33,19 +33,19 @@
 
     <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[680px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.common.code') }}</th>
-                    <th class="font-semibold">{{ __('app.common.name') }}</th>
-                    <th class="font-semibold">{{ __('app.assets.purchase_date') }}</th>
-                    <th class="font-semibold">{{ __('app.common.value') }}</th>
-                    <th class="font-semibold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.common.code') }}</th>
+                    <th class="font-bold">{{ __('app.common.name') }}</th>
+                    <th class="font-bold">{{ __('app.assets.purchase_date') }}</th>
+                    <th class="font-bold">{{ __('app.common.value') }}</th>
+                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($assets as $asset)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $asset->asset_code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $asset->asset_code }}</span></td>
                         <td class="text-[var(--ink-700)]">{{ $asset->name }}</td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($asset->purchase_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $asset->value, 2) }}</td>
@@ -54,7 +54,7 @@
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"
-                                        class="edit-asset-btn icon-btn"
+                                        class="edit-asset-btn icon-btn-edit"
                                         aria-label="Edit {{ $asset->name }}"
                                         data-action="{{ route('assets.update', $asset) }}"
                                         data-asset-code="{{ $asset->asset_code }}"
@@ -62,16 +62,16 @@
                                         data-purchase-date="{{ \Illuminate\Support\Carbon::parse($asset->purchase_date)->format('Y-m-d') }}"
                                         data-value="{{ $asset->value }}"
                                     >
-                                        <i class="fa-solid fa-pen text-xs"></i>
+                                        <i class="fa-solid fa-pen text-[15px]"></i>
                                     </button>
                                     <button
                                         type="button"
-                                        class="delete-asset-btn icon-btn"
+                                        class="delete-asset-btn icon-btn-del"
                                         aria-label="Delete {{ $asset->name }}"
                                         data-action="{{ route('assets.destroy', $asset) }}"
                                         data-name="{{ $asset->name }}"
                                     >
-                                        <i class="fa-solid fa-trash text-xs"></i>
+                                        <i class="fa-solid fa-trash text-[15px]"></i>
                                     </button>
                                 </div>
                             @endcan

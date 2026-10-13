@@ -56,16 +56,16 @@
         </div>
 
         <table class="w-full text-sm min-w-[940px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('insight.payment_methods.method') }}</th>
+                    <th class="p-5 font-bold">{{ __('insight.payment_methods.method') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.cash_sales_count') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.cash_sales') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.receivable_count') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.receivable_payments') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.refunds') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.income') }}</th>
-                    <th class="font-semibold text-right pr-5">{{ __('insight.payment_methods.supplier_paid') }}</th>
+                    <th class="font-bold text-right pr-5">{{ __('insight.payment_methods.supplier_paid') }}</th>
                 </tr>
             </thead>
             <tbody>

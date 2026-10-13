@@ -11,7 +11,7 @@
             <label class="sr-only" for="positionReportSearch">{{ __('app.reports.position.search_label') }}</label>
             <input id="positionReportSearch" name="q" type="search" value="{{ $search }}"
                 placeholder="{{ __('app.reports.position.search_placeholder') }}" autocomplete="off"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
             <i
                 class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </div>
@@ -90,19 +90,19 @@
         </div>
 
         <table class="w-full text-sm min-w-[760px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.reports.position.product_code') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.position.product_name') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.position.warehouse') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.reports.position.product_code') }}</th>
+                    <th class="font-bold">{{ __('app.reports.position.product_name') }}</th>
+                    <th class="font-bold">{{ __('app.reports.position.warehouse') }}</th>
                     <th class="font-semibold text-right">{{ __('app.reports.position.balance') }}</th>
-                    <th class="font-semibold">{{ __('app.reports.position.status') }}</th>
+                    <th class="font-bold">{{ __('app.reports.position.status') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($positions as $position)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 text-[var(--ink-400)]">{{ $position->product_code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $position->product_code }}</span></td>
                         <td class="font-medium text-[var(--ink-900)]">{{ $position->product_name }}</td>
                         <td class="text-[var(--ink-700)]">{{ $position->warehouse_name }}</td>
                         <td class="text-right font-medium text-[var(--ink-900)]">

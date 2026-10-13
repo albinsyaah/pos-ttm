@@ -14,7 +14,7 @@
                 type="search"
                 value="{{ $search }}"
                 placeholder="{{ __('app.chart_of_accounts.search_placeholder') }}"
-                class="w-64 sm:w-80 rounded-full bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
+                class="w-64 sm:w-96 rounded-xl bg-[var(--surface)] py-2.5 pl-11 pr-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors"
             />
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-400)] text-sm"></i>
         </form>
@@ -33,18 +33,18 @@
 
     <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[620px]">
-            <thead class="text-[var(--ink-400)] text-xs uppercase tracking-wide">
+            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="p-5 font-semibold">{{ __('app.common.code') }}</th>
-                    <th class="font-semibold">{{ __('app.chart_of_accounts.account_name') }}</th>
-                    <th class="font-semibold">{{ __('app.chart_of_accounts.type') }}</th>
-                    <th class="font-semibold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="p-5 font-bold">{{ __('app.common.code') }}</th>
+                    <th class="font-bold">{{ __('app.chart_of_accounts.account_name') }}</th>
+                    <th class="font-bold">{{ __('app.chart_of_accounts.type') }}</th>
+                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($accounts as $account)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $account->account_code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $account->account_code }}</span></td>
                         <td class="text-[var(--ink-700)]">{{ $account->account_name }}</td>
                         <td class="text-[var(--ink-400)]">{{ $account->type }}</td>
                         <td class="text-right pr-5">
@@ -52,23 +52,23 @@
                                 <div class="inline-flex items-center gap-2">
                                     <button
                                         type="button"
-                                        class="edit-account-btn icon-btn"
+                                        class="edit-account-btn icon-btn-edit"
                                         aria-label="Edit {{ $account->account_name }}"
                                         data-action="{{ route('finance.chart-of-accounts.update', $account) }}"
                                         data-account-code="{{ $account->account_code }}"
                                         data-account-name="{{ $account->account_name }}"
                                         data-type="{{ $account->type }}"
                                     >
-                                        <i class="fa-solid fa-pen text-xs"></i>
+                                        <i class="fa-solid fa-pen text-[15px]"></i>
                                     </button>
                                     <button
                                         type="button"
-                                        class="delete-account-btn icon-btn"
+                                        class="delete-account-btn icon-btn-del"
                                         aria-label="Delete {{ $account->account_name }}"
                                         data-action="{{ route('finance.chart-of-accounts.destroy', $account) }}"
                                         data-name="{{ $account->account_name }}"
                                     >
-                                        <i class="fa-solid fa-trash text-xs"></i>
+                                        <i class="fa-solid fa-trash text-[15px]"></i>
                                     </button>
                                 </div>
                             @endcan
