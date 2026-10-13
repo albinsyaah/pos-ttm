@@ -45,7 +45,7 @@
             <tbody>
                 @forelse($assets as $asset)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $asset->asset_code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $asset->asset_code }}</span></td>
                         <td class="text-[var(--ink-700)]">{{ $asset->name }}</td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($asset->purchase_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $asset->value, 2) }}</td>

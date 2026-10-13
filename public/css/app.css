@@ -262,6 +262,18 @@ select:focus-visible {
     background: var(--surface);
 }
 
+.code-badge{
+  display:inline-block;
+  padding:.2rem .6rem;
+  border-radius:6px;
+  background:var(--brand-100);
+  color:var(--brand-700);
+  font-weight:600;
+  font-size:.8125rem;
+  line-height:1.25;
+  white-space:nowrap;
+}
+
 /* Toasts */
 .toast {
     animation: toast-in .25s ease forwards;
@@ -397,6 +409,8 @@ select:focus-visible {
     .report-table-wrap [id$="Loading"] {
         display: none !important;
     }
+
+    .code-badge{ background:none !important; color:#000 !important; padding:0 !important; }
 
     @page {
         margin: 14mm;

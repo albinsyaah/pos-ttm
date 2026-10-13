@@ -46,7 +46,7 @@
             <tbody>
                 @forelse($receivablePayments as $payment)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $payment->payment_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $payment->payment_number }}</span></td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $payment->customer?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $payment->paymentMethod?->name ?? '-' }}</td>

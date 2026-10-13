@@ -48,7 +48,7 @@
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($ledger->transaction_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $ledger->account?->account_name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $ledger->reference_number ?: '—' }}</td>
+                        <td>@if($ledger->reference_number)<span class="code-badge">{{ $ledger->reference_number }}</span>@else<span class="text-[var(--ink-400)]">—</span>@endif</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $ledger->debit, 2) }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $ledger->credit, 2) }}</td>
                         <td class="text-right pr-5">

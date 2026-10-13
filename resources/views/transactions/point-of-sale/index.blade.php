@@ -53,7 +53,7 @@
             <tbody>
                 @forelse($pointOfSales as $sale)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $sale->invoice_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $sale->invoice_number }}</span></td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($sale->sale_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $sale->customer?->name ?: __('app.common.walk_in') }}</td>
                         <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: __('app.common.all_warehouses') }}</td>

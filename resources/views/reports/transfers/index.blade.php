@@ -124,7 +124,7 @@
                         $lineQty = $transfer->internalMutationDetails->sum('qty');
                     @endphp
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $transfer->mutation_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $transfer->mutation_number }}</span></td>
                         <td class="text-[var(--ink-400)]">
                             {{ \Illuminate\Support\Carbon::parse($transfer->mutation_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $transfer->fromWarehouse?->name ?: '—' }}</td>

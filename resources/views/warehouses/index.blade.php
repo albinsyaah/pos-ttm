@@ -42,7 +42,7 @@
             <tbody>
                 @forelse($warehouses as $warehouse)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $warehouse->code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $warehouse->code }}</span></td>
                         <td class="text-[var(--ink-700)]">{{ $warehouse->name }}</td>
                         <td class="text-[var(--ink-400)] max-w-xs truncate">{{ $warehouse->location ?: '—' }}</td>
                         <td class="text-right pr-5">

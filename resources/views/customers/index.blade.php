@@ -43,7 +43,7 @@
             <tbody>
                 @forelse($customers as $customer)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $customer->code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $customer->code }}</span></td>
                         <td class="text-[var(--ink-700)]">{{ $customer->name }}</td>
                         <td class="text-[var(--ink-400)]">{{ $customer->phone ?: '—' }}</td>
                         <td class="text-[var(--ink-400)] max-w-xs truncate">{{ $customer->address ?: '—' }}</td>

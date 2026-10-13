@@ -229,7 +229,7 @@
                     <th class="font-bold">{{ __('app.dashboard.source') }}</th>
                     <th class="font-bold">{{ __('app.dashboard.date') }}</th>
                     <th class="font-bold">{{ __('app.dashboard.total') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.dashboard.receipt') }}</th>
+                    {{-- <th class="font-bold text-right pr-5">{{ __('app.dashboard.receipt') }}</th> --}}
                 </tr>
             </thead>
 
@@ -242,9 +242,9 @@
                         <td class="text-[var(--ink-700)]">{{ ucfirst($order['source']) }}</td>
                         <td class="text-[var(--ink-400)]">{{ $order['date'] }} &middot; {{ $order['time'] }}</td>
                         <td class="font-semibold text-[var(--ink-900)]">{{ Money::rupiah($order['total']) }}</td>
-                        <td class="text-right pr-5">
+                        {{-- <td class="text-right pr-5">
                             <button class="dl-btn border border-gray-200 text-[var(--ink-700)] rounded-full px-4 py-2 text-xs font-medium hover:border-[var(--brand-600)] hover:text-[var(--brand-600)] transition-colors">{{ __('app.dashboard.print') }}</button>
-                        </td>
+                        </td> --}}
                     </tr>
                 @empty
                 @endforelse

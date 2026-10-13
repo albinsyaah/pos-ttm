@@ -41,7 +41,7 @@
                         <td class="font-medium text-[var(--ink-900)]">
                             {{ $h->product?->name ?: '—' }}
                             @if($h->product?->code)
-                                <span class="block text-xs text-[var(--ink-400)] font-normal">{{ $h->product->code }}</span>
+                                <span class="code-badge mt-1">{{ $h->product->code }}</span>
                             @endif
                         </td>
                         <td class="text-[var(--ink-700)]">{{ $h->price_category }}</td>

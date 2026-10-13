@@ -47,7 +47,7 @@
             <tbody>
                 @forelse($internalReceipts as $internalReceipt)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $internalReceipt->mutation_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $internalReceipt->mutation_number }}</span></td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($internalReceipt->mutation_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $internalReceipt->toWarehouse?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $internalReceipt->requestedBy?->name ?: '—' }}</td>

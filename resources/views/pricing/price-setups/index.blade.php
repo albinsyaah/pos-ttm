@@ -48,7 +48,7 @@
                         <td class="p-5 font-medium text-[var(--ink-900)]">
                             {{ $priceSetup->product?->name ?: '—' }}
                             @if($priceSetup->product?->code)
-                                <span class="block text-xs text-[var(--ink-400)] font-normal">{{ $priceSetup->product->code }}</span>
+                                <span class="code-badge mt-1">{{ $priceSetup->product->code }}</span>
                             @endif
                         </td>
                         <td class="text-[var(--ink-700)]">{{ $priceSetup->price_category }}</td>

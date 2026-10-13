@@ -123,7 +123,7 @@
                         $price = $priceByProduct[$product->id] ?? 0;
                     @endphp
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 text-[var(--ink-400)]">{{ $product->code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $product->code }}</span></td>
                         <td class="font-medium text-[var(--ink-900)]">{{ $product->name }}</td>
                         <td class="text-[var(--ink-700)]">{{ $product->brand?->name ?? '-' }}</td>
                         <td class="text-[var(--ink-700)]">{{ $product->itemType?->name ?? '-' }}</td>

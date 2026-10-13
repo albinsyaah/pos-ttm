@@ -118,7 +118,7 @@
                         <td class="p-5 font-medium text-[var(--ink-900)]">
                             {{ $row['customer']->name }}
                             @if ($row['customer']->code)
-                                <span class="text-[var(--ink-400)] font-normal">({{ $row['customer']->code }})</span>
+                                <span class="code-badge ml-1">{{ $row['customer']->code }}</span>
                             @endif
                         </td>
                         <td class=" text-[var(--ink-700)]">

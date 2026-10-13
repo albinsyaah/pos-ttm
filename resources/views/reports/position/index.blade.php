@@ -102,7 +102,7 @@
             <tbody>
                 @forelse($positions as $position)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 text-[var(--ink-400)]">{{ $position->product_code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $position->product_code }}</span></td>
                         <td class="font-medium text-[var(--ink-900)]">{{ $position->product_name }}</td>
                         <td class="text-[var(--ink-700)]">{{ $position->warehouse_name }}</td>
                         <td class="text-right font-medium text-[var(--ink-900)]">

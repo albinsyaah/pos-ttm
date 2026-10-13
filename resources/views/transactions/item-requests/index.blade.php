@@ -47,7 +47,7 @@
             <tbody>
                 @forelse($itemRequests as $itemRequest)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $itemRequest->mutation_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $itemRequest->mutation_number }}</span></td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($itemRequest->mutation_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $itemRequest->toWarehouse?->name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)]">{{ $itemRequest->requestedBy?->name ?: '—' }}</td>

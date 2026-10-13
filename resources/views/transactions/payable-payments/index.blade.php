@@ -47,10 +47,10 @@
             <tbody>
                 @forelse($payablePayments as $payment)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $payment->payment_number }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $payment->payment_number }}</span></td>
                         <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
                         <td class="text-[var(--ink-700)]">{{ $payment->supplier?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $payment->purchase?->invoice_number ?: '—' }}</td>
+                        <td>@if($payment->purchase?->invoice_number)<span class="code-badge">{{ $payment->purchase?->invoice_number }}</span>@else<span class="text-[var(--ink-400)]">—</span>@endif</td>
                         <td class="text-[var(--ink-400)]">{{ $payment->paymentMethod?->name ?? '-' }}</td>
                         <td class="text-[var(--ink-700)]">{{ number_format((float) $payment->amount, 2) }}</td>
                         <td class="text-right pr-5">

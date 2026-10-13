@@ -44,7 +44,7 @@
             <tbody>
                 @forelse($accounts as $account)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $account->account_code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $account->account_code }}</span></td>
                         <td class="text-[var(--ink-700)]">{{ $account->account_name }}</td>
                         <td class="text-[var(--ink-400)]">{{ $account->type }}</td>
                         <td class="text-right pr-5">

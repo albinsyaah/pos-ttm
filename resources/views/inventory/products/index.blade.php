@@ -48,7 +48,7 @@
             <tbody>
                 @forelse($products as $product)
                     <tr class="table-row border-b border-gray-50">
-                        <td class="p-5 font-medium text-[var(--ink-900)]">{{ $product->code }}</td>
+                        <td class="p-5"><span class="code-badge">{{ $product->code }}</span></td>
                         <td class="text-[var(--ink-700)]">{{ $product->name }}</td>
                         <td class="text-[var(--ink-400)]">
                             {{ $product->unit_name }}
