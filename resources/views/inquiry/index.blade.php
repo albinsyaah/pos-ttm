@@ -54,9 +54,9 @@
         </div>
     </form>
 
-    <div id="inquiryTableWrap" class="relative bg-white rounded-xl border border-[var(--ink-200)] mt-6 overflow-x-auto">
+    <div id="inquiryTableWrap" class="relative bg-white rounded-xl mt-6 overflow-x-auto">
 
-        <div id="inquiryLoading" class="hidden absolute inset-0 z-10 flex items-start justify-center pt-16 bg-white/70 backdrop-blur-[1px] rounded-3xl">
+        <div id="inquiryLoading" class="hidden absolute inset-0 z-10 flex items-start justify-center pt-16 bg-white/70 backdrop-blur-[1px] rounded-xl">
             <i class="fa-solid fa-circle-notch fa-spin text-xl text-[var(--brand-600)]"></i>
         </div>
 
@@ -69,14 +69,14 @@
                 <col style="width: 28%">
                 <col style="width: 18%">
             </colgroup>
-            <thead class="text-black text-[14px] uppercase tracking-wide">
+            <thead class="text-[var(--ink-900)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="px-5 py-4 font-semibold whitespace-nowrap">{{ __('app.common.code') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ __('app.common.name') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ __('app.products.brand') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ __('app.products.item_type') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ __('app.inquiry.stock') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ __('app.inquiry.price') }}</th>
+                    <th class="px-5 py-4 font-bold whitespace-nowrap">{{ __('app.common.code') }}</th>
+                    <th class="px-5 py-4 font-bold">{{ __('app.common.name') }}</th>
+                    <th class="px-5 py-4 font-bold">{{ __('app.products.brand') }}</th>
+                    <th class="px-5 py-4 font-bold">{{ __('app.products.item_type') }}</th>
+                    <th class="px-5 py-4 font-bold">{{ __('app.inquiry.stock') }}</th>
+                    <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -85,7 +85,7 @@
                         $stock = $stockByProduct[$product->id] ?? null;
                         $prices = $pricesByProduct[$product->id] ?? collect();
                     @endphp
-                    <tr class="table-row border-b border-gray-50 align-top">
+                    <tr class="table-row align-top {{ $loop->even ? 'is-zebra' : '' }}">
                         <td class="px-5 py-4 whitespace-nowrap"><span class="code-badge">{{ $product->code }}</span></td>
                         <td class="px-5 py-4 text-[var(--ink-700)]">{{ $product->name }}</td>
                         <td class="px-5 py-4 text-[var(--ink-400)]">{{ $product->brand?->name ?: '—' }}</td>
@@ -192,4 +192,4 @@
         @endif
     </script>
     <script src="{{ asset('js/inquiry.js') }}"></script>
-@endpush
+@endpush 

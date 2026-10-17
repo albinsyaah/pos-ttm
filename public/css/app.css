@@ -567,6 +567,10 @@ select:focus-visible {
 /* ---------------------------------------------------------------
    Tabel (semua halaman): grid halus, header jelas, baris zebra + hover
    Ubah variabel di :root untuk menyesuaikan tanpa menyentuh view.
+
+   Selector memakai "main :not(td) > table" sehingga tabel bersarang
+   (tabel di dalam <td>, mis. riwayat harga di Inquiry) tidak ikut
+   di-grid dan tetap memakai class Tailwind miliknya sendiri.
    --------------------------------------------------------------- */
 :root {
     --table-border: #dde2f0;   /* warna garis */
@@ -578,7 +582,7 @@ select:focus-visible {
     --cell-px: 1rem;           /* jarak kiri-kanan sel (lebar kolom) */
 }
 
-main table {
+main :not(td) > table {
     border-collapse: separate;
     border-spacing: 0;
     border: 1px solid var(--table-border);
@@ -586,28 +590,34 @@ main table {
     overflow: hidden;
 }
 
-/* Garis: hanya kanan & bawah per sel supaya tidak dobel */
-main table th,
-main table td {
+/* Garis: hanya kanan & bawah per sel supaya tidak dobel.
+   vertical-align sengaja tidak diset, jadi class align-top / align-middle
+   pada <tr> di view tetap berfungsi. */
+main :not(td) > table > thead > tr > th,
+main :not(td) > table > thead > tr > td,
+main :not(td) > table > tbody > tr > th,
+main :not(td) > table > tbody > tr > td {
     padding: var(--cell-py) var(--cell-px);
     border: 0;
     border-right: 1px solid var(--table-border);
     border-bottom: 1px solid var(--table-border);
-    vertical-align: middle;
 }
 
-main table th:last-child,
-main table td:last-child {
+main :not(td) > table > thead > tr > :last-child,
+main :not(td) > table > tbody > tr > :last-child {
     border-right: 0;
 }
 
-main table tbody tr:last-child td {
+/* Baris terakhir tanpa garis bawah (tabel sudah punya border luar).
+   Baris detail tersembunyi (class "hidden") tidak dihitung. */
+main :not(td) > table > tbody > tr:last-child > td,
+main :not(td) > table > tbody > tr:nth-last-child(2):has(+ tr.hidden) > td {
     border-bottom: 0;
 }
 
 /* Header */
-main table thead th,
-main table thead td {
+main :not(td) > table > thead > tr > th,
+main :not(td) > table > thead > tr > td {
     background: var(--table-head-bg);
     color: var(--ink-900);
     font-size: var(--th-size);
@@ -617,13 +627,21 @@ main table thead td {
     white-space: nowrap;
 }
 
-/* Zebra + hover */
-main table tbody tr:nth-child(even) td {
+/* Zebra + hover. Jika baris tersusun berpasangan (baris data + baris detail,
+   mis. Inquiry), beri class "is-zebra" pada baris data genap di view. */
+main :not(td) > table > tbody > tr:nth-child(even) > td,
+main :not(td) > table > tbody > tr.is-zebra > td {
     background: var(--table-zebra);
 }
 
-main table tbody tr:hover td {
+main :not(td) > table > tbody > tr:hover > td {
     background: var(--table-hover);
+}
+
+/* Baris detail / grup: tetap memakai latar khusus, tidak ikut zebra/hover */
+main :not(td) > table > tbody > tr[data-history-row] > td,
+main :not(td) > table > tbody > tr[data-salesman-row] > td {
+    background: var(--surface);
 }
 
 /* Tombol aksi (edit/hapus) di dalam tabel */
@@ -635,10 +653,9 @@ main table .icon-btn-del {
     font-size: .8rem;
 }
 
-/* Baris kosong / loading (colspan) */
-main table td[colspan] {
+/* Pesan kosong / loading: sel colspan ber-class text-center */
+main :not(td) > table > tbody > tr > td[colspan].text-center {
     padding: 2rem var(--cell-px);
-    text-align: center;
     color: var(--ink-400);
     border-right: 0;
 }
