@@ -102,7 +102,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[920px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.sales.invoice_number') }}</th>
                     <th class="font-bold">{{ __('app.sales.sale_date') }}</th>
@@ -117,12 +117,12 @@
                 @forelse($sales as $sale)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $sale->invoice_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">
+                        <td class="text-[var(--ink-900)]">
                             {{ \Illuminate\Support\Carbon::parse($sale->sale_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $sale->customer?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: __('app.common.all_warehouses') }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">Rp{{ number_format((float) $sale->total_amount) }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $sale->customer?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $sale->warehouse?->name ?: __('app.common.all_warehouses') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $sale->saleDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">Rp{{ number_format((float) $sale->total_amount) }}</td>
                         <td class="{{ (float) $sale->returned_total > 0 ? 'text-[var(--bad-600)] font-semibold' : 'text-[var(--ink-400)]' }}">
                             {{ (float) $sale->returned_total > 0 ? 'Rp'.number_format((float) $sale->returned_total) : '—' }}
                         </td>

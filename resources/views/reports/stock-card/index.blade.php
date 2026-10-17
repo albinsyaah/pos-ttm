@@ -109,7 +109,7 @@
             </div>
         @else
             <table class="w-full text-sm min-w-[880px]">
-                <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+                <thead class="text-black text-[14px] uppercase tracking-wide">
                     <tr class="text-left border-b border-gray-100">
                         <th class="p-5 font-bold">{{ __('app.reports.stock_card.date') }}</th>
                         <th class="font-bold">{{ __('app.reports.stock_card.reference_number') }}</th>
@@ -132,8 +132,8 @@
                             <td class="p-5 text-[var(--ink-400)]">
                                 {{ \Illuminate\Support\Carbon::parse($row['date'])->format('d M Y') }}</td>
                             <td><span class="code-badge">{{ $row['reference_number'] }}</span></td>
-                            <td class="text-[var(--ink-700)]">{{ $row['warehouse'] ?: '—' }}</td>
-                            <td class="text-[var(--ink-700)]">{{ $row['type_label'] }}</td>
+                            <td class="text-[var(--ink-900)]">{{ $row['warehouse'] ?: '—' }}</td>
+                            <td class="text-[var(--ink-900)]">{{ $row['type_label'] }}</td>
                             <td class=" text-[var(--ink-700)]">
                                 {{ $row['qty'] > 0 ? number_format($row['qty']) : '—' }}</td>
                             <td class=" text-[var(--ink-700)]">

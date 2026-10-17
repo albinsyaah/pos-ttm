@@ -94,7 +94,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[900px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.purchase_orders.po_number') }}</th>
                     <th class="font-bold">{{ __('app.purchase_orders.order_date') }}</th>
@@ -111,17 +111,17 @@
                     @endphp
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $purchaseOrder->po_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">
+                        <td class="text-[var(--ink-900)]">
                             {{ \Illuminate\Support\Carbon::parse($purchaseOrder->order_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $purchaseOrder->supplier?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $purchaseOrder->supplier?->name ?: '—' }}</td>
                         <td>
                             <span
                                 class="badge-{{ $purchaseOrder->status === 'cancelled' ? 'bad' : ($purchaseOrder->status === 'completed' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 {{ $purchaseOrder->status }}
                             </span>
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $purchaseOrder->purchaseOrderDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">Rp{{ number_format($lineTotal) }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $purchaseOrder->purchaseOrderDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">Rp{{ number_format($lineTotal) }}</td>
                     </tr>
                 @empty
                     <tr>

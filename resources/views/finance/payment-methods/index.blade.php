@@ -31,15 +31,15 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[640px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.common.name') }}</th>
                     <th class="font-bold">{{ __('app.payment_methods.kind') }}</th>
                     <th class="font-bold">{{ __('app.payment_methods.status') }}</th>
                     <th class="font-bold">{{ __('app.payment_methods.used') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,10 +47,10 @@
                     @php($used = $method->sales_count + $method->ap_payments_count + $method->ar_payments_count)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ $method->name }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $method->is_cash ? __('app.payment_methods.kind_cash') : __('app.payment_methods.kind_non_cash') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $method->is_cash ? __('app.payment_methods.kind_cash') : __('app.payment_methods.kind_non_cash') }}</td>
                         <td class="{{ $method->is_active ? 'text-[var(--ink-700)]' : 'text-[var(--ink-400)]' }}">{{ $method->is_active ? __('app.payment_methods.active') : __('app.payment_methods.inactive') }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $used }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ $used }}</td>
+                        <td class="text-center">
                             @can('finance.payment-methods.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -62,7 +62,7 @@
                                         data-is-cash="{{ $method->is_cash ? 1 : 0 }}"
                                         data-is-active="{{ $method->is_active ? 1 : 0 }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -72,7 +72,7 @@
                                         data-name="{{ $method->name }}"
                                         data-used="{{ $used > 0 ? 1 : 0 }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan

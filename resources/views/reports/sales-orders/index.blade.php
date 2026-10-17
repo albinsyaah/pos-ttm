@@ -95,7 +95,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[900px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.sales_orders.so_number') }}</th>
                     <th class="font-bold">{{ __('app.sales_orders.order_date') }}</th>
@@ -112,17 +112,17 @@
                     @endphp
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $salesOrder->so_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">
+                        <td class="text-[var(--ink-900)]">
                             {{ \Illuminate\Support\Carbon::parse($salesOrder->order_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $salesOrder->customer?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $salesOrder->customer?->name ?: '—' }}</td>
                         <td>
                             <span
                                 class="badge-{{ $salesOrder->status === 'cancelled' ? 'bad' : ($salesOrder->status === 'completed' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 {{ $salesOrder->status }}
                             </span>
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $salesOrder->salesOrderDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">Rp{{ number_format($lineTotal) }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $salesOrder->salesOrderDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">Rp{{ number_format($lineTotal) }}</td>
                     </tr>
                 @empty
                     <tr>

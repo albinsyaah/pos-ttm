@@ -107,7 +107,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[900px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.reports.transfer.mutation_number') }}</th>
                     <th class="font-bold">{{ __('app.reports.transfer.mutation_date') }}</th>
@@ -125,17 +125,17 @@
                     @endphp
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $transfer->mutation_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">
+                        <td class="text-[var(--ink-900)]">
                             {{ \Illuminate\Support\Carbon::parse($transfer->mutation_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $transfer->fromWarehouse?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $transfer->toWarehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $transfer->fromWarehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $transfer->toWarehouse?->name ?: '—' }}</td>
                         <td>
                             <span
                                 class="badge-{{ $transfer->status === 'rejected' ? 'bad' : ($transfer->status === 'completed' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 {{ $transfer->status }}
                             </span>
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $transfer->internalMutationDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $transfer->internalMutationDetails->count() }}</td>
                         <td class="text-right font-medium text-[var(--ink-900)]">{{ number_format($lineQty) }}</td>
                     </tr>
                 @empty

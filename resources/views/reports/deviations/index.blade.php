@@ -95,7 +95,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[820px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.reports.deviation.mutation_number') }}</th>
                     <th class="font-bold">{{ __('app.reports.deviation.mutation_date') }}</th>
@@ -112,16 +112,16 @@
                     @endphp
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $deviation->mutation_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">
+                        <td class="text-[var(--ink-900)]">
                             {{ \Illuminate\Support\Carbon::parse($deviation->mutation_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $deviation->fromWarehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $deviation->fromWarehouse?->name ?: '—' }}</td>
                         <td>
                             <span
                                 class="badge-{{ $deviation->status === 'rejected' ? 'bad' : ($deviation->status === 'completed' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 {{ $deviation->status }}
                             </span>
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $deviation->internalMutationDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $deviation->internalMutationDetails->count() }}</td>
                         <td
                             class="text-right font-medium {{ $lineQty < 0 ? 'text-red-600' : 'text-[var(--ink-900)]' }}">
                             {{ $lineQty > 0 ? '+' : '' }}{{ number_format($lineQty) }}</td>

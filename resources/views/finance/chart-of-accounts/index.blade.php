@@ -31,23 +31,23 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[620px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.common.code') }}</th>
                     <th class="font-bold">{{ __('app.chart_of_accounts.account_name') }}</th>
                     <th class="font-bold">{{ __('app.chart_of_accounts.type') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($accounts as $account)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $account->account_code }}</span></td>
-                        <td class="text-[var(--ink-700)]">{{ $account->account_name }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $account->type }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ $account->account_name }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $account->type }}</td>
+                        <td class="text-center">
                             @can('finance.chart-of-accounts.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -59,7 +59,7 @@
                                         data-account-name="{{ $account->account_name }}"
                                         data-type="{{ $account->type }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -68,7 +68,7 @@
                                         data-action="{{ route('finance.chart-of-accounts.destroy', $account) }}"
                                         data-name="{{ $account->account_name }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan

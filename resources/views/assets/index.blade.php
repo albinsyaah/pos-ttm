@@ -31,25 +31,25 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[680px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.common.code') }}</th>
                     <th class="font-bold">{{ __('app.common.name') }}</th>
                     <th class="font-bold">{{ __('app.assets.purchase_date') }}</th>
                     <th class="font-bold">{{ __('app.common.value') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($assets as $asset)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $asset->asset_code }}</span></td>
-                        <td class="text-[var(--ink-700)]">{{ $asset->name }}</td>
-                        <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($asset->purchase_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $asset->value, 2) }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ $asset->name }}</td>
+                        <td class="text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($asset->purchase_date)->format('d M Y') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ number_format((float) $asset->value, 2) }}</td>
+                        <td class="text-center">
                             @can('assets.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -62,7 +62,7 @@
                                         data-purchase-date="{{ \Illuminate\Support\Carbon::parse($asset->purchase_date)->format('Y-m-d') }}"
                                         data-value="{{ $asset->value }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -71,7 +71,7 @@
                                         data-action="{{ route('assets.destroy', $asset) }}"
                                         data-name="{{ $asset->name }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan

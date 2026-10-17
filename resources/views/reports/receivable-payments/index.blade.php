@@ -96,7 +96,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[760px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.receivable_payments.payment_number') }}</th>
                     <th class="font-bold">{{ __('app.receivable_payments.payment_date') }}</th>
@@ -109,11 +109,11 @@
                 @forelse($receivablePayments as $payment)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $payment->payment_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">
+                        <td class="text-[var(--ink-900)]">
                             {{ \Illuminate\Support\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $payment->customer?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $payment->paymentMethod?->name ?? '-' }}</td>
-                        <td class="text-[var(--ink-700)]">Rp{{ number_format((float) $payment->amount) }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $payment->customer?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $payment->paymentMethod?->name ?? '-' }}</td>
+                        <td class="text-[var(--ink-900)]">Rp{{ number_format((float) $payment->amount) }}</td>
                     </tr>
                 @empty
                     <tr>

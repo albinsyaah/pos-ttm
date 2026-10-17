@@ -31,9 +31,9 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[860px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.purchase_orders.po_number') }}</th>
                     <th class="font-bold">{{ __('app.purchase_orders.order_date') }}</th>
@@ -41,7 +41,7 @@
                     <th class="font-bold">{{ __('app.purchase_orders.status') }}</th>
                     <th class="font-bold">{{ __('app.purchase_orders.items') }}</th>
                     <th class="font-bold">{{ __('app.purchase_orders.total') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -51,16 +51,16 @@
                     @endphp
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $purchaseOrder->po_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($purchaseOrder->order_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $purchaseOrder->supplier?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($purchaseOrder->order_date)->format('d M Y') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $purchaseOrder->supplier?->name ?: '—' }}</td>
                         <td>
                             <span class="badge-{{ $purchaseOrder->status === 'cancelled' ? 'bad' : ($purchaseOrder->status === 'completed' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 {{ $purchaseOrder->status }}
                             </span>
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $purchaseOrder->purchaseOrderDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">Rp{{ number_format($lineTotal) }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ $purchaseOrder->purchaseOrderDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">Rp{{ number_format($lineTotal) }}</td>
+                        <td class="text-center">
                             @can('transactions.purchase-orders.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -74,7 +74,7 @@
                                         data-status="{{ $purchaseOrder->status }}"
                                         data-items="{{ $purchaseOrder->purchaseOrderDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty, 'price' => $d->price])->toJson() }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -83,7 +83,7 @@
                                         data-action="{{ route('transactions.purchase-orders.destroy', $purchaseOrder) }}"
                                         data-name="{{ $purchaseOrder->po_number }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan
@@ -217,7 +217,7 @@
             <td class="p-2 item-line-total text-[var(--ink-700)] font-medium">0.00</td>
             <td class="p-2 text-right">
                 <button type="button" class="remove-item-btn icon-btn" aria-label="{{ __('app.purchase_orders.remove') }}">
-                    <i class="fa-solid fa-trash text-[15px]"></i>
+                    <i class="fa-solid fa-trash text-xs"></i>
                 </button>
             </td>
         </tr>

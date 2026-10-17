@@ -69,7 +69,7 @@
                 <col style="width: 28%">
                 <col style="width: 18%">
             </colgroup>
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="px-5 py-4 font-semibold whitespace-nowrap">{{ __('app.common.code') }}</th>
                     <th class="px-5 py-4 font-semibold">{{ __('app.common.name') }}</th>

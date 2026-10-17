@@ -90,7 +90,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[760px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.reports.position.product_code') }}</th>
                     <th class="font-bold">{{ __('app.reports.position.product_name') }}</th>
@@ -104,7 +104,7 @@
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $position->product_code }}</span></td>
                         <td class="font-medium text-[var(--ink-900)]">{{ $position->product_name }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $position->warehouse_name }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $position->warehouse_name }}</td>
                         <td class="text-right font-medium text-[var(--ink-900)]">
                             @php
                                 $packaging = new \App\Models\Product($position->only(['unit_name', 'pack_name', 'pack_qty', 'box_name', 'box_qty']));

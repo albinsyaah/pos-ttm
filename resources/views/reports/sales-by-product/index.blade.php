@@ -62,7 +62,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[980px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('insight.common.product') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.by_product.price') }}</th>

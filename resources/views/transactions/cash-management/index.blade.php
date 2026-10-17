@@ -31,16 +31,16 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[820px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.cash_management.transaction_date') }}</th>
                     <th class="font-bold">{{ __('app.cash_management.type') }}</th>
                     <th class="font-bold">{{ __('app.cash_management.account') }}</th>
                     <th class="font-bold">{{ __('app.cash_management.description') }}</th>
                     <th class="font-bold">{{ __('app.common.value') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -58,10 +58,10 @@
                                 </span>
                             @endif
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $cashTransaction->account?->account_name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $cashTransaction->account?->account_name ?: '—' }}</td>
                         <td class="text-[var(--ink-400)] max-w-[220px] truncate">{{ $cashTransaction->description ?: '—' }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $cashTransaction->amount, 2) }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ number_format((float) $cashTransaction->amount, 2) }}</td>
+                        <td class="text-center">
                             @can('transactions.cash-management.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -75,7 +75,7 @@
                                         data-description="{{ $cashTransaction->description }}"
                                         data-amount="{{ $cashTransaction->amount }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -84,7 +84,7 @@
                                         data-action="{{ route('transactions.cash-management.destroy', $cashTransaction) }}"
                                         data-name="{{ $cashTransaction->description ?: ($cashTransaction->type === 'in' ? __('app.cash_management.cash_in') : __('app.cash_management.cash_out')) }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan
