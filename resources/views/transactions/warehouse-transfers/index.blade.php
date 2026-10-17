@@ -31,9 +31,9 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[900px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.warehouse_transfers.mutation_number') }}</th>
                     <th class="font-bold">{{ __('app.warehouse_transfers.mutation_date') }}</th>
@@ -42,24 +42,24 @@
                     <th class="font-bold">{{ __('app.warehouse_transfers.requested_by') }}</th>
                     <th class="font-bold">{{ __('app.warehouse_transfers.status') }}</th>
                     <th class="font-bold">{{ __('app.warehouse_transfers.items') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($warehouseTransfers as $warehouseTransfer)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $warehouseTransfer->mutation_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($warehouseTransfer->mutation_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $warehouseTransfer->fromWarehouse?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $warehouseTransfer->toWarehouse?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $warehouseTransfer->requestedBy?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($warehouseTransfer->mutation_date)->format('d M Y') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $warehouseTransfer->fromWarehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $warehouseTransfer->toWarehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $warehouseTransfer->requestedBy?->name ?: '—' }}</td>
                         <td>
                             <span class="badge-{{ $warehouseTransfer->status === 'rejected' ? 'bad' : ($warehouseTransfer->status === 'completed' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 {{ $warehouseTransfer->status }}
                             </span>
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $warehouseTransfer->internalMutationDetails->count() }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ $warehouseTransfer->internalMutationDetails->count() }}</td>
+                        <td class="text-center">
                             @can('transactions.warehouse-transfers.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -75,7 +75,7 @@
                                         data-status="{{ $warehouseTransfer->status }}"
                                         data-items="{{ $warehouseTransfer->internalMutationDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty, 'notes' => $d->notes])->toJson() }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -84,7 +84,7 @@
                                         data-action="{{ route('transactions.warehouse-transfers.destroy', $warehouseTransfer) }}"
                                         data-name="{{ $warehouseTransfer->mutation_number }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan
@@ -231,7 +231,7 @@
             </td>
             <td class="p-2 text-right">
                 <button type="button" class="remove-item-btn icon-btn" aria-label="{{ __('app.warehouse_transfers.remove') }}">
-                    <i class="fa-solid fa-trash text-[15px]"></i>
+                    <i class="fa-solid fa-trash text-xs"></i>
                 </button>
             </td>
         </tr>

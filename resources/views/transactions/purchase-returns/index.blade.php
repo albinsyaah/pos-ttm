@@ -31,30 +31,30 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[820px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.purchase_returns.return_number') }}</th>
                     <th class="font-bold">{{ __('app.purchase_returns.return_date') }}</th>
                     <th class="font-bold">{{ __('app.purchase_returns.purchase') }}</th>
                     <th class="font-bold">{{ __('app.purchase_returns.items') }}</th>
                     <th class="font-bold">{{ __('app.purchase_returns.total') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($purchaseReturns as $purchaseReturn)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $purchaseReturn->return_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($purchaseReturn->return_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">
+                        <td class="text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($purchaseReturn->return_date)->format('d M Y') }}</td>
+                        <td class="text-[var(--ink-900)]">
                             {{ $purchaseReturn->purchase?->invoice_number ?: '—' }}
                             <span class="text-[var(--ink-400)]">{{ $purchaseReturn->purchase?->supplier ? '· ' . $purchaseReturn->purchase->supplier->name : '' }}</span>
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $purchaseReturn->purchaseReturnDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $purchaseReturn->total_amount, 2) }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ $purchaseReturn->purchaseReturnDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">{{ number_format((float) $purchaseReturn->total_amount, 2) }}</td>
+                        <td class="text-center">
                             @can('transactions.purchase-returns.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -69,7 +69,7 @@
                                         data-total-amount="{{ $purchaseReturn->total_amount }}"
                                         data-items="{{ $purchaseReturn->purchaseReturnDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty, 'reason' => $d->reason])->toJson() }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -78,7 +78,7 @@
                                         data-action="{{ route('transactions.purchase-returns.destroy', $purchaseReturn) }}"
                                         data-name="{{ $purchaseReturn->return_number }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan
@@ -199,7 +199,7 @@
             </td>
             <td class="p-2 text-right">
                 <button type="button" class="remove-item-btn icon-btn" aria-label="{{ __('app.purchase_orders.remove') }}">
-                    <i class="fa-solid fa-trash text-[15px]"></i>
+                    <i class="fa-solid fa-trash text-xs"></i>
                 </button>
             </td>
         </tr>

@@ -85,7 +85,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[760px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.reports.receipt.transaction_date') }}</th>
                     <th class="font-bold">{{ __('app.reports.receipt.account') }}</th>
@@ -98,14 +98,14 @@
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5 text-[var(--ink-400)]">
                             {{ \Illuminate\Support\Carbon::parse($receipt->transaction_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">
+                        <td class="text-[var(--ink-900)]">
                             @if ($receipt->account)
                                 {{ $receipt->account->account_code }} &ndash; {{ $receipt->account->account_name }}
                             @else
                                 —
                             @endif
                         </td>
-                        <td class="text-[var(--ink-700)]">{{ $receipt->description ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $receipt->description ?: '—' }}</td>
                         <td class="text-right font-medium text-[var(--ink-900)]">
                             Rp{{ number_format((float) $receipt->amount) }}</td>
                     </tr>

@@ -31,9 +31,9 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[920px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.sales.invoice_number') }}</th>
                     <th class="font-bold">{{ __('app.sales.sale_date') }}</th>
@@ -41,19 +41,19 @@
                     <th class="font-bold">{{ __('app.sales.warehouse') }}</th>
                     <th class="font-bold">{{ __('app.sales.items') }}</th>
                     <th class="font-bold">{{ __('app.sales.total') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($sales as $sale)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $sale->invoice_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($sale->sale_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $sale->customer?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $sale->warehouse?->name ?: __('app.common.all_warehouses') }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $sale->saleDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $sale->total_amount, 2) }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($sale->sale_date)->format('d M Y') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $sale->customer?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $sale->warehouse?->name ?: __('app.common.all_warehouses') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $sale->saleDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">{{ number_format((float) $sale->total_amount, 2) }}</td>
+                        <td class="text-center">
                             @include('partials.print-links', ['sale' => $sale])
                             @can('transactions.sales.manage')
                                 <div class="inline-flex items-center gap-2">
@@ -71,7 +71,7 @@
                                         data-driver-name="{{ $sale->driver_name }}"
                                         data-items="{{ $sale->saleDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty, 'price' => $d->price])->toJson() }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -80,7 +80,7 @@
                                         data-action="{{ route('transactions.sales.destroy', $sale) }}"
                                         data-name="{{ $sale->invoice_number }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan
@@ -240,7 +240,7 @@
             <td class="p-2 item-line-total text-[var(--ink-700)] font-medium">0.00</td>
             <td class="p-2 text-right">
                 <button type="button" class="remove-item-btn icon-btn" aria-label="{{ __('app.purchase_orders.remove') }}">
-                    <i class="fa-solid fa-trash text-[15px]"></i>
+                    <i class="fa-solid fa-trash text-xs"></i>
                 </button>
             </td>
         </tr>

@@ -104,7 +104,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[900px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.reports.inventory.product_code') }}</th>
                     <th class="font-bold">{{ __('app.reports.inventory.product_name') }}</th>
@@ -125,9 +125,9 @@
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $product->code }}</span></td>
                         <td class="font-medium text-[var(--ink-900)]">{{ $product->name }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $product->brand?->name ?? '-' }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $product->itemType?->name ?? '-' }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $product->productGroup?->name ?? '-' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $product->brand?->name ?? '-' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $product->itemType?->name ?? '-' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $product->productGroup?->name ?? '-' }}</td>
                         <td class=" font-medium text-[var(--ink-900)]">
                             {{ $product->formatQuantity($stock) }}
                             @if ($product->hasPack() || $product->hasBox())

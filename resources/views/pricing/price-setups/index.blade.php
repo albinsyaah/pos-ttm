@@ -31,15 +31,15 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[720px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.price_setups.product') }}</th>
                     <th class="font-bold">{{ __('app.price_setups.price_category') }}</th>
                     <th class="font-bold">{{ __('app.common.value') }}</th>
                     <th class="font-bold">{{ __('app.price_setups.effective_date') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -51,10 +51,10 @@
                                 <span class="code-badge mt-1">{{ $priceSetup->product->code }}</span>
                             @endif
                         </td>
-                        <td class="text-[var(--ink-700)]">{{ $priceSetup->price_category }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $priceSetup->amount, 2) }}</td>
-                        <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($priceSetup->effective_date)->format('d M Y') }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ $priceSetup->price_category }}</td>
+                        <td class="text-[var(--ink-900)]">{{ number_format((float) $priceSetup->amount, 2) }}</td>
+                        <td class="text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($priceSetup->effective_date)->format('d M Y') }}</td>
+                        <td class="text-center">
                             @can('pricing.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -67,7 +67,7 @@
                                         data-effective-date="{{ \Illuminate\Support\Carbon::parse($priceSetup->effective_date)->format('Y-m-d') }}"
                                         data-product-id="{{ $priceSetup->product_id }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -76,7 +76,7 @@
                                         data-action="{{ route('pricing.price-setups.destroy', $priceSetup) }}"
                                         data-name="{{ $priceSetup->price_category }} — {{ $priceSetup->product?->name }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan

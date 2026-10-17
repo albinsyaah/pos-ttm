@@ -221,7 +221,7 @@
 
     <div class="bg-white rounded-3xl mt-5 overflow-x-auto">
         <table class="w-full text-sm min-w-[720px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.dashboard.invoice') }}</th>
                     <th class="font-bold">{{ __('app.dashboard.customer') }}</th>
@@ -229,7 +229,7 @@
                     <th class="font-bold">{{ __('app.dashboard.source') }}</th>
                     <th class="font-bold">{{ __('app.dashboard.date') }}</th>
                     <th class="font-bold">{{ __('app.dashboard.total') }}</th>
-                    {{-- <th class="font-bold text-right pr-5">{{ __('app.dashboard.receipt') }}</th> --}}
+                    {{-- <th class="font-bold text-center">{{ __('app.dashboard.receipt') }}</th> --}}
                 </tr>
             </thead>
 
@@ -237,12 +237,12 @@
                 @forelse($orders as $order)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ $order['id'] }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $order['customer'] }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $order['items'] }} {{ __('app.dashboard.items_count') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ ucfirst($order['source']) }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $order['date'] }} &middot; {{ $order['time'] }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $order['customer'] }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $order['items'] }} {{ __('app.dashboard.items_count') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ ucfirst($order['source']) }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $order['date'] }} &middot; {{ $order['time'] }}</td>
                         <td class="font-semibold text-[var(--ink-900)]">{{ Money::rupiah($order['total']) }}</td>
-                        {{-- <td class="text-right pr-5">
+                        {{-- <td class="text-center">
                             <button class="dl-btn border border-gray-200 text-[var(--ink-700)] rounded-full px-4 py-2 text-xs font-medium hover:border-[var(--brand-600)] hover:text-[var(--brand-600)] transition-colors">{{ __('app.dashboard.print') }}</button>
                         </td> --}}
                     </tr>

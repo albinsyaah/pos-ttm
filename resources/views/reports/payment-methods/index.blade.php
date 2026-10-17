@@ -56,7 +56,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[940px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('insight.payment_methods.method') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.cash_sales_count') }}</th>
@@ -65,7 +65,7 @@
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.receivable_payments') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.refunds') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.payment_methods.income') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('insight.payment_methods.supplier_paid') }}</th>
+                    <th class="font-bold text-center">{{ __('insight.payment_methods.supplier_paid') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -102,7 +102,7 @@
                         <td class="text-right">{{ Money::rupiah($totals['ar_received']) }}</td>
                         <td class="text-right">{{ $totals['returns'] > 0 ? '-'.Money::rupiah($totals['returns']) : '—' }}</td>
                         <td class="text-right">{{ Money::rupiah($totals['income']) }}</td>
-                        <td class="text-right pr-5">{{ Money::rupiah($totals['ap_paid']) }}</td>
+                        <td class="text-center">{{ Money::rupiah($totals['ap_paid']) }}</td>
                     </tr>
                 </tfoot>
             @endif

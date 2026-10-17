@@ -20,9 +20,9 @@
         </form>
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[900px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.price_histories.when') }}</th>
                     <th class="font-bold">{{ __('app.price_histories.who') }}</th>
@@ -37,16 +37,16 @@
                 @forelse($histories as $h)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5 text-[var(--ink-400)]">{{ $h->created_at?->format('d M Y H:i') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $h->user?->username ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $h->user?->username ?: '—' }}</td>
                         <td class="font-medium text-[var(--ink-900)]">
                             {{ $h->product?->name ?: '—' }}
                             @if($h->product?->code)
                                 <span class="code-badge mt-1">{{ $h->product->code }}</span>
                             @endif
                         </td>
-                        <td class="text-[var(--ink-700)]">{{ $h->price_category }}</td>
-                        <td class="text-[var(--ink-700)]">{{ __('app.price_histories.action_'.$h->action) }}</td>
-                        <td class="text-[var(--ink-400)]">
+                        <td class="text-[var(--ink-900)]">{{ $h->price_category }}</td>
+                        <td class="text-[var(--ink-900)]">{{ __('app.price_histories.action_'.$h->action) }}</td>
+                        <td class="text-[var(--ink-900)]">
                             @if($h->old_amount !== null)
                                 {{ number_format((float) $h->old_amount, 2) }}
                                 <span class="block text-xs">{{ $h->old_effective_date?->format('d M Y') }}</span>

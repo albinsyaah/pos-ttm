@@ -62,14 +62,14 @@
         </div>
 
         <table class="w-full text-sm min-w-[760px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('insight.salesman.salesman') }}</th>
                     <th class="font-bold">{{ __('insight.common.product') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.salesman.paid_qty') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.salesman.free_qty') }}</th>
                     <th class="font-semibold text-right">{{ __('insight.returns.returned_qty') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('insight.common.revenue') }}</th>
+                    <th class="font-bold text-center">{{ __('insight.common.revenue') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,12 +82,12 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="text-right pr-5">{{ Money::rupiah($group['revenue']) }}</td>
+                        <td class="text-center">{{ Money::rupiah($group['revenue']) }}</td>
                     </tr>
                     @foreach ($group['rows'] as $row)
                         <tr class="table-row border-b border-gray-50">
                             <td class="p-3"></td>
-                            <td class="text-[var(--ink-700)]">{{ $row['product']->name }}</td>
+                            <td class="text-[var(--ink-900)]">{{ $row['product']->name }}</td>
                             <td class="text-right text-[var(--ink-700)]">{{ $row['paid_qty'] > 0 ? $row['product']->formatQuantity($row['paid_qty']) : '—' }}</td>
                             <td class="text-right text-[var(--ink-400)]">{{ $row['free_qty'] > 0 ? $row['product']->formatQuantity($row['free_qty']) : '—' }}</td>
                             <td class="text-right {{ $row['returned_qty'] > 0 ? 'text-[var(--bad-600)] font-semibold' : 'text-[var(--ink-400)]' }}">{{ $row['returned_qty'] > 0 ? $row['product']->formatQuantity($row['returned_qty']) : '—' }}</td>

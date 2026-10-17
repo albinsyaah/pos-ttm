@@ -59,15 +59,15 @@
         </button>
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[760px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.users.username') }}</th>
                     <th class="font-bold">{{ __('app.users.employee') }}</th>
                     <th class="font-bold">{{ __('app.users.roles') }}</th>
                     <th class="font-bold">{{ __('app.common.status') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -79,7 +79,7 @@
                                 <span class="badge badge-neutral ml-1">{{ __('app.users.you') }}</span>
                             @endif
                         </td>
-                        <td class="text-[var(--ink-700)]">{{ $user->employee->name ?? '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $user->employee->name ?? '—' }}</td>
                         <td>
                             @forelse($user->roles as $role)
                                 <span class="badge {{ $role->name === 'Super Admin' ? 'badge-brand' : 'badge-neutral' }} mr-1 mb-1">{{ $role->name }}</span>
@@ -105,7 +105,7 @@
                                 </span>
                             </form>
                         </td>
-                        <td class="text-right pr-5">
+                        <td class="text-center">
                             <div class="inline-flex items-center gap-2">
                                 <button
                                     type="button"
@@ -118,7 +118,7 @@
                                     data-is-active="{{ $user->is_active ? '1' : '0' }}"
                                     data-is-self="{{ $user->id === auth()->id() ? '1' : '0' }}"
                                 >
-                                    <i class="fa-solid fa-pen text-[15px]"></i>
+                                    <i class="fa-solid fa-pen text-xs"></i>
                                 </button>
                                 @if($user->id !== auth()->id())
                                     <button
@@ -128,7 +128,7 @@
                                         data-action="{{ route('admin.users.destroy', $user) }}"
                                         data-name="{{ $user->username }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 @endif
                             </div>

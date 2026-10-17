@@ -84,7 +84,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[820px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.sales_returns.return_number') }}</th>
                     <th class="font-bold">{{ __('app.sales_returns.return_date') }}</th>
@@ -97,14 +97,14 @@
                 @forelse($salesReturns as $salesReturn)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $salesReturn->return_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">
+                        <td class="text-[var(--ink-900)]">
                             {{ \Illuminate\Support\Carbon::parse($salesReturn->return_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">
+                        <td class="text-[var(--ink-900)]">
                             {{ $salesReturn->sale?->invoice_number ?: '—' }}
                             <span class="text-[var(--ink-400)]">{{ $salesReturn->sale?->customer ? '· ' . $salesReturn->sale->customer->name : '' }}</span>
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $salesReturn->salesReturnDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">Rp{{ number_format((float) $salesReturn->total_amount) }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $salesReturn->salesReturnDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">Rp{{ number_format((float) $salesReturn->total_amount) }}</td>
                     </tr>
                 @empty
                     <tr>

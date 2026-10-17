@@ -563,3 +563,82 @@ select:focus-visible {
     color: var(--ink-700);
     padding: .35rem 0;
 }
+
+/* ---------------------------------------------------------------
+   Tabel (semua halaman): grid halus, header jelas, baris zebra + hover
+   Ubah variabel di :root untuk menyesuaikan tanpa menyentuh view.
+   --------------------------------------------------------------- */
+:root {
+    --table-border: #dde2f0;   /* warna garis */
+    --table-head-bg: #eef1fb;  /* latar header */
+    --table-zebra: #fafbff;    /* baris genap */
+    --table-hover: #f0f2ff;    /* baris saat di-hover */
+    --th-size: 14px;           /* ukuran font header */
+    --cell-py: .7rem;          /* jarak atas-bawah sel (tinggi baris) */
+    --cell-px: 1rem;           /* jarak kiri-kanan sel (lebar kolom) */
+}
+
+main table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--table-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Garis: hanya kanan & bawah per sel supaya tidak dobel */
+main table th,
+main table td {
+    padding: var(--cell-py) var(--cell-px);
+    border: 0;
+    border-right: 1px solid var(--table-border);
+    border-bottom: 1px solid var(--table-border);
+    vertical-align: middle;
+}
+
+main table th:last-child,
+main table td:last-child {
+    border-right: 0;
+}
+
+main table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* Header */
+main table thead th,
+main table thead td {
+    background: var(--table-head-bg);
+    color: var(--ink-900);
+    font-size: var(--th-size);
+    font-weight: 700;
+    letter-spacing: .04em;
+    border-bottom: 2px solid #c9d0ee;
+    white-space: nowrap;
+}
+
+/* Zebra + hover */
+main table tbody tr:nth-child(even) td {
+    background: var(--table-zebra);
+}
+
+main table tbody tr:hover td {
+    background: var(--table-hover);
+}
+
+/* Tombol aksi (edit/hapus) di dalam tabel */
+main table .icon-btn,
+main table .icon-btn-edit,
+main table .icon-btn-del {
+    width: 2rem;
+    height: 2rem;
+    font-size: .8rem;
+}
+
+/* Baris kosong / loading (colspan) */
+main table td[colspan] {
+    padding: 2rem var(--cell-px);
+    text-align: center;
+    color: var(--ink-400);
+    border-right: 0;
+}

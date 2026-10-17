@@ -31,27 +31,27 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[780px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.general_ledgers.transaction_date') }}</th>
                     <th class="font-bold">{{ __('app.general_ledgers.account') }}</th>
                     <th class="font-bold">{{ __('app.general_ledgers.reference_number') }}</th>
                     <th class="font-bold">{{ __('app.general_ledgers.debit') }}</th>
                     <th class="font-bold">{{ __('app.general_ledgers.credit') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($ledgers as $ledger)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5 font-medium text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($ledger->transaction_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $ledger->account?->account_name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $ledger->account?->account_name ?: '—' }}</td>
                         <td>@if($ledger->reference_number)<span class="code-badge">{{ $ledger->reference_number }}</span>@else<span class="text-[var(--ink-400)]">—</span>@endif</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $ledger->debit, 2) }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $ledger->credit, 2) }}</td>
-                        <td class="text-right pr-5">
+                        <td class="text-[var(--ink-900)]">{{ number_format((float) $ledger->debit, 2) }}</td>
+                        <td class="text-[var(--ink-900)]">{{ number_format((float) $ledger->credit, 2) }}</td>
+                        <td class="text-center">
                             @can('finance.general-ledgers.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -65,7 +65,7 @@
                                         data-debit="{{ $ledger->debit }}"
                                         data-credit="{{ $ledger->credit }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -74,7 +74,7 @@
                                         data-action="{{ route('finance.general-ledgers.destroy', $ledger) }}"
                                         data-name="{{ $ledger->reference_number ?: $ledger->account?->account_name }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan

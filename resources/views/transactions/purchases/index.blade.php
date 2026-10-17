@@ -31,9 +31,9 @@
         @endcan
     </div>
 
-    <div class="bg-white rounded-3xl mt-6 overflow-x-auto">
+    <div class="bg-[var(--surface)] mt-6 overflow-x-auto">
         <table class="w-full text-sm min-w-[1120px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.purchases.invoice_number') }}</th>
                     <th class="font-bold">{{ __('app.purchases.purchase_date') }}</th>
@@ -44,16 +44,16 @@
                     <th class="font-bold">{{ __('app.purchases.items') }}</th>
                     <th class="font-bold">{{ __('app.purchases.total') }}</th>
                     <th class="font-bold">{{ __('app.purchases.outstanding') }}</th>
-                    <th class="font-bold text-right pr-5">{{ __('app.common.actions') }}</th>
+                    <th class="font-bold text-center">{{ __('app.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($purchases as $purchase)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $purchase->invoice_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($purchase->purchase_date)->format('d M Y') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($purchase->purchase_date)->format('d M Y') }}</td>
                         @php($balance = $balances->get($purchase->id))
-                        <td class="text-[var(--ink-400)]">
+                        <td class="text-[var(--ink-900)]">
                             {{ $purchase->due_date?->format('d M Y') ?: '—' }}
                             @if($balance && $balance['outstanding'] > 0 && $balance['days_left'] < 0)
                                 <span class="block text-xs font-semibold text-[var(--bad-600)]">{{ __('app.purchases.overdue_days', ['days' => abs($balance['days_left'])]) }}</span>
@@ -61,16 +61,16 @@
                                 <span class="block text-xs font-semibold text-[var(--warn-600)]">{{ __('app.purchases.due_in_days', ['days' => $balance['days_left']]) }}</span>
                             @endif
                         </td>
-                        <td class="text-[var(--ink-700)]">{{ $purchase->supplier?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $purchase->warehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $purchase->supplier?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $purchase->warehouse?->name ?: '—' }}</td>
                         <td>
                             <span class="badge-{{ $purchase->status === 'cancelled' ? 'bad' : ($purchase->status === 'received' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 {{ $purchase->status }}
                             </span>
                         </td>
-                        <td class="text-[var(--ink-400)]">{{ $purchase->purchaseDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">{{ number_format((float) $purchase->total_amount, 2) }}</td>
-                        <td class="text-[var(--ink-700)]">
+                        <td class="text-[var(--ink-900)]">{{ $purchase->purchaseDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">{{ number_format((float) $purchase->total_amount, 2) }}</td>
+                        <td class="text-[var(--ink-900)]">
                             @if(! $balance)
                                 —
                             @elseif($balance['outstanding'] > 0)
@@ -79,7 +79,7 @@
                                 <span class="text-[var(--good-600)] font-semibold">{{ __('app.purchases.paid_off') }}</span>
                             @endif
                         </td>
-                        <td class="text-right pr-5">
+                        <td class="text-center">
                             @can('transactions.purchases.manage')
                                 <div class="inline-flex items-center gap-2">
                                     <button
@@ -95,7 +95,7 @@
                                         data-status="{{ $purchase->status }}"
                                         data-items="{{ $purchase->purchaseDetails->map(fn ($d) => ['product_id' => $d->product_id, 'qty' => $d->qty, 'price' => $d->price])->toJson() }}"
                                     >
-                                        <i class="fa-solid fa-pen text-[15px]"></i>
+                                        <i class="fa-solid fa-pen text-xs"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -104,7 +104,7 @@
                                         data-action="{{ route('transactions.purchases.destroy', $purchase) }}"
                                         data-name="{{ $purchase->invoice_number }}"
                                     >
-                                        <i class="fa-solid fa-trash text-[15px]"></i>
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             @endcan
@@ -258,7 +258,7 @@
             <td class="p-2 item-line-total text-[var(--ink-700)] font-medium">0.00</td>
             <td class="p-2 text-right">
                 <button type="button" class="remove-item-btn icon-btn" aria-label="{{ __('app.purchase_orders.remove') }}">
-                    <i class="fa-solid fa-trash text-[15px]"></i>
+                    <i class="fa-solid fa-trash text-xs"></i>
                 </button>
             </td>
         </tr>

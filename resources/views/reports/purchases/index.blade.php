@@ -102,7 +102,7 @@
         </div>
 
         <table class="w-full text-sm min-w-[920px]">
-            <thead class="text-[var(--ink-400)] text-[14px] uppercase tracking-wide">
+            <thead class="text-black text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
                     <th class="p-5 font-bold">{{ __('app.purchases.invoice_number') }}</th>
                     <th class="font-bold">{{ __('app.purchases.purchase_date') }}</th>
@@ -117,16 +117,16 @@
                 @forelse($purchases as $purchase)
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $purchase->invoice_number }}</span></td>
-                        <td class="text-[var(--ink-400)]">{{ \Illuminate\Support\Carbon::parse($purchase->purchase_date)->format('d M Y') }}</td>
-                        <td class="text-[var(--ink-700)]">{{ $purchase->supplier?->name ?: '—' }}</td>
-                        <td class="text-[var(--ink-400)]">{{ $purchase->warehouse?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($purchase->purchase_date)->format('d M Y') }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $purchase->supplier?->name ?: '—' }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $purchase->warehouse?->name ?: '—' }}</td>
                         {{-- <td>
                             <span class="badge-{{ $purchase->status === 'cancelled' ? 'bad' : ($purchase->status === 'received' ? 'good' : 'neutral') }} inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 {{ $purchase->status }}
                             </span>
                         </td> --}}
-                        <td class="text-[var(--ink-400)]">{{ $purchase->purchaseDetails->count() }}</td>
-                        <td class="text-[var(--ink-700)]">Rp{{ number_format((float) $purchase->total_amount) }}</td>
+                        <td class="text-[var(--ink-900)]">{{ $purchase->purchaseDetails->count() }}</td>
+                        <td class="text-[var(--ink-900)]">Rp{{ number_format((float) $purchase->total_amount) }}</td>
                     </tr>
                 @empty
                     <tr>
