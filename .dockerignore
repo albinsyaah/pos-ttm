@@ -1,0 +1,17 @@
+.git
+.env
+.env.*
+!.env.example
+vendor
+node_modules
+storage/*
+public/build
+public/hot
+bootstrap/cache/*.php
+database/database.sqlite
+.phpunit.cache
+.idea
+.vscode
+*.zip
+docker-compose*.yml
+Dockerfile

@@ -1,0 +1,44 @@
+# Semua konfigurasi rahasia dibaca dari .env.docker (bukan .env Laravel Anda),
+# jadi tidak bentrok dengan .env yang dipakai untuk development biasa.
+services:
+  app:
+    build:
+      context: .
+      target: app
+      args:
+        # INSTALL_DEV: ${INSTALL_DEV:-false}
+        INSTALL_DEV: ${INSTALL_DEV:-true}
+    env_file: .env.docker
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - app_storage:/var/www/html/storage
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      target: web
+    ports:
+      - "8000:80"   # ubah angka kiri bila port 8000 sudah terpakai
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    env_file: .env.docker
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  app_storage:
