@@ -27,7 +27,7 @@ RUN if [ "$INSTALL_DEV" = "true" ]; then \
 # ---------------------------------------------------------------
 # Tahap 3: image aplikasi (PHP-FPM)
 # ---------------------------------------------------------------
-FROM php:8.3-fpm-alpine AS app
+FROM php:8.3.36-fpm-alpine AS app
 COPY --from=ghcr.io/mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 RUN install-php-extensions pdo_mysql bcmath intl opcache \
     && apk add --no-cache mysql-client

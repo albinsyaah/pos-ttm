@@ -1,5 +1,3 @@
-# Semua konfigurasi rahasia dibaca dari .env.docker (bukan .env Laravel Anda),
-# jadi tidak bentrok dengan .env yang dipakai untuk development biasa.
 services:
   app:
     build:
@@ -21,7 +19,7 @@ services:
       context: .
       target: web
     ports:
-      - "8000:80"   # ubah angka kiri bila port 8000 sudah terpakai
+      - "8000:80"  
     depends_on:
       - app
     restart: unless-stopped
