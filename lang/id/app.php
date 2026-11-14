@@ -362,6 +362,8 @@ return [
         'all_warehouses' => 'Semua Gudang',
         'stock' => 'Stok',
         'price' => 'Harga',
+        'price_retail' => 'Retail',
+        'price_wholesale' => 'Grosir',
         'no_stock_data' => 'Belum ada data stok',
         'no_price_data' => 'Belum ada data harga',
         'no_products_found' => 'Barang tidak ditemukan.',

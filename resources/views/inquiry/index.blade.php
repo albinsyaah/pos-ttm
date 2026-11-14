@@ -66,8 +66,9 @@
                 <col style="width: 19%">
                 <col style="width: 16%">
                 <col style="width: 10%">
-                <col style="width: 28%">
-                <col style="width: 18%">
+                <col style="width: 10%">
+                <col style="width: 15%">
+                <col style="width: 17%">
             </colgroup>
             <thead class="text-[var(--ink-900)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
@@ -76,14 +77,17 @@
                     <th class="px-5 py-4 font-bold">{{ __('app.products.brand') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.products.item_type') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.inquiry.stock') }}</th>
-                    <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price') }}</th>
+                    <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_retail') }}</th>
+                    <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_wholesale') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($products as $product)
                     @php
                         $stock = $stockByProduct[$product->id] ?? null;
-                        $prices = $pricesByProduct[$product->id] ?? collect();
+                        $prices = collect($pricesByProduct[$product->id] ?? []);
+                        $retailPrice = $prices->first(fn ($p) => strcasecmp($p->price_category, 'Retail') === 0);
+                        $wholesalePrice = $prices->first(fn ($p) => in_array(strtolower($p->price_category), ['grosir', 'wholesale'], true));
                     @endphp
                     <tr class="table-row align-top {{ $loop->even ? 'is-zebra' : '' }}">
                         <td class="px-5 py-4 whitespace-nowrap"><span class="code-badge">{{ $product->code }}</span></td>
@@ -93,40 +97,42 @@
                         <td class="px-5 py-4">
                             @if($stock)
                                 <span class="font-semibold text-[var(--ink-900)]">{{ $product->formatQuantity($stock['total']) }}</span>
-                                @if($stock['total'] > 0)
+                                {{-- @if($stock['total'] > 0)
                                     <span class="chip bg-[var(--good-100)] text-[var(--good-600)] ml-1" data-availability="available">{{ __('insight.inquiry.available') }}</span>
                                 @else
                                     <span class="chip bg-[var(--bad-100)] text-[var(--bad-600)] ml-1" data-availability="out">{{ __('insight.inquiry.out_of_stock') }}</span>
-                                @endif
-                                <div class="mt-1.5 flex flex-wrap gap-1.5">
-                                    @foreach($stock['warehouses'] as $row)
-                                        <span class="inline-flex items-center rounded-full bg-[var(--surface)] px-2.5 py-1 text-xs text-[var(--ink-400)] whitespace-nowrap">
-                                            {{ $row['name'] }}: {{ $product->formatQuantity($row['balance']) }}
-                                        </span>
-                                    @endforeach
-                                </div>
+                                @endif --}}
                             @else
                                 <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_stock_data') }}</span>
                             @endif
                         </td>
                         <td class="px-5 py-4">
-                            @forelse($prices as $price)
+                            @if($retailPrice)
                                 <div class="text-[var(--ink-700)] whitespace-nowrap">
-                                    <span class="text-[var(--ink-400)] text-xs">{{ $price->price_category }}:</span>
-                                    <span class="font-semibold">{{ Money::rupiah($price->amount) }}</span>
-                                    <span class="text-[var(--ink-400)] text-[11px]">({{ __('insight.inquiry.effective') }} {{ \Illuminate\Support\Carbon::parse($price->effective_date)->format('d M Y') }})</span>
+                                    <span class="font-semibold">{{ Money::rupiah($retailPrice->amount) }}</span>
+                                    <div class="text-[var(--ink-400)] text-[11px]">({{ __('insight.inquiry.effective') }} {{ \Illuminate\Support\Carbon::parse($retailPrice->effective_date)->format('d M Y') }})</div>
                                 </div>
-                            @empty
+                            @else
                                 <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_price_data') }}</span>
-                            @endforelse
+                            @endif
+                        </td>
+                        <td class="px-5 py-4">
+                            @if($wholesalePrice)
+                                <div class="text-[var(--ink-700)] whitespace-nowrap">
+                                    <span class="font-semibold">{{ Money::rupiah($wholesalePrice->amount) }}</span>
+                                    <div class="text-[var(--ink-400)] text-[11px]">({{ __('insight.inquiry.effective') }} {{ \Illuminate\Support\Carbon::parse($wholesalePrice->effective_date)->format('d M Y') }})</div>
+                                </div>
+                            @else
+                                <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_price_data') }}</span>
+                            @endif
                             <button type="button" data-history-toggle="{{ $product->id }}" aria-expanded="false"
-                                    class="mt-2 text-xs font-semibold text-[var(--brand-600)] hover:underline">
+                                    class="mt-2 block text-xs font-semibold text-[var(--brand-600)] hover:underline">
                                 {{ __('insight.inquiry.price_history') }}
                             </button>
                         </td>
                     </tr>
                     <tr class="hidden bg-[var(--surface)]" data-history-row="{{ $product->id }}">
-                        <td colspan="6" class="px-5 py-4">
+                        <td colspan="7" class="px-5 py-4">
                             @php $history = $historyByProduct[$product->id] ?? collect(); @endphp
                             @if($history->isEmpty())
                                 <p class="text-xs text-[var(--ink-400)]">{{ __('insight.inquiry.no_price_history') }}</p>
@@ -166,7 +172,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="7" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.inquiry.no_products_found') }}
                         </td>
@@ -192,4 +198,4 @@
         @endif
     </script>
     <script src="{{ asset('js/inquiry.js') }}"></script>
-@endpush 
+@endpush

@@ -362,6 +362,8 @@ return [
         'all_warehouses' => 'All Warehouses',
         'stock' => 'Stock',
         'price' => 'Price',
+        'price_retail' => 'Retail',
+        'price_wholesale' => 'Wholesale',
         'no_stock_data' => 'No stock data',
         'no_price_data' => 'No price data',
         'no_products_found' => 'No products found.',
