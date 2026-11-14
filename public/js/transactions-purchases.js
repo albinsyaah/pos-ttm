@@ -16,6 +16,9 @@ const itemRowTemplate = document.getElementById('itemRowTemplate');
 const noItemsMessage = document.getElementById('noItemsMessage');
 const grandTotalEl = document.getElementById('grandTotal');
 
+// Current purchase price (Setup Harga → Beli) per product id, used to suggest a line's unit price
+const purchasePrices = JSON.parse(itemRowsBody.dataset.purchasePrices || '{}');
+
 let rowIndex = 0;
 
 function openModal(modal) {
@@ -66,6 +69,20 @@ function addItemRow(values = {}) {
 
   row.querySelector('.item-qty').addEventListener('input', () => recalcRow(row));
   row.querySelector('.item-price').addEventListener('input', () => recalcRow(row));
+
+  // Picking a product suggests its purchase price, unless the user typed a different one
+  const productSelect = row.querySelector('.item-product');
+  const priceInput = row.querySelector('.item-price');
+  productSelect.addEventListener('change', () => {
+    const suggested = purchasePrices[productSelect.value];
+    if (suggested === undefined) return;
+    if (priceInput.value === '' || priceInput.value === priceInput.dataset.autoPrice) {
+      priceInput.value = suggested;
+      priceInput.dataset.autoPrice = priceInput.value;
+      recalcRow(row);
+    }
+  });
+
   row.querySelector('.remove-item-btn').addEventListener('click', () => {
     row.remove();
     recalcGrandTotal();

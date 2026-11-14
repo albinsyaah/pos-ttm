@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
+use App\Services\PriceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -52,6 +53,8 @@ class PurchaseOrderController extends Controller implements HasMiddleware
             'search' => $search,
             'suppliers' => Supplier::orderBy('name')->get(),
             'products' => Product::orderBy('name')->get(),
+            // Current harga beli per product, used to pre-fill the unit price of a line.
+            'purchasePrices' => app(PriceService::class)->purchasePriceMap(Product::pluck('id')),
             'statuses' => self::STATUSES,
         ]);
     }

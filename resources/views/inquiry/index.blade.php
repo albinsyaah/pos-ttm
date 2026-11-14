@@ -4,7 +4,7 @@
 @section('page-title', __('app.inquiry.title'))
 
 @section('content')
-@php use App\Support\Money; @endphp
+@php use App\Support\Money; use App\Services\PriceService; @endphp
 
     <form id="inquiryFilterForm" action="{{ route('inquiry.index') }}" method="GET" class="flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
@@ -62,13 +62,9 @@
 
         <table class="w-full text-sm min-w-[900px] table-fixed">
             <colgroup>
-                <col style="width: 9%">
-                <col style="width: 19%">
-                <col style="width: 16%">
-                <col style="width: 10%">
-                <col style="width: 10%">
-                <col style="width: 15%">
-                <col style="width: 17%">
+                @foreach($canSeePurchasePrice ? [8, 17, 13, 9, 9, 14, 14, 16] : [9, 19, 16, 10, 10, 15, 17] as $width)
+                    <col style="width: {{ $width }}%">
+                @endforeach
             </colgroup>
             <thead class="text-[var(--ink-900)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
@@ -77,6 +73,9 @@
                     <th class="px-5 py-4 font-bold">{{ __('app.products.brand') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.products.item_type') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.inquiry.stock') }}</th>
+                    @if($canSeePurchasePrice)
+                        <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_purchase') }}</th>
+                    @endif
                     <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_retail') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_wholesale') }}</th>
                 </tr>
@@ -86,8 +85,9 @@
                     @php
                         $stock = $stockByProduct[$product->id] ?? null;
                         $prices = collect($pricesByProduct[$product->id] ?? []);
-                        $retailPrice = $prices->first(fn ($p) => strcasecmp($p->price_category, 'Retail') === 0);
-                        $wholesalePrice = $prices->first(fn ($p) => in_array(strtolower($p->price_category), ['grosir', 'wholesale'], true));
+                        $purchasePrice = $prices->first(fn ($p) => PriceService::canonicalCategory($p->price_category) === PriceService::PURCHASE);
+                        $retailPrice = $prices->first(fn ($p) => PriceService::canonicalCategory($p->price_category) === PriceService::RETAIL);
+                        $wholesalePrice = $prices->first(fn ($p) => PriceService::canonicalCategory($p->price_category) === PriceService::WHOLESALE);
                     @endphp
                     <tr class="table-row align-top {{ $loop->even ? 'is-zebra' : '' }}">
                         <td class="px-5 py-4 whitespace-nowrap"><span class="code-badge">{{ $product->code }}</span></td>
@@ -106,6 +106,18 @@
                                 <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_stock_data') }}</span>
                             @endif
                         </td>
+                        @if($canSeePurchasePrice)
+                            <td class="px-5 py-4">
+                                @if($purchasePrice)
+                                    <div class="text-[var(--ink-700)] whitespace-nowrap">
+                                        <span class="font-semibold">{{ Money::rupiah($purchasePrice->amount) }}</span>
+                                        <div class="text-[var(--ink-400)] text-[11px]">({{ __('insight.inquiry.effective') }} {{ \Illuminate\Support\Carbon::parse($purchasePrice->effective_date)->format('d M Y') }})</div>
+                                    </div>
+                                @else
+                                    <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_price_data') }}</span>
+                                @endif
+                            </td>
+                        @endif
                         <td class="px-5 py-4">
                             @if($retailPrice)
                                 <div class="text-[var(--ink-700)] whitespace-nowrap">
@@ -132,7 +144,7 @@
                         </td>
                     </tr>
                     <tr class="hidden bg-[var(--surface)]" data-history-row="{{ $product->id }}">
-                        <td colspan="7" class="px-5 py-4">
+                        <td colspan="{{ $canSeePurchasePrice ? 8 : 7 }}" class="px-5 py-4">
                             @php $history = $historyByProduct[$product->id] ?? collect(); @endphp
                             @if($history->isEmpty())
                                 <p class="text-xs text-[var(--ink-400)]">{{ __('insight.inquiry.no_price_history') }}</p>
@@ -151,7 +163,7 @@
                                         @foreach($history as $log)
                                             <tr class="border-t border-white">
                                                 <td class="py-1.5 pr-3 whitespace-nowrap">{{ $log->created_at?->format('d M Y H:i') }}</td>
-                                                <td class="py-1.5 pr-3">{{ $log->price_category }}</td>
+                                                <td class="py-1.5 pr-3">{{ PriceService::label($log->price_category) }}</td>
                                                 <td class="py-1.5 pr-3 whitespace-nowrap">
                                                     @if($log->action === \App\Models\PriceHistory::CREATED)
                                                         {{ __('insight.inquiry.set_to') }} <strong>{{ Money::rupiah($log->new_amount) }}</strong>
@@ -172,7 +184,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="{{ $canSeePurchasePrice ? 8 : 7 }}" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.inquiry.no_products_found') }}
                         </td>

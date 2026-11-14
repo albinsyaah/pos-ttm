@@ -10,6 +10,7 @@ use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\Warehouse;
 use App\Services\PayableService;
+use App\Services\PriceService;
 use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -70,6 +71,8 @@ class PurchaseController extends Controller implements HasMiddleware
             'warehouses' => Warehouse::orderBy('name')->get(),
             'purchaseOrders' => PurchaseOrder::orderByDesc('order_date')->get(),
             'products' => Product::orderBy('name')->get(),
+            // Current harga beli per product, used to pre-fill the unit price of a line.
+            'purchasePrices' => app(PriceService::class)->purchasePriceMap(Product::pluck('id')),
             'statuses' => self::STATUSES,
         ]);
     }

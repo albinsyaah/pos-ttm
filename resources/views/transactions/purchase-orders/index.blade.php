@@ -170,7 +170,7 @@
                                     <th class="p-3 w-10"></th>
                                 </tr>
                             </thead>
-                            <tbody id="itemRows"></tbody>
+                            <tbody id="itemRows" data-purchase-prices="{{ json_encode($purchasePrices) }}"></tbody>
                         </table>
                         <p id="noItemsMessage" class="text-center text-xs text-[var(--ink-400)] py-6">{{ __('app.purchase_orders.no_items_added') }}</p>
                     </div>

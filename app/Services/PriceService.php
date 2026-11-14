@@ -17,6 +17,63 @@ use Illuminate\Support\Carbon;
 class PriceService
 {
     public const RETAIL = 'Retail';
+    public const WHOLESALE = 'Grosir';
+    /** Harga beli: what the shop pays its suppliers. Sensitive: it reveals the margin. */
+    public const PURCHASE = 'Beli';
+
+    /** The standard categories offered when setting up a price. Free-text categories (e.g. "Member") still work. */
+    public const CATEGORIES = [self::RETAIL, self::WHOLESALE, self::PURCHASE];
+
+    /** Spellings (lower case) that all mean one standard category. */
+    private const ALIASES = [
+        'retail' => self::RETAIL,
+        'grosir' => self::WHOLESALE,
+        'wholesale' => self::WHOLESALE,
+        'beli' => self::PURCHASE,
+        'purchase' => self::PURCHASE,
+        'harga beli' => self::PURCHASE,
+    ];
+
+    /**
+     * The standard name for a typed category ("beli", "Purchase" => "Beli");
+     * anything that is not a known spelling is returned trimmed, unchanged.
+     */
+    public static function canonicalCategory(string $category): string
+    {
+        $category = trim($category);
+
+        return self::ALIASES[mb_strtolower($category)] ?? $category;
+    }
+
+    /**
+     * Name shown to people for a category: "Retail" is shown as Sell Price /
+     * Harga Jual (the stored value stays "Retail"). Categories without a
+     * translation (e.g. "Member") are shown as they are.
+     */
+    public static function label(string $category): string
+    {
+        $key = 'app.price_categories.'.self::canonicalCategory($category);
+        $label = __($key);
+
+        return $label === $key ? $category : $label;
+    }
+
+    /** Every lower-case spelling that means the given standard category. */
+    public static function aliasesOf(string $canonical): array
+    {
+        return array_keys(array_filter(self::ALIASES, fn ($c) => $c === $canonical));
+    }
+
+    /**
+     * Current purchase price per product: [product_id => amount].
+     * Products with no purchase price are left out.
+     */
+    public function purchasePriceMap(iterable $productIds, $asOf = null): array
+    {
+        return collect($this->currentPrices($productIds, self::PURCHASE, $asOf))
+            ->map(fn ($price) => $price['amount'])
+            ->all();
+    }
 
     /**
      * Price per product on a date: [product_id => ['amount' => float, 'effective_date' => 'Y-m-d']].

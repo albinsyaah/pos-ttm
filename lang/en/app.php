@@ -323,6 +323,12 @@ return [
     ],
 
     // Price Setups (Setup Harga)
+    'price_categories' => [
+        'Retail' => 'Sell Price',
+        'Grosir' => 'Wholesale',
+        'Beli' => 'Purchase Price',
+    ],
+
     'price_setups' => [
         'title' => 'Price Setup',
         'search_price_setups' => 'Search price setups',
@@ -331,7 +337,7 @@ return [
         'edit_price_setup' => 'Edit Price Setup',
         'product' => 'Product',
         'price_category' => 'Price Category',
-        'price_category_placeholder' => 'e.g. Retail, Wholesale, Member',
+        'price_category_placeholder' => 'e.g. Retail, Grosir, Beli (purchase), Member',
         'effective_date' => 'Effective Date',
         'no_price_setups_found' => 'No price setups found.',
         'delete_price_setup' => 'Delete price setup?',
@@ -362,8 +368,9 @@ return [
         'all_warehouses' => 'All Warehouses',
         'stock' => 'Stock',
         'price' => 'Price',
-        'price_retail' => 'Retail',
+        'price_retail' => 'Sell Price',
         'price_wholesale' => 'Wholesale',
+        'price_purchase' => 'Purchase Price',
         'no_stock_data' => 'No stock data',
         'no_price_data' => 'No price data',
         'no_products_found' => 'No products found.',
@@ -689,11 +696,14 @@ return [
             'item_type' => 'Item Type',
             'product_group' => 'Product Group',
             'total_stock' => 'Stock',
-            'unit_price' => 'Unit Price',
+            'unit_price' => 'Sell Price',
             'stock_value' => 'Stock Value',
+            'purchase_price' => 'Purchase Price',
+            'purchase_value' => 'Purchase Value',
             'summary_total_products' => 'Products Listed',
             'summary_total_stock' => 'Total Stock',
             'summary_total_value' => 'Total Stock Value',
+            'summary_total_purchase_value' => 'Total Purchase Value',
             'no_data' => 'No products found.',
         ],
     ],

@@ -62,7 +62,7 @@
         </div>
     </form>
 
-    <div class="grid sm:grid-cols-3 gap-4 mt-6 report-summary">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 report-summary">
         <div class="bg-white rounded-3xl p-5">
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
                 {{ __('app.reports.inventory.summary_total_products') }}</p>
@@ -77,6 +77,11 @@
             <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
                 {{ __('app.reports.inventory.summary_total_value') }}</p>
             <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">Rp{{ number_format((float) $totalValue) }}</p>
+        </div>
+        <div class="bg-white rounded-3xl p-5">
+            <p class="text-xs text-[var(--ink-400)] font-semibold uppercase tracking-wide">
+                {{ __('app.reports.inventory.summary_total_purchase_value') }}</p>
+            <p class="text-2xl font-extrabold text-[var(--ink-900)] mt-1">Rp{{ number_format((float) $totalPurchaseValue) }}</p>
         </div>
     </div>
 
@@ -114,6 +119,8 @@
                     <th class="font-semibold ">{{ __('app.reports.inventory.total_stock') }}</th>
                     <th class="font-semibold ">{{ __('app.reports.inventory.unit_price') }}</th>
                     <th class="font-semibold ">{{ __('app.reports.inventory.stock_value') }}</th>
+                    <th class="font-semibold ">{{ __('app.reports.inventory.purchase_price') }}</th>
+                    <th class="font-semibold ">{{ __('app.reports.inventory.purchase_value') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -121,6 +128,7 @@
                     @php
                         $stock = $stockByProduct[$product->id] ?? 0;
                         $price = $priceByProduct[$product->id] ?? 0;
+                        $purchasePrice = $purchasePriceByProduct[$product->id] ?? 0;
                     @endphp
                     <tr class="table-row border-b border-gray-50">
                         <td class="p-5"><span class="code-badge">{{ $product->code }}</span></td>
@@ -136,10 +144,12 @@
                         </td>
                         <td class=" text-[var(--ink-700)]">Rp{{ number_format((float) $price) }}</td>
                         <td class=" font-medium text-[var(--ink-900)]">Rp{{ number_format((float) ($stock * $price)) }}</td>
+                        <td class=" text-[var(--ink-700)]">Rp{{ number_format((float) $purchasePrice) }}</td>
+                        <td class=" font-medium text-[var(--ink-900)]">Rp{{ number_format((float) ($stock * $purchasePrice)) }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="10" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.reports.inventory.no_data') }}
                         </td>

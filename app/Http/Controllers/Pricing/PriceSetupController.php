@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PriceHistory;
 use App\Models\PriceSetup;
 use App\Models\Product;
+use App\Services\PriceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -46,6 +47,7 @@ class PriceSetupController extends Controller implements HasMiddleware
             'priceSetups' => $priceSetups,
             'search' => $search,
             'products' => Product::orderBy('name')->get(),
+            'categories' => $this->categoryOptions(),
         ]);
     }
 
@@ -95,13 +97,35 @@ class PriceSetupController extends Controller implements HasMiddleware
         return redirect()->route('pricing.price-setups.index')->with('success', __('Price setup deleted successfully.'));
     }
 
+    /**
+     * Options of the category select: the standard ones, then any other
+     * category already in use (e.g. "Member") so its rows stay editable.
+     */
+    protected function categoryOptions(): array
+    {
+        return collect(PriceService::CATEGORIES)
+            ->merge(
+                PriceSetup::query()->distinct()->pluck('price_category')
+                    ->map(fn ($category) => PriceService::canonicalCategory($category))
+            )
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     protected function validatePriceSetup(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'price_category' => ['required', 'string', 'max:100'],
             'amount' => ['required', 'numeric', 'min:0', 'max:9999999999999.99'],
             'effective_date' => ['required', 'date'],
             'product_id' => ['required', 'exists:products,id'],
         ]);
+
+        // "beli" / "Purchase" / "wholesale" are stored under the standard name,
+        // so every page that looks a category up finds the same rows.
+        $data['price_category'] = PriceService::canonicalCategory($data['price_category']);
+
+        return $data;
     }
 }

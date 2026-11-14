@@ -9,6 +9,7 @@ use App\Models\PriceHistory;
 use App\Models\PriceSetup;
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Services\PriceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +46,10 @@ class InquiryController extends Controller
 
         $productIds = $products->pluck('id');
 
+        // The purchase price (harga beli) reveals the margin, so it is only
+        // shown to users who may also open the Pricing module.
+        $canSeePurchasePrice = (bool) $request->user()?->can('pricing.view');
+
         return view('inquiry.index', [
             'products' => $products,
             'search' => $search,
@@ -55,8 +60,9 @@ class InquiryController extends Controller
             'itemTypes' => ItemType::orderBy('name')->get(),
             'warehouses' => Warehouse::orderBy('name')->get(),
             'stockByProduct' => $this->stockForProducts($productIds, $warehouseId),
-            'pricesByProduct' => $this->pricesForProducts($productIds),
-            'historyByProduct' => $this->priceHistoryForProducts($productIds),
+            'canSeePurchasePrice' => $canSeePurchasePrice,
+            'pricesByProduct' => $this->pricesForProducts($productIds, $canSeePurchasePrice),
+            'historyByProduct' => $this->priceHistoryForProducts($productIds, $canSeePurchasePrice),
         ]);
     }
 
@@ -107,7 +113,7 @@ class InquiryController extends Controller
      * Current price per category for each product (most recent effective_date
      * wins per price_category), keyed by product_id.
      */
-    protected function pricesForProducts(Collection $productIds): array
+    protected function pricesForProducts(Collection $productIds, bool $withPurchase = false): array
     {
         if ($productIds->isEmpty()) {
             return [];
@@ -115,6 +121,7 @@ class InquiryController extends Controller
 
         return PriceSetup::query()
             ->whereIn('product_id', $productIds)
+            ->when(! $withPurchase, fn ($query) => $this->withoutPurchaseCategory($query))
             // A price dated in the future does not apply yet.
             ->whereDate('effective_date', '<=', now()->toDateString())
             ->orderByDesc('effective_date')
@@ -133,7 +140,7 @@ class InquiryController extends Controller
      * the page, newest first, keyed by product_id. One small query per product
      * so each product keeps its own last HISTORY_LIMIT rows.
      */
-    protected function priceHistoryForProducts(Collection $productIds): array
+    protected function priceHistoryForProducts(Collection $productIds, bool $withPurchase = false): array
     {
         $history = [];
 
@@ -141,11 +148,23 @@ class InquiryController extends Controller
             $history[$productId] = PriceHistory::query()
                 ->with('user')
                 ->where('product_id', $productId)
+                ->when(! $withPurchase, fn ($query) => $this->withoutPurchaseCategory($query))
                 ->orderByDesc('id')
                 ->limit(self::HISTORY_LIMIT)
                 ->get();
         }
 
         return $history;
+    }
+
+    /** Leaves the purchase price (any spelling of it) out of a price_setups / price_histories query. */
+    protected function withoutPurchaseCategory($query)
+    {
+        $aliases = PriceService::aliasesOf(PriceService::PURCHASE);
+
+        return $query->whereRaw(
+            'LOWER(price_category) NOT IN ('.implode(', ', array_fill(0, count($aliases), '?')).')',
+            $aliases
+        );
     }
 }

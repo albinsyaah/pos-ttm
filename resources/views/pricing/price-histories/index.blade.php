@@ -44,7 +44,7 @@
                                 <span class="code-badge mt-1">{{ $h->product->code }}</span>
                             @endif
                         </td>
-                        <td class="text-[var(--ink-900)]">{{ $h->price_category }}</td>
+                        <td class="text-[var(--ink-900)]">{{ \App\Services\PriceService::label($h->price_category) }}</td>
                         <td class="text-[var(--ink-900)]">{{ __('app.price_histories.action_'.$h->action) }}</td>
                         <td class="text-[var(--ink-900)]">
                             @if($h->old_amount !== null)

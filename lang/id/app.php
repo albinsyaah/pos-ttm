@@ -323,6 +323,12 @@ return [
     ],
 
     // Setup Harga
+    'price_categories' => [
+        'Retail' => 'Harga Jual',
+        'Grosir' => 'Grosir',
+        'Beli' => 'Harga Beli',
+    ],
+
     'price_setups' => [
         'title' => 'Setup Harga',
         'search_price_setups' => 'Cari setup harga',
@@ -331,7 +337,7 @@ return [
         'edit_price_setup' => 'Ubah Setup Harga',
         'product' => 'Produk',
         'price_category' => 'Kategori Harga',
-        'price_category_placeholder' => 'mis. Retail, Grosir, Member',
+        'price_category_placeholder' => 'mis. Retail, Grosir, Beli, Member',
         'effective_date' => 'Tanggal Berlaku',
         'no_price_setups_found' => 'Setup harga tidak ditemukan.',
         'delete_price_setup' => 'Hapus setup harga?',
@@ -362,8 +368,9 @@ return [
         'all_warehouses' => 'Semua Gudang',
         'stock' => 'Stok',
         'price' => 'Harga',
-        'price_retail' => 'Retail',
+        'price_retail' => 'Harga Jual',
         'price_wholesale' => 'Grosir',
+        'price_purchase' => 'Harga Beli',
         'no_stock_data' => 'Belum ada data stok',
         'no_price_data' => 'Belum ada data harga',
         'no_products_found' => 'Barang tidak ditemukan.',
@@ -688,11 +695,14 @@ return [
             'item_type' => 'Jenis',
             'product_group' => 'Kelompok Produk',
             'total_stock' => 'Stok',
-            'unit_price' => 'Harga Satuan',
+            'unit_price' => 'Harga Jual',
             'stock_value' => 'Nilai Stok',
+            'purchase_price' => 'Harga Beli',
+            'purchase_value' => 'Nilai Beli',
             'summary_total_products' => 'Produk Ditampilkan',
             'summary_total_stock' => 'Total Stok',
             'summary_total_value' => 'Total Nilai Stok',
+            'summary_total_purchase_value' => 'Total Nilai Beli',
             'no_data' => 'Produk tidak ditemukan.',
         ],
     ],
