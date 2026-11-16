@@ -56,7 +56,7 @@
     const list = document.createElement('div');
     list.className = 'product-picker-list';
     list.setAttribute('role', 'listbox');
-    list.style.cssText = 'position:fixed;z-index:80;max-height:14rem;overflow-y:auto;background:#fff;border:1px solid #e5e7eb;border-radius:.6rem;box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:.75rem;';
+    list.style.cssText = 'position:fixed;z-index:80;max-height:14rem;overflow-y:auto;background:#fff;border:1px solid #e5e7eb;border-radius:.6rem;box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:.75rem;box-sizing:border-box;';
 
     let open = false;
     let shown = [];
@@ -95,15 +95,23 @@
 
     function place() {
       const rect = input.getBoundingClientRect();
-      const below = window.innerHeight - rect.bottom;
-      list.style.left = `${rect.left}px`;
-      list.style.width = `${Math.max(rect.width, 220)}px`;
+
+      // The page may be zoomed (html { zoom: .9 }): then a CSS length is drawn k times
+      // larger or smaller than the pixels getBoundingClientRect reports. Measure k with a
+      // probe width, and turn every wanted position into CSS lengths by dividing by it.
+      list.style.width = '200px';
+      const k = list.getBoundingClientRect().width / 200 || 1;
+
+      const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+      const below = viewportHeight - rect.bottom;
+      list.style.left = `${rect.left / k}px`;
+      list.style.width = `${Math.max(rect.width, 220) / k}px`;
       if (below < 160 && rect.top > below) {
         list.style.top = '';
-        list.style.bottom = `${window.innerHeight - rect.top + 2}px`;
+        list.style.bottom = `${(viewportHeight - rect.top + 2) / k}px`;
       } else {
         list.style.bottom = '';
-        list.style.top = `${rect.bottom + 2}px`;
+        list.style.top = `${(rect.bottom + 2) / k}px`;
       }
     }
 
@@ -162,6 +170,8 @@
       place();
       window.addEventListener('resize', place);
       window.addEventListener('scroll', place, true);
+      // A box inside a modal that is still animating in moves without a scroll or resize
+      window.addEventListener('animationend', place, true);
     }
 
     function closeList() {
@@ -171,6 +181,7 @@
       list.remove();
       window.removeEventListener('resize', place);
       window.removeEventListener('scroll', place, true);
+      window.removeEventListener('animationend', place, true);
     }
 
     function choose(index) {

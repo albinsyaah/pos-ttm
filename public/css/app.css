@@ -58,9 +58,11 @@ select:focus-visible {
     color: var(--brand-700);
 }
 
-/* Sidebar items */
+/* Sidebar items (dark sidebar): every level shares one text color per state,
+   so a third-level link (.sub2) can no longer override hover / active. */
 .sidebar-item {
     position: relative;
+    color: var(--ink-400);
     transition: color .15s ease, background-color .15s ease;
     border-radius: 12px;
 }
@@ -75,6 +77,20 @@ select:focus-visible {
     color: var(--ink-200);
     background: var(--brand-700);
     font-weight: 600;
+}
+
+/* Sidebar search: dark text, placeholder and icon on the grey field */
+#navSearch {
+    color: var(--ink-900);
+}
+
+#navSearch::placeholder {
+    color: var(--ink-900);
+    opacity: .75;
+}
+
+#navSearch ~ i {
+    color: var(--ink-900);
 }
 
 /* Sidebar accordion */
@@ -102,12 +118,12 @@ select:focus-visible {
 
 .nav-chevron {
     transition: transform .18s ease;
-    color: var(--ink-400);
+    color: inherit;
 }
 
 .nav-toggle[aria-expanded="true"] .nav-chevron {
     transform: rotate(90deg);
-    color: var(--brand-600);
+    color: var(--ink-200);
 }
 
 .nav-panel {
@@ -124,11 +140,6 @@ select:focus-visible {
 
 .sidebar-item.sub2 {
     font-size: .75rem;
-    color: var(--ink-400);
-}
-
-.sidebar-item.sub2:hover {
-    color: var(--brand-600);
 }
 
 .nav-hidden {
@@ -439,6 +450,30 @@ select:focus-visible {
     box-shadow: 0 24px 48px -16px rgba(26, 33, 56, .35);
     max-height: 90vh;
     overflow-y: auto;
+}
+
+/* Bigger modals: each size step of the markup (max-w-sm / md / lg / 2xl) is widened, and the
+   padding made roomier. Two classes win over the single Tailwind utility, so no rebuild is needed. */
+.modal-card.max-w-sm,
+.due-popup-card.max-w-sm {
+    max-width: 32rem;
+}
+
+.modal-card.max-w-md,
+.due-popup-card.max-w-md {
+    max-width: 40rem;
+}
+
+.modal-card.max-w-lg {
+    max-width: 46rem;
+}
+
+.modal-card.max-w-2xl {
+    max-width: 60rem;
+}
+
+.modal-card.p-6 {
+    padding: 2rem;
 }
 
 @keyframes modal-in {

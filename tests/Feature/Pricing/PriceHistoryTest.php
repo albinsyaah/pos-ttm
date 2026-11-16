@@ -110,6 +110,22 @@ it('logs a new price with the user who added it', function () {
         ->and((float) $log->new_amount)->toBe(2500.0);
 });
 
+it('stores the purchase price under its standard name whatever spelling was typed', function () {
+    $user = priceTestUser();
+    $p = priceTestProduct();
+
+    $this->actingAs($user)->post(route('pricing.price-setups.store'), [
+        'product_id' => $p->id, 'price_category' => ' purchase ', 'amount' => 800, 'effective_date' => '2026-10-01',
+    ])->assertSessionHasNoErrors();
+
+    expect(PriceSetup::first()->price_category)->toBe('Beli');
+    expect(PriceService::canonicalCategory('Harga Beli'))->toBe(PriceService::PURCHASE)
+        ->and(PriceService::canonicalCategory('wholesale'))->toBe(PriceService::WHOLESALE)
+        ->and(PriceService::canonicalCategory('Member'))->toBe('Member');
+
+    expect((new PriceService())->purchasePriceMap([$p->id], '2026-10-02'))->toBe([$p->id => 800.0]);
+});
+
 it('logs the old and new amount when a price is changed', function () {
     $user = priceTestUser();
     $p = priceTestProduct();

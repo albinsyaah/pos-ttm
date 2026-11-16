@@ -35,6 +35,7 @@ class PriceSetupSeeder extends Seeder
             $variance = fake()->numberBetween(-10, 15) / 100;
             $retail = round(($base * (1 + $variance)) / 500) * 500;
             $wholesale = round(($retail * 0.9) / 500) * 500;
+            $purchase = round(($retail * 0.8) / 500) * 500;
 
             PriceSetup::firstOrCreate(
                 [
@@ -52,6 +53,15 @@ class PriceSetupSeeder extends Seeder
                     'effective_date' => $effectiveDate,
                 ],
                 ['amount' => $wholesale]
+            );
+
+            PriceSetup::firstOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'price_category' => 'Beli',
+                    'effective_date' => $effectiveDate,
+                ],
+                ['amount' => $purchase]
             );
         });
     }

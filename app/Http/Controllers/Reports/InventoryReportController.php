@@ -62,12 +62,15 @@ class InventoryReportController extends Controller
         $allFilteredIds = (clone $productsQuery)->pluck('id');
         $stockByProduct = $this->stockForProducts($allFilteredIds);
         $priceByProduct = $this->retailPriceForProducts($allFilteredIds);
+        $purchasePriceByProduct = $this->latestPriceForProducts($allFilteredIds, 'Beli');
 
         $totalProducts = $allFilteredIds->count();
         $totalStock = array_sum($stockByProduct);
         $totalValue = 0;
+        $totalPurchaseValue = 0;
         foreach ($allFilteredIds as $productId) {
             $totalValue += ($stockByProduct[$productId] ?? 0) * ($priceByProduct[$productId] ?? 0);
+            $totalPurchaseValue += ($stockByProduct[$productId] ?? 0) * ($purchasePriceByProduct[$productId] ?? 0);
         }
 
         $products = $productsQuery->paginate(20)->withQueryString();
@@ -83,9 +86,11 @@ class InventoryReportController extends Controller
             'productGroups' => ProductGroup::orderBy('name')->get(),
             'stockByProduct' => $stockByProduct,
             'priceByProduct' => $priceByProduct,
+            'purchasePriceByProduct' => $purchasePriceByProduct,
             'totalProducts' => $totalProducts,
             'totalStock' => $totalStock,
             'totalValue' => $totalValue,
+            'totalPurchaseValue' => $totalPurchaseValue,
         ]);
     }
 
@@ -122,13 +127,22 @@ class InventoryReportController extends Controller
      */
     protected function retailPriceForProducts(Collection $productIds): array
     {
+        return $this->latestPriceForProducts($productIds, 'Retail');
+    }
+
+    /**
+     * Same as retailPriceForProducts() for any price category (e.g. the
+     * purchase price, "Beli"); products without one are left out.
+     */
+    protected function latestPriceForProducts(Collection $productIds, string $category): array
+    {
         if ($productIds->isEmpty()) {
             return [];
         }
 
         return PriceSetup::query()
             ->whereIn('product_id', $productIds)
-            ->where('price_category', 'Retail')
+            ->where('price_category', $category)
             // A price dated in the future does not apply yet.
             ->whereDate('effective_date', '<=', now()->toDateString())
             ->orderByDesc('effective_date')

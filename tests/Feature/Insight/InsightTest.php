@@ -519,9 +519,10 @@ it('shows stock in units, packs and boxes with an availability label', function 
 
     $this->get(route('inquiry.index'))
         ->assertOk()
-        ->assertSee('2 box 3 pack 5 pcs')
-        ->assertSee('data-availability="available"', false)
-        ->assertSee('data-availability="out"', false);
+        ->assertSee('2 box 3 pack 5 pcs');
+    // The available / out-of-stock chip is commented out in the Inquiry view, so it is not asserted here.
+    // ->assertSee('data-availability="available"', false)
+    // ->assertSee('data-availability="out"', false);
 });
 
 it('shows the current price with its effective date, and ignores a future price', function () {
@@ -586,6 +587,34 @@ it('keeps only the latest ten price changes per product', function () {
 
     $this->get(route('inquiry.index'))
         ->assertViewHas('historyByProduct', fn ($history) => $history[$urea->id]->count() === 10);
+});
+
+it('shows the purchase price in the inquiry only to users who may open pricing', function () {
+    insLogin(['inquiry.view', 'pricing.view']);
+    $urea = insProduct('Pupuk Urea');
+    insPrice($urea, 4000, '2026-09-01', 'Beli');
+    insPrice($urea, 5000, '2026-09-01');
+
+    $this->get(route('inquiry.index'))
+        ->assertOk()
+        ->assertSee('Harga Beli')
+        ->assertSee('Rp 4.000')
+        ->assertSee('Rp 5.000');
+});
+
+it('hides the purchase price and its changes from inquiry-only users', function () {
+    insLogin(['inquiry.view']);
+    $urea = insProduct('Pupuk Urea');
+    insPrice($urea, 4000, '2026-09-01', 'Beli');
+    insPrice($urea, 5000, '2026-09-01');
+
+    $this->get(route('inquiry.index'))
+        ->assertOk()
+        ->assertDontSee('Harga Beli')
+        ->assertDontSee('Rp 4.000')
+        ->assertSee('Rp 5.000')
+        ->assertViewHas('historyByProduct', fn ($history) => $history[$urea->id]->pluck('price_category')->all() === ['Retail'])
+        ->assertViewHas('pricesByProduct', fn ($prices) => collect($prices[$urea->id])->pluck('price_category')->all() === ['Retail']);
 });
 
 // ---- Permissions and menu ----------------------------------------------------------------

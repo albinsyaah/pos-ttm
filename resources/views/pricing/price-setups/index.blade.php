@@ -51,7 +51,7 @@
                                 <span class="code-badge mt-1">{{ $priceSetup->product->code }}</span>
                             @endif
                         </td>
-                        <td class="text-[var(--ink-900)]">{{ $priceSetup->price_category }}</td>
+                        <td class="text-[var(--ink-900)]">{{ \App\Services\PriceService::label($priceSetup->price_category) }}</td>
                         <td class="text-[var(--ink-900)]">{{ number_format((float) $priceSetup->amount, 2) }}</td>
                         <td class="text-[var(--ink-900)]">{{ \Illuminate\Support\Carbon::parse($priceSetup->effective_date)->format('d M Y') }}</td>
                         <td class="text-center">
@@ -62,7 +62,7 @@
                                         class="edit-price-setup-btn icon-btn-edit"
                                         aria-label="Edit {{ $priceSetup->price_category }}"
                                         data-action="{{ route('pricing.price-setups.update', $priceSetup) }}"
-                                        data-price-category="{{ $priceSetup->price_category }}"
+                                        data-price-category="{{ \App\Services\PriceService::canonicalCategory($priceSetup->price_category) }}"
                                         data-amount="{{ $priceSetup->amount }}"
                                         data-effective-date="{{ \Illuminate\Support\Carbon::parse($priceSetup->effective_date)->format('Y-m-d') }}"
                                         data-product-id="{{ $priceSetup->product_id }}"
@@ -125,9 +125,13 @@
                     </div>
                     <div>
                         <label for="price_category" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.price_setups.price_category') }}</label>
-                        <input id="price_category" name="price_category" type="text" required maxlength="100"
-                               placeholder="{{ __('app.price_setups.price_category_placeholder') }}"
-                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors" />
+                        <select id="price_category" name="price_category" required
+                               class="w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
+                            <option value="">{{ __('app.common.select') }}</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category }}">{{ \App\Services\PriceService::label($category) }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div>
                         <label for="amount" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.value') }}</label>
