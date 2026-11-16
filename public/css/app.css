@@ -441,6 +441,30 @@ select:focus-visible {
     overflow-y: auto;
 }
 
+/* Bigger modals: each size step of the markup (max-w-sm / md / lg / 2xl) is widened, and the
+   padding made roomier. Two classes win over the single Tailwind utility, so no rebuild is needed. */
+.modal-card.max-w-sm,
+.due-popup-card.max-w-sm {
+    max-width: 32rem;
+}
+
+.modal-card.max-w-md,
+.due-popup-card.max-w-md {
+    max-width: 40rem;
+}
+
+.modal-card.max-w-lg {
+    max-width: 46rem;
+}
+
+.modal-card.max-w-2xl {
+    max-width: 60rem;
+}
+
+.modal-card.p-6 {
+    padding: 2rem;
+}
+
 @keyframes modal-in {
     from {
         opacity: 0;
