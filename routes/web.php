@@ -17,6 +17,7 @@ use App\Http\Controllers\Inventory\ItemTypeController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\ProductGroupController;
 use App\Http\Controllers\InquiryController;
+use App\Http\Controllers\InquiryEditController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Pricing\PriceHistoryController;
 use App\Http\Controllers\Pricing\PriceSetupController;
@@ -116,6 +117,17 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/inquiry', [InquiryController::class, 'index'])
         ->middleware('permission:inquiry.view')
         ->name('inquiry.index');
+
+    // Add / edit a product (data, prices, stock) from the Inquiry page.
+    Route::get('/inquiry/{product}/data', [InquiryEditController::class, 'show'])
+        ->middleware('permission:inquiry.manage')
+        ->name('inquiry.product-data');
+    Route::post('/inquiry', [InquiryEditController::class, 'store'])
+        ->middleware('permission:inquiry.manage')
+        ->name('inquiry.store');
+    Route::put('/inquiry/{product}', [InquiryEditController::class, 'update'])
+        ->middleware('permission:inquiry.manage')
+        ->name('inquiry.update');
 
     // Per-action permission checks live on the controller itself via
     // HasMiddleware (see CustomerController::middleware()).

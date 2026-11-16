@@ -50,6 +50,9 @@ class InquiryController extends Controller
         // shown to users who may also open the Pricing module.
         $canSeePurchasePrice = (bool) $request->user()?->can('pricing.view');
 
+        // Add / edit from this page (see InquiryEditController).
+        $canManage = (bool) $request->user()?->can('inquiry.manage');
+
         return view('inquiry.index', [
             'products' => $products,
             'search' => $search,
@@ -61,6 +64,11 @@ class InquiryController extends Controller
             'warehouses' => Warehouse::orderBy('name')->get(),
             'stockByProduct' => $this->stockForProducts($productIds, $warehouseId),
             'canSeePurchasePrice' => $canSeePurchasePrice,
+            'canManage' => $canManage,
+            // Every product, for the select of the add / edit form.
+            'allProducts' => $canManage ? Product::orderBy('name')->get(['id', 'code', 'name']) : collect(),
+            // Stock of every warehouse (the table above may be filtered to one) for the edit form.
+            'warehouseStockByProduct' => $canManage ? $this->warehouseStockForProducts($productIds) : [],
             'pricesByProduct' => $this->pricesForProducts($productIds, $canSeePurchasePrice),
             'historyByProduct' => $this->priceHistoryForProducts($productIds, $canSeePurchasePrice),
         ]);
@@ -104,6 +112,34 @@ class InquiryController extends Controller
                 'name' => $row->warehouse_name,
                 'balance' => (int) $row->balance,
             ];
+        }
+
+        return $stock;
+    }
+
+    /**
+     * Latest balance per product and warehouse, never filtered:
+     * [$productId => [$warehouseId => balance]].
+     */
+    protected function warehouseStockForProducts(Collection $productIds): array
+    {
+        if ($productIds->isEmpty()) {
+            return [];
+        }
+
+        $latest = InventoryLedger::select('product_id', 'warehouse_id', DB::raw('MAX(id) as last_id'))
+            ->whereIn('product_id', $productIds)
+            ->groupBy('product_id', 'warehouse_id');
+
+        $stock = [];
+
+        $rows = InventoryLedger::joinSub($latest, 'latest', function ($join) {
+                $join->on('inventory_ledgers.id', '=', 'latest.last_id');
+            })
+            ->get(['inventory_ledgers.product_id', 'inventory_ledgers.warehouse_id', 'inventory_ledgers.balance']);
+
+        foreach ($rows as $row) {
+            $stock[$row->product_id][$row->warehouse_id] = (int) $row->balance;
         }
 
         return $stock;

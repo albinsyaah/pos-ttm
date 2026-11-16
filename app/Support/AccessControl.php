@@ -181,6 +181,7 @@ class AccessControl
                 'label' => 'Inquery',
                 'permissions' => [
                     'inquiry.view' => 'Use inquiry/search tools',
+                    'inquiry.manage' => 'Add and edit products, prices and stock from inquiry',
                 ],
             ],
             'notifications' => [

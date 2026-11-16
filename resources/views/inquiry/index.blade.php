@@ -5,6 +5,16 @@
 
 @section('content')
 @php use App\Support\Money; use App\Services\PriceService; @endphp
+@php
+    $colspan = 7 + ($canSeePurchasePrice ? 1 : 0) + ($canManage ? 1 : 0);
+    $widths = match (true) {
+        $canSeePurchasePrice && $canManage => [7, 15, 12, 9, 9, 13, 13, 15, 6],
+        $canSeePurchasePrice => [8, 17, 13, 9, 9, 14, 14, 16],
+        $canManage => [8, 17, 14, 9, 9, 14, 17, 6],
+        default => [9, 19, 16, 10, 10, 15, 17],
+    };
+    $inputClass = 'w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors';
+@endphp
 
     <form id="inquiryFilterForm" action="{{ route('inquiry.index') }}" method="GET" class="flex items-center justify-between flex-wrap gap-4" data-live-search="custom">
         <div class="relative">
@@ -51,6 +61,13 @@
                     <option value="{{ $warehouse->id }}" @selected((string) $warehouseId === (string) $warehouse->id)>{{ $warehouse->name }}</option>
                 @endforeach
             </select>
+
+            @if($canManage)
+                <button type="button" id="addInquiryProductBtn" data-action="{{ route('inquiry.store') }}"
+                        class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
+                    <i class="fa-solid fa-plus"></i> {{ __('app.inquiry.add_product') }}
+                </button>
+            @endif
         </div>
     </form>
 
@@ -62,7 +79,7 @@
 
         <table class="w-full text-sm min-w-[900px] table-fixed">
             <colgroup>
-                @foreach($canSeePurchasePrice ? [8, 17, 13, 9, 9, 14, 14, 16] : [9, 19, 16, 10, 10, 15, 17] as $width)
+                @foreach($widths as $width)
                     <col style="width: {{ $width }}%">
                 @endforeach
             </colgroup>
@@ -78,6 +95,9 @@
                     @endif
                     <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_retail') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_wholesale') }}</th>
+                    @if($canManage)
+                        <th class="px-3 py-4"><span class="sr-only">{{ __('app.common.actions') }}</span></th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -142,9 +162,27 @@
                                 {{ __('insight.inquiry.price_history') }}
                             </button>
                         </td>
+                        @if($canManage)
+                            <td class="px-3 py-4 text-center">
+                                <button type="button" class="edit-inquiry-btn icon-btn-edit"
+                                        aria-label="{{ __('app.inquiry.edit') }} {{ $product->name }}"
+                                        data-action="{{ route('inquiry.update', $product) }}"
+                                        data-product-id="{{ $product->id }}"
+                                        data-code="{{ $product->code }}"
+                                        data-unit-name="{{ $product->unit_name }}"
+                                        data-brand-id="{{ $product->brand_id }}"
+                                        data-item-type-id="{{ $product->item_type_id }}"
+                                        data-price-purchase="{{ $purchasePrice ? (float) $purchasePrice->amount : '' }}"
+                                        data-price-retail="{{ $retailPrice ? (float) $retailPrice->amount : '' }}"
+                                        data-price-wholesale="{{ $wholesalePrice ? (float) $wholesalePrice->amount : '' }}"
+                                        data-stock="{{ json_encode((object) ($warehouseStockByProduct[$product->id] ?? [])) }}">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                            </td>
+                        @endif
                     </tr>
                     <tr class="hidden bg-[var(--surface)]" data-history-row="{{ $product->id }}">
-                        <td colspan="{{ $canSeePurchasePrice ? 8 : 7 }}" class="px-5 py-4">
+                        <td colspan="{{ $colspan }}" class="px-5 py-4">
                             @php $history = $historyByProduct[$product->id] ?? collect(); @endphp
                             @if($history->isEmpty())
                                 <p class="text-xs text-[var(--ink-400)]">{{ __('insight.inquiry.no_price_history') }}</p>
@@ -184,7 +222,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ $canSeePurchasePrice ? 8 : 7 }}" class="text-center py-14 text-[var(--ink-400)] text-sm">
+                        <td colspan="{{ $colspan }}" class="text-center py-14 text-[var(--ink-400)] text-sm">
                             <i class="fa-regular fa-face-frown text-2xl block mb-2"></i>
                             {{ __('app.inquiry.no_products_found') }}
                         </td>
@@ -198,10 +236,141 @@
         {{ $products->links() }}
     </div>
 
+@if($canManage)
+        {{-- Add / edit product: data, prices and stock --}}
+        <div id="inquiryModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="inquiryModalTitle"
+             data-update-url="{{ route('inquiry.update', '__ID__') }}"
+             data-data-url="{{ route('inquiry.product-data', '__ID__') }}"
+             data-title-add="{{ __('app.inquiry.add_product') }}"
+             data-title-edit="{{ __('app.inquiry.edit_product') }}">
+            <div class="modal-card bg-white rounded-3xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 id="inquiryModalTitle" class="font-semibold text-lg text-[var(--ink-900)]">{{ __('app.inquiry.add_product') }}</h3>
+                    <button type="button" class="icon-btn modal-close" aria-label="Close">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                </div>
+
+                <form id="inquiryEditForm" method="POST" action="{{ route('inquiry.store') }}">
+                    @csrf
+                    <div id="inquiryFormMethod"></div>
+                    <input type="hidden" name="_inquiry_form" value="1">
+                    <input type="hidden" name="_product_id" id="inquiryProductId" value="">
+
+                    <p class="text-xs font-semibold uppercase tracking-wide text-[var(--ink-400)] mb-3">{{ __('app.inquiry.product_section') }}</p>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="sm:col-span-2">
+                            <label for="inquiry_product_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.name') }}</label>
+                            <select id="inquiry_product_id" name="product_id" required class="{{ $inputClass }}">
+                                <option value="">{{ __('app.common.select') }}</option>
+                                @foreach($allProducts as $option)
+                                    <option value="{{ $option->id }}">{{ $option->code }} — {{ $option->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="inquiry_code" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.common.code') }}</label>
+                            <input id="inquiry_code" name="code" type="text" maxlength="50" placeholder="{{ __('app.inquiry.code_auto_hint') }}" class="{{ $inputClass }}" />
+                        </div>
+                        <div>
+                            <label for="inquiry_unit_name" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.inquiry.unit') }}</label>
+                            <input id="inquiry_unit_name" name="unit_name" type="text" maxlength="30" required class="{{ $inputClass }}" />
+                        </div>
+                        <div>
+                            <label for="inquiry_brand_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.brand') }}</label>
+                            <select id="inquiry_brand_id" name="brand_id" class="{{ $inputClass }}">
+                                <option value="">—</option>
+                                @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="inquiry_item_type_id" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.products.item_type') }}</label>
+                            <select id="inquiry_item_type_id" name="item_type_id" class="{{ $inputClass }}">
+                                <option value="">—</option>
+                                @foreach($itemTypes as $itemType)
+                                    <option value="{{ $itemType->id }}">{{ $itemType->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <p class="text-xs font-semibold uppercase tracking-wide text-[var(--ink-400)] mt-6 mb-1">{{ __('app.inquiry.price_section') }}</p>
+                    <p class="text-xs text-[var(--ink-400)] mb-3">{{ __('app.inquiry.price_hint') }}</p>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        @if($canSeePurchasePrice)
+                            <div>
+                                <label for="inquiry_price_purchase" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.inquiry.price_purchase') }}</label>
+                                <input id="inquiry_price_purchase" name="prices[purchase]" type="number" step="0.01" min="0" class="{{ $inputClass }}" />
+                            </div>
+                        @endif
+                        <div>
+                            <label for="inquiry_price_retail" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.inquiry.price_retail') }}</label>
+                            <input id="inquiry_price_retail" name="prices[retail]" type="number" step="0.01" min="0" class="{{ $inputClass }}" />
+                        </div>
+                        <div>
+                            <label for="inquiry_price_wholesale" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.inquiry.price_wholesale') }}</label>
+                            <input id="inquiry_price_wholesale" name="prices[wholesale]" type="number" step="0.01" min="0" class="{{ $inputClass }}" />
+                        </div>
+                        <div>
+                            <label for="inquiry_price_effective_date" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ __('app.inquiry.effective_date') }}</label>
+                            <input id="inquiry_price_effective_date" name="price_effective_date" type="date" value="{{ now()->toDateString() }}" class="{{ $inputClass }}" />
+                        </div>
+                    </div>
+
+                    <p class="text-xs font-semibold uppercase tracking-wide text-[var(--ink-400)] mt-6 mb-1">{{ __('app.inquiry.stock_section') }}</p>
+                    <p class="text-xs text-[var(--ink-400)] mb-3">{{ __('app.inquiry.stock_hint') }}</p>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        @foreach($warehouses as $warehouse)
+                            <div>
+                                <label for="inquiry_stock_{{ $warehouse->id }}" class="block text-xs font-medium text-[var(--ink-700)] mb-1.5">{{ $warehouse->name }}</label>
+                                <input id="inquiry_stock_{{ $warehouse->id }}" name="stock[{{ $warehouse->id }}]" type="number" step="1" min="0" class="{{ $inputClass }}" />
+                            </div>
+                        @endforeach
+                    </div>
+
+                    @if ($errors->any())
+                        <div class="mt-4 text-xs text-[var(--bad-600)] space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div class="flex items-center justify-end gap-3 mt-6">
+                        <button type="button" class="modal-close text-sm font-medium text-[var(--ink-700)] px-4 py-2.5">{{ __('app.common.cancel') }}</button>
+                        <button type="submit" class="bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">{{ __('app.common.save') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
 @endsection
+
+@push('styles')
+    <style>
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 33, 56, .45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            z-index: 50;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-card { box-shadow: 0 24px 48px -16px rgba(26,33,56,.35); }
+    </style>
+@endpush
 
 @push('scripts')
     <script>
+        @if($canManage && $errors->any() && old('_inquiry_form'))
+            window.INQUIRY_REOPEN = @json(collect(old())->except(['_token', '_method'])->all());
+        @endif
         @if(session('success'))
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('success'))));
         @endif
@@ -209,5 +378,9 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-circle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    @if($canManage)
+        {{-- Searchable product select of the add / edit form --}}
+        <script src="{{ asset('js/product-picker.js') }}"></script>
+    @endif
     <script src="{{ asset('js/inquiry.js') }}"></script>
 @endpush
