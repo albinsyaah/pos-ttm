@@ -40,6 +40,8 @@ class InquiryController extends Controller
             })
             ->when($brandId, fn ($query) => $query->where('brand_id', $brandId))
             ->when($itemTypeId, fn ($query) => $query->where('item_type_id', $itemTypeId))
+            // Most recently updated products first
+            ->orderByRaw($this->lastUpdatedSql().' DESC')
             ->orderBy('name')
             ->paginate(20)
             ->withQueryString();
@@ -115,6 +117,28 @@ class InquiryController extends Controller
         }
 
         return $stock;
+    }
+
+    /**
+     * SQL for the moment a product last changed: its own data (updated_at), its
+     * latest price change (price_histories) or its latest stock
+     * movement (inventory_ledgers), whichever is newest. Used to list recently
+     * updated products first.
+     */
+    protected function lastUpdatedSql(): string
+    {
+        $epoch = "'1970-01-01 00:00:00'";
+
+        $parts = [
+            "COALESCE(products.updated_at, {$epoch})",
+            "COALESCE((SELECT MAX(ph.created_at) FROM price_histories ph WHERE ph.product_id = products.id), {$epoch})",
+            "COALESCE((SELECT MAX(il.created_at) FROM inventory_ledgers il WHERE il.product_id = products.id), {$epoch})",
+        ];
+
+        // SQLite's multi-argument MAX() is MySQL / PostgreSQL's GREATEST().
+        $function = DB::connection()->getDriverName() === 'sqlite' ? 'MAX' : 'GREATEST';
+
+        return $function.'('.implode(', ', $parts).')';
     }
 
     /**

@@ -116,7 +116,7 @@
                         <td class="px-3 py-4">
                             <div class="flex items-center justify-center gap-2">
                                 <button type="button" data-history-toggle="{{ $product->id }}" aria-expanded="false"
-                                        class="w-11 h-11 rounded-full flex items-center justify-center bg-[var(--surface)] text-[var(--brand-600)] hover:bg-[var(--brand-600)] hover:text-white transition-colors"
+                                        class="w-8 h-8 text-[.8rem] rounded-full flex items-center justify-center bg-[var(--surface)] text-[var(--brand-600)] hover:bg-[var(--brand-600)] hover:text-white transition-colors"
                                         title="{{ __('insight.inquiry.price_history') }}"
                                         aria-label="{{ __('insight.inquiry.price_history') }} {{ $product->name }}">
                                     <i class="fa-solid fa-clock-rotate-left text-xs"></i>
