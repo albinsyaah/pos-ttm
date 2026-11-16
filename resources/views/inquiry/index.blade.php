@@ -6,13 +6,11 @@
 @section('content')
 @php use App\Support\Money; use App\Services\PriceService; @endphp
 @php
-    $colspan = 7 + ($canSeePurchasePrice ? 1 : 0) + ($canManage ? 1 : 0);
-    $widths = match (true) {
-        $canSeePurchasePrice && $canManage => [7, 15, 12, 9, 9, 13, 13, 15, 6],
-        $canSeePurchasePrice => [8, 17, 13, 9, 9, 14, 14, 16],
-        $canManage => [8, 17, 14, 9, 9, 14, 17, 6],
-        default => [9, 19, 16, 10, 10, 15, 17],
-    };
+    // No, code, name, brand, item type, stock, (purchase,) retail, actions (price history + edit)
+    $colspan = 8 + ($canSeePurchasePrice ? 1 : 0);
+    $widths = $canSeePurchasePrice
+        ? [4, 8, 18, 10, 10, 9, 12, 12, 17]
+        : [5, 9, 21, 12, 12, 11, 13, 17];
     $inputClass = 'w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors';
 @endphp
 
@@ -32,36 +30,6 @@
         </div>
 
         <div class="flex items-center gap-3 flex-wrap ">
-            @if($search || $brandId || $itemTypeId || $warehouseId)
-                <a href="{{ route('inquiry.index') }}" class="text-xs font-semibold text-[var(--ink-400)] hover:text-[var(--ink-900)] transition-colors">
-                    <i class="fa-solid fa-xmark"></i> Reset Filters
-                </a>
-            @endif
-
-            <select id="inquiryBrand" name="brand_id"
-                   class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
-                <option value="">{{ __('app.inquiry.all_brands') }}</option>
-                @foreach($brands as $brand)
-                    <option value="{{ $brand->id }}" @selected((string) $brandId === (string) $brand->id)>{{ $brand->name }}</option>
-                @endforeach
-            </select>
-
-            <select id="inquiryItemType" name="item_type_id"
-                   class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
-                <option value="">{{ __('app.inquiry.all_item_types') }}</option>
-                @foreach($itemTypes as $itemType)
-                    <option value="{{ $itemType->id }}" @selected((string) $itemTypeId === (string) $itemType->id)>{{ $itemType->name }}</option>
-                @endforeach
-            </select>
-
-            <select id="inquiryWarehouse" name="warehouse_id"
-                   class="rounded-full bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors">
-                <option value="">{{ __('app.inquiry.all_warehouses') }}</option>
-                @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}" @selected((string) $warehouseId === (string) $warehouse->id)>{{ $warehouse->name }}</option>
-                @endforeach
-            </select>
-
             @if($canManage)
                 <button type="button" id="addInquiryProductBtn" data-action="{{ route('inquiry.store') }}"
                         class="flex items-center gap-2 bg-[var(--brand-600)] hover:bg-[var(--brand-700)] text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors">
@@ -85,6 +53,7 @@
             </colgroup>
             <thead class="text-[var(--ink-900)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
+                    <th class="px-5 py-4 font-bold whitespace-nowrap">No</th>
                     <th class="px-5 py-4 font-bold whitespace-nowrap">{{ __('app.common.code') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.common.name') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.products.brand') }}</th>
@@ -94,10 +63,7 @@
                         <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_purchase') }}</th>
                     @endif
                     <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_retail') }}</th>
-                    <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_wholesale') }}</th>
-                    @if($canManage)
-                        <th class="px-3 py-4"><span class="sr-only">{{ __('app.common.actions') }}</span></th>
-                    @endif
+                    <th class="px-3 py-4"><span class="sr-only">{{ __('app.common.actions') }}</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -110,6 +76,7 @@
                         $wholesalePrice = $prices->first(fn ($p) => PriceService::canonicalCategory($p->price_category) === PriceService::WHOLESALE);
                     @endphp
                     <tr class="table-row align-top {{ $loop->even ? 'is-zebra' : '' }}">
+                        <td class="px-5 py-4 whitespace-nowrap text-[var(--ink-400)]">{{ $products->firstItem() + $loop->index }}</td>
                         <td class="px-5 py-4 whitespace-nowrap"><span class="code-badge">{{ $product->code }}</span></td>
                         <td class="px-5 py-4 text-[var(--ink-700)]">{{ $product->name }}</td>
                         <td class="px-5 py-4 text-[var(--ink-400)]">{{ $product->brand?->name ?: '—' }}</td>
@@ -148,22 +115,13 @@
                                 <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_price_data') }}</span>
                             @endif
                         </td>
-                        <td class="px-5 py-4">
-                            @if($wholesalePrice)
-                                <div class="text-[var(--ink-700)] whitespace-nowrap">
-                                    <span class="font-semibold">{{ Money::rupiah($wholesalePrice->amount) }}</span>
-                                    <div class="text-[var(--ink-400)] text-[11px]">({{ __('insight.inquiry.effective') }} {{ \Illuminate\Support\Carbon::parse($wholesalePrice->effective_date)->format('d M Y') }})</div>
-                                </div>
-                            @else
-                                <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_price_data') }}</span>
-                            @endif
-                            <button type="button" data-history-toggle="{{ $product->id }}" aria-expanded="false"
-                                    class="mt-2 block text-xs font-semibold text-[var(--brand-600)] hover:underline">
-                                {{ __('insight.inquiry.price_history') }}
-                            </button>
-                        </td>
-                        @if($canManage)
-                            <td class="px-3 py-4 text-center">
+                        <td class="px-3 py-4">
+                            <div class="flex items-center justify-center gap-2">
+                                <button type="button" data-history-toggle="{{ $product->id }}" aria-expanded="false"
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] hover:bg-[var(--brand-600)] hover:text-white text-xs font-semibold text-[var(--brand-600)] px-3 py-1.5 whitespace-nowrap transition-colors">
+                                    <i class="fa-solid fa-clock-rotate-left text-xs"></i> {{ __('insight.inquiry.price_history') }}
+                                </button>
+                                @if($canManage)
                                 <button type="button" class="edit-inquiry-btn icon-btn-edit"
                                         aria-label="{{ __('app.inquiry.edit') }} {{ $product->name }}"
                                         data-action="{{ route('inquiry.update', $product) }}"
@@ -178,8 +136,9 @@
                                         data-stock="{{ json_encode((object) ($warehouseStockByProduct[$product->id] ?? [])) }}">
                                     <i class="fa-solid fa-pen text-xs"></i>
                                 </button>
-                            </td>
-                        @endif
+                                @endif
+                            </div>
+                        </td>
                     </tr>
                     <tr class="hidden bg-[var(--surface)]" data-history-row="{{ $product->id }}">
                         <td colspan="{{ $colspan }}" class="px-5 py-4">

@@ -1,12 +1,7 @@
-// Inquiry (product lookup) page: debounced search + filter auto-submit with loading feedback
+// Inquiry (product lookup) page: debounced search with loading feedback
 const inquiryForm = document.getElementById('inquiryFilterForm');
 const inquirySearch = document.getElementById('inquirySearch');
 const inquiryLoading = document.getElementById('inquiryLoading');
-const inquiryFilters = [
-  document.getElementById('inquiryBrand'),
-  document.getElementById('inquiryItemType'),
-  document.getElementById('inquiryWarehouse'),
-];
 
 function showLoading() {
   // NOTE: don't use the `disabled` attribute here — disabled fields are
@@ -15,14 +10,6 @@ function showLoading() {
   inquiryLoading?.classList.remove('hidden');
   inquiryForm?.classList.add('opacity-60', 'pointer-events-none');
 }
-
-// Filters submit immediately on change
-inquiryFilters.forEach((el) => {
-  el?.addEventListener('change', () => {
-    showLoading();
-    inquiryForm.submit();
-  });
-});
 
 // Search box: debounce so it searches as the user types, without hammering the server
 let searchDebounce;
