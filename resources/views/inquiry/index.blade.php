@@ -6,11 +6,11 @@
 @section('content')
 @php use App\Support\Money; use App\Services\PriceService; @endphp
 @php
-    // No, code, name, brand, item type, stock, (purchase,) retail, actions (price history + edit)
-    $colspan = 8 + ($canSeePurchasePrice ? 1 : 0);
+    // No, code, name, brand, item type, stock, (purchase,) retail, effective date, actions (price history + edit)
+    $colspan = 9 + ($canSeePurchasePrice ? 1 : 0);
     $widths = $canSeePurchasePrice
-        ? [4, 8, 18, 10, 10, 9, 12, 12, 17]
-        : [5, 9, 21, 12, 12, 11, 13, 17];
+        ? [3, 7, 18, 10, 10, 8, 11, 11, 12, 10]
+        : [3, 8, 22, 12, 12, 10, 13, 12, 8];
     $inputClass = 'w-full rounded-xl bg-[var(--surface)] py-2.5 px-4 text-sm outline-none border border-transparent focus:border-[var(--brand-600)] focus:bg-white transition-colors';
 @endphp
 
@@ -53,7 +53,7 @@
             </colgroup>
             <thead class="text-[var(--ink-900)] text-[14px] uppercase tracking-wide">
                 <tr class="text-left border-b border-gray-100">
-                    <th class="px-5 py-4 font-bold whitespace-nowrap">No</th>
+                    <th class="px-2 py-4 font-bold whitespace-nowrap">No</th>
                     <th class="px-5 py-4 font-bold whitespace-nowrap">{{ __('app.common.code') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.common.name') }}</th>
                     <th class="px-5 py-4 font-bold">{{ __('app.products.brand') }}</th>
@@ -63,6 +63,7 @@
                         <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_purchase') }}</th>
                     @endif
                     <th class="px-5 py-4 font-bold">{{ __('app.inquiry.price_retail') }}</th>
+                    <th class="px-5 py-4 font-bold">{{ __('app.inquiry.effective_date') }}</th>
                     <th class="px-3 py-4"><span class="sr-only">{{ __('app.common.actions') }}</span></th>
                 </tr>
             </thead>
@@ -76,7 +77,7 @@
                         $wholesalePrice = $prices->first(fn ($p) => PriceService::canonicalCategory($p->price_category) === PriceService::WHOLESALE);
                     @endphp
                     <tr class="table-row align-top {{ $loop->even ? 'is-zebra' : '' }}">
-                        <td class="px-5 py-4 whitespace-nowrap text-[var(--ink-400)]">{{ $products->firstItem() + $loop->index }}</td>
+                        <td class="px-2 py-4 whitespace-nowrap text-[var(--ink-400)]">{{ $products->firstItem() + $loop->index }}</td>
                         <td class="px-5 py-4 whitespace-nowrap"><span class="code-badge">{{ $product->code }}</span></td>
                         <td class="px-5 py-4 text-[var(--ink-700)]">{{ $product->name }}</td>
                         <td class="px-5 py-4 text-[var(--ink-400)]">{{ $product->brand?->name ?: '—' }}</td>
@@ -96,10 +97,7 @@
                         @if($canSeePurchasePrice)
                             <td class="px-5 py-4">
                                 @if($purchasePrice)
-                                    <div class="text-[var(--ink-700)] whitespace-nowrap">
-                                        <span class="font-semibold">{{ Money::rupiah($purchasePrice->amount) }}</span>
-                                        <div class="text-[var(--ink-400)] text-[11px]">({{ __('insight.inquiry.effective') }} {{ \Illuminate\Support\Carbon::parse($purchasePrice->effective_date)->format('d M Y') }})</div>
-                                    </div>
+                                    <span class="font-semibold text-[var(--ink-700)] whitespace-nowrap">{{ Money::rupiah($purchasePrice->amount) }}</span>
                                 @else
                                     <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_price_data') }}</span>
                                 @endif
@@ -107,19 +105,21 @@
                         @endif
                         <td class="px-5 py-4">
                             @if($retailPrice)
-                                <div class="text-[var(--ink-700)] whitespace-nowrap">
-                                    <span class="font-semibold">{{ Money::rupiah($retailPrice->amount) }}</span>
-                                    <div class="text-[var(--ink-400)] text-[11px]">({{ __('insight.inquiry.effective') }} {{ \Illuminate\Support\Carbon::parse($retailPrice->effective_date)->format('d M Y') }})</div>
-                                </div>
+                                <span class="font-semibold text-[var(--ink-700)] whitespace-nowrap">{{ Money::rupiah($retailPrice->amount) }}</span>
                             @else
                                 <span class="text-[var(--ink-400)] text-xs">{{ __('app.inquiry.no_price_data') }}</span>
                             @endif
                         </td>
+                        <td class="px-5 py-4 whitespace-nowrap text-[var(--ink-700)]">
+                            {{ $retailPrice ? \Illuminate\Support\Carbon::parse($retailPrice->effective_date)->format('d M Y') : '—' }}
+                        </td>
                         <td class="px-3 py-4">
                             <div class="flex items-center justify-center gap-2">
                                 <button type="button" data-history-toggle="{{ $product->id }}" aria-expanded="false"
-                                        class="inline-flex items-center gap-1.5 rounded-full bg-[var(--surface)] hover:bg-[var(--brand-600)] hover:text-white text-xs font-semibold text-[var(--brand-600)] px-3 py-1.5 whitespace-nowrap transition-colors">
-                                    <i class="fa-solid fa-clock-rotate-left text-xs"></i> {{ __('insight.inquiry.price_history') }}
+                                        class="w-11 h-11 rounded-full flex items-center justify-center bg-[var(--surface)] text-[var(--brand-600)] hover:bg-[var(--brand-600)] hover:text-white transition-colors"
+                                        title="{{ __('insight.inquiry.price_history') }}"
+                                        aria-label="{{ __('insight.inquiry.price_history') }} {{ $product->name }}">
+                                    <i class="fa-solid fa-clock-rotate-left text-xs"></i>
                                 </button>
                                 @if($canManage)
                                 <button type="button" class="edit-inquiry-btn icon-btn-edit"
