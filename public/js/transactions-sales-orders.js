@@ -58,6 +58,7 @@ function addItemRow(values = {}) {
   itemRowsBody.appendChild(row);
 
   if (values.product_id) row.querySelector('.item-product').value = values.product_id;
+  window.ProductPicker?.enhance(row.querySelector('.item-product'));
   if (values.qty !== undefined) row.querySelector('.item-qty').value = values.qty;
   if (values.price !== undefined) row.querySelector('.item-price').value = values.price;
 

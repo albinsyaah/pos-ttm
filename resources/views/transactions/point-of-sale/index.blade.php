@@ -287,5 +287,6 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-triangle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    <script src="{{ asset('js/product-picker.js') }}"></script>
     <script src="{{ asset('js/transactions-point-of-sale.js') }}"></script>
 @endpush
