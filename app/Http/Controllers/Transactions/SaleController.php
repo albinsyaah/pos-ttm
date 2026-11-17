@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SalesOrder;
 use App\Models\Warehouse;
+use App\Services\PriceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -64,6 +65,8 @@ class SaleController extends Controller implements HasMiddleware
             'salesmen' => Employee::orderBy('name')->get(),
             'salesOrders' => SalesOrder::orderByDesc('order_date')->get(),
             'products' => Product::orderBy('name')->get(),
+            // Dated Retail prices per product, used to pre-fill the unit price of a line.
+            'sellingPrices' => app(PriceService::class)->priceBook(Product::pluck('id')),
         ]);
     }
 

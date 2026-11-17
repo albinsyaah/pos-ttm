@@ -176,7 +176,7 @@
                                     <th class="p-3 w-10"></th>
                                 </tr>
                             </thead>
-                            <tbody id="itemRows"></tbody>
+                            <tbody id="itemRows" data-selling-prices="{{ json_encode($sellingPrices) }}"></tbody>
                         </table>
                         <p id="noItemsMessage" class="text-center text-xs text-[var(--ink-400)] py-6">{{ __('app.purchase_orders.no_items_added') }}</p>
                     </div>
@@ -275,5 +275,6 @@
             document.addEventListener('DOMContentLoaded', () => showToast(@json(session('error')), 'fa-triangle-exclamation', 'var(--bad-600)'));
         @endif
     </script>
+    <script src="{{ asset('js/selling-price.js') }}"></script>
     <script src="{{ asset('js/transactions-sales-spg.js') }}"></script>
 @endpush

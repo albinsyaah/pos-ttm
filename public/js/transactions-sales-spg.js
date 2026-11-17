@@ -12,6 +12,7 @@ const spgWarehouseIdInput = document.getElementById('warehouse_id');
 
 const itemRowsBody = document.getElementById('itemRows');
 const itemRowTemplate = document.getElementById('itemRowTemplate');
+const sellingPrices = JSON.parse(itemRowsBody.dataset.sellingPrices || '{}');
 const noItemsMessage = document.getElementById('noItemsMessage');
 const grandTotalEl = document.getElementById('grandTotal');
 
@@ -62,6 +63,11 @@ function addItemRow(values = {}) {
   if (values.qty !== undefined) row.querySelector('.item-qty').value = values.qty;
   if (values.price !== undefined) row.querySelector('.item-price').value = values.price;
 
+  // Picking a product suggests its selling price, unless the user typed a different one
+  row.querySelector('.item-product').addEventListener('change', () => {
+    if (window.SellingPrice?.suggest(row, sellingPrices, saleDateInput.value)) recalcRow(row);
+  });
+
   row.querySelector('.item-qty').addEventListener('input', () => recalcRow(row));
   row.querySelector('.item-price').addEventListener('input', () => recalcRow(row));
   row.querySelector('.remove-item-btn').addEventListener('click', () => {
@@ -79,6 +85,13 @@ function resetItemRows() {
 }
 
 document.getElementById('addItemRowBtn')?.addEventListener('click', () => addItemRow());
+
+// A different date can mean a different dated price: refresh the suggested ones
+saleDateInput?.addEventListener('change', () => {
+  itemRowsBody.querySelectorAll('.item-row').forEach((row) => {
+    if (window.SellingPrice?.suggest(row, sellingPrices, saleDateInput.value)) recalcRow(row);
+  });
+});
 
 // Open "Add Transaction"
 document.getElementById('addSalesSpgBtn')?.addEventListener('click', (e) => {

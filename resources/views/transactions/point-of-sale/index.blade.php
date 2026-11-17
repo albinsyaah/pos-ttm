@@ -188,7 +188,7 @@
                                     <th class="p-3 w-10"></th>
                                 </tr>
                             </thead>
-                            <tbody id="itemRows"></tbody>
+                            <tbody id="itemRows" data-selling-prices="{{ json_encode($sellingPrices) }}"></tbody>
                         </table>
                         <p id="noItemsMessage" class="text-center text-xs text-[var(--ink-400)] py-6">{{ __('app.purchase_orders.no_items_added') }}</p>
                     </div>
@@ -288,5 +288,6 @@
         @endif
     </script>
     <script src="{{ asset('js/product-picker.js') }}"></script>
+    <script src="{{ asset('js/selling-price.js') }}"></script>
     <script src="{{ asset('js/transactions-point-of-sale.js') }}"></script>
 @endpush

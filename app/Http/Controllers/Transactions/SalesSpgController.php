@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Warehouse;
+use App\Services\PriceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -64,6 +65,8 @@ class SalesSpgController extends Controller implements HasMiddleware
             'warehouses' => Warehouse::orderBy('name')->get(),
             'salesmen' => Employee::orderBy('name')->get(),
             'products' => Product::orderBy('name')->get(),
+            // Dated Retail prices per product, used to pre-fill the unit price of a line.
+            'sellingPrices' => app(PriceService::class)->priceBook(Product::pluck('id')),
         ]);
     }
 
